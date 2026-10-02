@@ -66,12 +66,64 @@ const navItems = [
   { label: "Tech Tree", href: "/skills/" },
 ];
 
+const DEMO_REEL_URL = "https://temporary-rushing-bugle-cnroga2.vercel.app/karthik_veeranala_demo_reel.mp4";
+
 const projects = [
-  { slug: "e2e-automation-suite", title: "HEADLESS E2E AUTOMATION SUITE", type: "Unreal Engine 5.7 / Systems internship", description: "A project-agnostic Unreal Engine C++ harness for headless test flows, recursive Slate/UMG discovery, physics determinism, replication checks, and GPU backbuffer streaming.", tags: ["Unreal Engine 5.7", "C++", "Win32", "FFmpeg"], tone: "signal", stat: "01 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_suite_workspace.png" },
-  { slug: "the-interlude", title: "THE INTERLUDE", type: "1st place / CodeDay 2.0", description: "A 6-DOF zero-gravity flight simulator built in 24 hours, with predictive lead-target AI, escalating interceptors, and visceral space-combat feel.", tags: ["Unreal Engine 4", "Physics", "AI"], tone: "moon", stat: "02 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg" },
-  { slug: "byteoasis", title: "BYTEOASIS: CODE TO ESCAPE", type: "2nd place / HackRush 2.0", description: "A first-person puzzle survival adventure where a stranded programmer repairs logic terminals, bypasses security grids, and executes commands across a cyber-archipelago.", tags: ["Unreal Engine", "Puzzle", "Terminals"], tone: "reset", stat: "03 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/byte_oasis/byte_oasis_maxres_thumbnail.jpg" },
-  { slug: "geek-o-wars", title: "GEEK'O'WARS", type: "Top 3 / MLH FrostHacks", description: "A third-person survival shooter set inside a laptop motherboard, where microscopic antivirus agents purge infected CPU cores and logic gates.", tags: ["Unreal Engine 4.21", "Shaders", "Combat"], tone: "ember", stat: "04 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/geek_o_wars/01_logo_banner.jpg" },
-  { slug: "city-of-aethel", title: "CITY OF AETHEL & 2D ARCADE", type: "Top 45 finalist / IGDC 2024", description: "A Phaser 3 showcase with multi-phase boss choreography, 5-hit melee combos, i-frame dodges, and eight playable web prototypes.", tags: ["Phaser 3", "Melee", "WebGL"], tone: "ember", stat: "05 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/phaser_games/01_city_of_aethel.png" },
+  {
+    slug: "e2e-automation-suite",
+    title: "HEADLESS E2E AUTOMATION SUITE",
+    type: "Unreal Engine 5.7 / Systems internship",
+    description: "A project-agnostic Unreal Engine C++ harness for headless test flows, recursive Slate/UMG discovery, physics determinism, replication checks, and GPU backbuffer streaming.",
+    tags: ["Unreal Engine 5.7", "C++", "Win32", "FFmpeg"],
+    tone: "signal",
+    stat: "01 / 05",
+    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_suite_workspace.png",
+    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/e2e_automation_suite_reel.mp4",
+  },
+  {
+    slug: "the-interlude",
+    title: "THE INTERLUDE",
+    type: "1st place / CodeDay 2.0",
+    description: "A 6-DOF zero-gravity flight simulator built in 24 hours, with predictive lead-target AI, escalating interceptors, and visceral space-combat feel.",
+    tags: ["Unreal Engine 4", "Physics", "AI"],
+    tone: "moon",
+    stat: "02 / 05",
+    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg",
+    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/the_interlude_reel.mp4",
+  },
+  {
+    slug: "byteoasis",
+    title: "BYTEOASIS: CODE TO ESCAPE",
+    type: "2nd place / HackRush 2.0",
+    description: "A first-person puzzle survival adventure where a stranded programmer repairs logic terminals, bypasses security grids, and executes commands across a cyber-archipelago.",
+    tags: ["Unreal Engine", "Puzzle", "Terminals"],
+    tone: "reset",
+    stat: "03 / 05",
+    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/byte_oasis/byte_oasis_maxres_thumbnail.jpg",
+    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/byteoasis_reel.mp4",
+  },
+  {
+    slug: "geek-o-wars",
+    title: "GEEK'O'WARS",
+    type: "Top 3 / MLH FrostHacks",
+    description: "A third-person survival shooter set inside a laptop motherboard, where microscopic antivirus agents purge infected CPU cores and logic gates.",
+    tags: ["Unreal Engine 4.21", "Shaders", "Combat"],
+    tone: "ember",
+    stat: "04 / 05",
+    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/geek_o_wars/01_logo_banner.jpg",
+    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/geek_o_wars_reel.mp4",
+  },
+  {
+    slug: "city-of-aethel",
+    title: "CITY OF AETHEL & 2D ARCADE",
+    type: "Top 45 Indie Finalist / IGDC 2024",
+    description: "A Phaser 3 showcase with multi-phase boss choreography, 5-hit melee combos, i-frame dodges, and eight playable web prototypes.",
+    tags: ["Phaser 3", "Melee", "WebGL"],
+    tone: "ember",
+    stat: "05 / 05",
+    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/phaser_games/01_city_of_aethel.png",
+    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/city_of_aethel_reel.mp4",
+  },
 ];
 
 const posts = [
@@ -107,9 +159,9 @@ function TopNav({ theme, onToggleTheme }: { theme: "beige" | "neon"; onToggleThe
   useEffect(() => setMenuOpen(false), [location]);
   return (
     <header className="site-nav">
-      <Link href="/" className="site-nav__brand" aria-label="Pixel Guild home">
+      <Link href="/" className="site-nav__brand" aria-label="Karthik Veeranala portfolio">
         <BrandMark />
-        <span className="site-nav__name">pixel<span>guild</span></span>
+        <span className="site-nav__name">karthik.<span>v</span></span>
       </Link>
       <nav className={`site-nav__links ${menuOpen ? "is-open" : ""}`} aria-label="Primary navigation">
         {navItems.map((item) => (
@@ -131,7 +183,7 @@ function SocialRail() {
   return (
     <aside className="social-rail" aria-label="Social links">
       <a href="https://github.com/karthikveeranala" target="_blank" rel="noreferrer" aria-label="GitHub"><Github size={14} /></a>
-      <a href="https://www.youtube.com/channel/UCUQkvmq6x0K-aLXb2B7yg9A" target="_blank" rel="noreferrer" aria-label="YouTube"><Youtube size={14} /></a>
+      <a href="https://www.youtube.com/@karthikkkk.v" target="_blank" rel="noreferrer" aria-label="YouTube"><Youtube size={14} /></a>
       <a href="https://www.linkedin.com/in/karthikveeranala/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={14} /></a>
       <a href="mailto:karthik.veeranala@gmail.com" aria-label="Email"><Mail size={14} /></a>
     </aside>
@@ -144,28 +196,152 @@ function ArcadeBackground() {
 }
 
 function PixelMascot() {
-  const [position, setPosition] = useState(() => ({ x: 22, y: Math.max(120, window.innerHeight - 155) }));
+  const [position, setPosition] = useState(() => {
+    try {
+      const saved = localStorage.getItem("karthik-mascot-position");
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return { x: 26, y: Math.max(120, typeof window !== "undefined" ? window.innerHeight - 165 : 400) };
+  });
   const [dragging, setDragging] = useState(false);
+  const [state, setState] = useState<"idle" | "wandering" | "dragging" | "excited">("idle");
+  const [facing, setFacing] = useState<"left" | "right">("right");
   const [message, setMessage] = useState("DRAG ME");
   const mascotRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef(position);
   const dragOffset = useRef({ x: 0, y: 0 });
   const moved = useRef(false);
-  useEffect(() => { try { const saved = localStorage.getItem("pixelguild-mascot-position"); if (saved) { const parsed = JSON.parse(saved); positionRef.current = parsed; setPosition(parsed); } } catch { /* use the default spawn point */ } }, []);
-  useEffect(() => { try { localStorage.setItem("pixelguild-mascot-position", JSON.stringify(position)); } catch { /* optional persistence */ } }, [position]);
+  const lastActiveRef = useRef(Date.now());
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("karthik-mascot-position", JSON.stringify(position));
+    } catch {}
+  }, [position]);
+
   useEffect(() => {
     const move = (event: PointerEvent) => {
       if (!dragging) return;
       moved.current = true;
-      const next = { x: Math.max(8, Math.min(window.innerWidth - 74, event.clientX - dragOffset.current.x)), y: Math.max(64, Math.min(window.innerHeight - 76, event.clientY - dragOffset.current.y)) };
+      lastActiveRef.current = Date.now();
+      const prevX = positionRef.current.x;
+      const nextX = Math.max(8, Math.min(window.innerWidth - 74, event.clientX - dragOffset.current.x));
+      const nextY = Math.max(64, Math.min(window.innerHeight - 76, event.clientY - dragOffset.current.y));
+      if (nextX !== prevX) {
+        setFacing(nextX > prevX ? "right" : "left");
+      }
+      const next = { x: nextX, y: nextY };
       positionRef.current = next;
       if (mascotRef.current) mascotRef.current.style.transform = `translate3d(${next.x}px, ${next.y}px, 0)`;
     };
-    const up = () => { if (!dragging) return; setDragging(false); setPosition(positionRef.current); };
-    window.addEventListener("pointermove", move, { passive: true }); window.addEventListener("pointerup", up, { passive: true });
-    return () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    const up = () => {
+      if (!dragging) return;
+      setDragging(false);
+      setState("idle");
+      setPosition(positionRef.current);
+      lastActiveRef.current = Date.now();
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerup", up, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
   }, [dragging]);
-  return <div ref={mascotRef} className={`pixel-mascot ${dragging ? "is-dragging" : ""}`} style={{ left: 0, top: 0, transform: `translate3d(${position.x}px, ${position.y}px, 0)` }} onPointerDown={(event) => { event.preventDefault(); const rect = event.currentTarget.getBoundingClientRect(); dragOffset.current = { x: event.clientX - rect.left, y: event.clientY - rect.top }; moved.current = false; setDragging(true); }} onClick={() => { if (!moved.current) setMessage((current) => current === "DRAG ME" ? "HI PLAYER!" : "DRAG ME"); }} role="button" tabIndex={0} aria-label="Draggable Pixel Guild mascot" onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setMessage("READY!"); }}><span className="pixel-mascot__bubble">{message}</span><span className="pixel-mascot__sprite" aria-hidden="true"><i /><i /><i /><b /><b /><em /></span><span className="pixel-mascot__tag">PG-01</span></div>;
+
+  useEffect(() => {
+    if (!dragging) return;
+    setState("dragging");
+    const dragPhrases = ["WHOA!", "WHERE WE GOIN'?", "HOLD ON TIGHT!", "SYSTEMS OVERHEAT!", "WHEEE!"];
+    const phrase = dragPhrases[Math.floor(Math.random() * dragPhrases.length)];
+    setMessage(phrase);
+    playArcadeTone("hover");
+  }, [dragging]);
+
+  useEffect(() => {
+    const checkWander = () => {
+      if (dragging) return;
+      const idleTime = Date.now() - lastActiveRef.current;
+      if (idleTime > 4500) {
+        setState("wandering");
+        const cur = positionRef.current;
+        const stepX = (Math.random() > 0.5 ? 1 : -1) * (50 + Math.random() * 80);
+        const nextX = Math.max(16, Math.min(window.innerWidth - 80, cur.x + stepX));
+        const stepY = (Math.random() - 0.5) * 40;
+        const nextY = Math.max(80, Math.min(window.innerHeight - 90, cur.y + stepY));
+        setFacing(nextX > cur.x ? "right" : "left");
+        const next = { x: nextX, y: nextY };
+        positionRef.current = next;
+        setPosition(next);
+        const wanderBubbles = ["PATROLLING...", "SCANNING...", "INSPECTION PASS", "KV-BOT ONLINE"];
+        setMessage(wanderBubbles[Math.floor(Math.random() * wanderBubbles.length)]);
+      }
+    };
+    const interval = window.setInterval(checkWander, 5000);
+    return () => window.clearInterval(interval);
+  }, [dragging]);
+
+  const handleClick = () => {
+    lastActiveRef.current = Date.now();
+    if (moved.current) return;
+    setState("excited");
+    playArcadeTone("win");
+    const quotes = [
+      "HI PLAYER!",
+      "READY FOR ACTION!",
+      "3X HACKATHON WINNER!",
+      "IGDC TOP 45 FINALIST!",
+      "UNREAL 5.7 C++!",
+      "PRESS START!",
+      "LET'S BUILD A GAME!",
+    ];
+    setMessage((cur) => {
+      const nextQuotes = quotes.filter((q) => q !== cur);
+      return nextQuotes[Math.floor(Math.random() * nextQuotes.length)];
+    });
+    setTimeout(() => {
+      setState("idle");
+    }, 1800);
+  };
+
+  return (
+    <div
+      ref={mascotRef}
+      className={`pixel-mascot ${dragging ? "is-dragging" : ""} is-${state} face-${facing}`}
+      style={{
+        left: 0,
+        top: 0,
+        transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
+        transition: state === "wandering" ? "transform 2.2s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
+      }}
+      onPointerDown={(event) => {
+        event.preventDefault();
+        const rect = event.currentTarget.getBoundingClientRect();
+        dragOffset.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        moved.current = false;
+        lastActiveRef.current = Date.now();
+        setDragging(true);
+      }}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      aria-label="Interactive Karthik Veeranala pixel companion"
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") handleClick();
+      }}
+    >
+      <span className="pixel-mascot__bubble">{message}</span>
+      <span className="pixel-mascot__sprite" aria-hidden="true">
+        <i className="pixel-mascot__eye pixel-mascot__eye--left" />
+        <i className="pixel-mascot__eye pixel-mascot__eye--right" />
+        <i className="pixel-mascot__mouth" />
+        <b className="pixel-mascot__foot pixel-mascot__foot--left" />
+        <b className="pixel-mascot__foot pixel-mascot__foot--right" />
+        <em className="pixel-mascot__arm" />
+      </span>
+      <span className="pixel-mascot__tag">KV-01</span>
+    </div>
+  );
 }
 
 function CursorFX() {
@@ -182,7 +358,7 @@ function CursorFX() {
 
 function CheatTerminal({ open, unlocked, onClose, onToggleCabinet, onDeveloper }: { open: boolean; unlocked: boolean; onClose: () => void; onToggleCabinet: () => void; onDeveloper: () => void }) {
   const [input, setInput] = useState("");
-  const [lines, setLines] = useState<string[]>(["PIXEL GUILD DEV CONSOLE v1.0", "Type HELP for commands."]);
+  const [lines, setLines] = useState<string[]>(["KARTHIK V DEV CONSOLE v1.0", "Type HELP for commands."]);
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     const command = input.trim().toLowerCase();
@@ -274,15 +450,15 @@ function StatusPill({ children = "AVAILABLE FOR COLLABORATION" }: { children?: R
 function HeroVideo({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`hero-video ${compact ? "hero-video--compact" : ""}`}>
-      <video autoPlay muted loop playsInline preload="metadata" aria-label="Atmospheric dark fantasy dungeon reel">
-        <source src="/dungeon-reel.mp4" type="video/mp4" />
+      <video autoPlay muted loop playsInline preload="metadata" aria-label="Karthik Veeranala Systems & Gameplay Master Reel">
+        <source src={DEMO_REEL_URL} type="video/mp4" />
       </video>
       <div className="hero-video__fallback" aria-hidden="true">
         <div className="dungeon-arch"><span /><span /><span /></div>
       </div>
       <div className="hero-video__veil" />
-      <div className="hero-video__hud"><span>REEL_06</span><span>00:06 / 00:06</span></div>
-      <div className="hero-video__caption"><span>THE UNDERGROUNDS</span><span>Dark-fantasy systems reel / Karthik Veeranala</span></div>
+      <div className="hero-video__hud"><span>MASTER_REEL</span><span>02:20 / 02:20</span></div>
+      <div className="hero-video__caption"><span>SYSTEMS ARCHITECTURE & GAMEPLAY</span><span>Unreal Engine 5.7 C++ / Karthik Veeranala</span></div>
     </div>
   );
 }
@@ -315,12 +491,45 @@ function ContributionDrawer({ project, onClose }: { project: typeof projects[num
 }
 
 function ProjectWindow({ project, onClose, onContributions }: { project: typeof projects[number]; onClose: () => void; onContributions: () => void }) {
-  return <div className="project-window__backdrop" role="dialog" aria-modal="true" aria-label={`${project.title} project window`} onClick={onClose}><article className="project-window" onClick={(event) => event.stopPropagation()}><button className="project-window__close" onClick={onClose} aria-label="Close project window">×</button><div className="project-window__media"><ProjectVisual tone={project.tone} label={project.stat} media={project.media} /><video src="/dungeon-reel.mp4" autoPlay muted loop playsInline /></div><Eyebrow>Project dossier / {project.type}</Eyebrow><h2>{project.title}</h2><p>{project.description}</p><div className="tag-row">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><div className="project-window__actions"><button className="button" onClick={onContributions}>My contributions <ArrowRight size={13} /></button><Link href={`/portfolio/${project.slug}/`} className="text-link">Open full case study <ArrowUpRight size={14} /></Link></div></article></div>;
+  return (
+    <div className="project-window__backdrop" role="dialog" aria-modal="true" aria-label={`${project.title} project window`} onClick={onClose}>
+      <article className="project-window" onClick={(event) => event.stopPropagation()}>
+        <button className="project-window__close" onClick={onClose} aria-label="Close project window">×</button>
+        <div className="project-window__media">
+          <ProjectVisual tone={project.tone} label={project.stat} media={project.media} />
+          <video src={project.video ?? DEMO_REEL_URL} autoPlay muted loop playsInline controls />
+        </div>
+        <Eyebrow>Project dossier / {project.type}</Eyebrow>
+        <h2>{project.title}</h2>
+        <p>{project.description}</p>
+        <div className="tag-row">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+        <div className="project-window__actions">
+          <button className="button" onClick={onContributions}>My contributions <ArrowRight size={13} /></button>
+          <Link href={`/portfolio/${project.slug}/`} className="text-link">Open full case study <ArrowUpRight size={14} /></Link>
+        </div>
+      </article>
+    </div>
+  );
 }
 
-
 function BackstorySection() {
-  return <section className="backstory-section backstory-section--highlight page-pad" id="backstory"><div className="backstory-section__stamp">01 / SAVE FILE<br /><strong>THE BACKSTORY</strong></div><div className="backstory-section__intro"><Eyebrow number="01">The backstory</Eyebrow><h2>My story is<br /><span>built under pressure.</span></h2><p>I am a game developer and engine systems programmer focused on low-level graphics, deterministic simulation, and real-time interaction. I am currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on graphics, systems programming, and algorithms.</p><Link href="/backstory/" className="text-link">Read the full backstory <ArrowUpRight size={14} /></Link></div><div className="backstory-section__facts"><div><strong>4+</strong><span>Hackathon victories</span></div><div><strong>14+</strong><span>Playable prototypes</span></div><div><strong>200+</strong><span>Student developers in Elysium Gaming Club</span></div><div><strong>UE 5.7</strong><span>Automation core</span></div></div></section>;
+  return (
+    <section className="backstory-section backstory-section--highlight page-pad" id="backstory">
+      <div className="backstory-section__stamp">01 / SAVE FILE<br /><strong>THE BACKSTORY</strong></div>
+      <div className="backstory-section__intro">
+        <Eyebrow number="01">The backstory</Eyebrow>
+        <h2>My story is<br /><span>built under pressure.</span></h2>
+        <p>I am a game developer and engine systems programmer focused on low-level graphics, deterministic simulation, and real-time interaction. I am currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on graphics, systems programming, and algorithms.</p>
+        <Link href="/backstory/" className="text-link">Read the full backstory <ArrowUpRight size={14} /></Link>
+      </div>
+      <div className="backstory-section__facts">
+        <div><strong>3</strong><span>Hackathon victories</span></div>
+        <div><strong>TOP 45</strong><span>IGDC indie finalist</span></div>
+        <div><strong>14+</strong><span>Playable prototypes</span></div>
+        <div><strong>200+</strong><span>Gaming Club developers</span></div>
+      </div>
+    </section>
+  );
 }
 
 function BackstoryPage() {
@@ -330,7 +539,38 @@ function BackstoryPage() {
     ["2024 — 2025", "President & Game Jam Organizer / Elysium Gaming Club — IARE", "Directing campus game development workshops, student hackathons, and collegiate esports tournaments for 200+ active student developers."],
     ["2022 — 2024", "Lead Systems & Gameplay Engineer / MLH & CodeDay", "Won 1st Place Overall at CodeDay 2.0 with The Interlude, 2nd at HackRush with ByteOasis, and Top 3 at FrostHacks with Geek'O'Wars."],
   ];
-  return <main className="inner-page backstory-page"><PageHeader number="01" kicker="Biography / the backstory" title={<>Ruthless execution.<br /><span>Playable results.</span></>} copy="The long route from systems programming and competitive game jams to engine architecture, community leadership, and high-velocity prototypes." /><section className="backstory-story page-pad"><div><Eyebrow>My story</Eyebrow><p className="lead">My engineering philosophy centers on ruthless execution under constraints. Over the past three years I have spearheaded teams in 24–48 hour competitive hackathons, turning ambitious mechanics into shippable, playable loops.</p><p>As President of the Elysium Gaming Club at IARE, I oversee campus game development initiatives, Unreal and Unity workshops, and collegiate esports tournaments for a community of more than 200 active students.</p></div><div className="backstory-identity"><span>KV</span><strong>Karthik Veeranala</strong><small>Hyderabad, India / B.Tech CSE</small></div></section><section className="timeline page-pad"><div className="section-topline"><Eyebrow>Career trajectory</Eyebrow><span className="muted-label">EXPERIENCE & MILESTONE PATH</span></div>{milestones.map(([date, title, copy]) => <article className="timeline-row" key={title}><span>{date}</span><div><h2>{title}</h2><p>{copy}</p></div></article>)}</section><section className="skills-strip page-pad"><Eyebrow>Proficiency & tools</Eyebrow><h2>Experience with engines<br /><span>& systems.</span></h2><div className="skills-strip__grid"><div><strong>95%</strong><h3>Unreal Engine 5.7 / 4</h3><p>Engine source builds, C++ core architecture, Slate/UMG UI auto-discovery, Win32 subsystems, Niagara particles, and dedicated servers.</p></div><div><strong>95%</strong><h3>C++ Systems & Low-Level</h3><p>Memory management, multi-threading, desktop sandboxing, backbuffer pixel streaming to FFmpeg, and state machines.</p></div><div><strong>85%</strong><h3>Phaser 2D Web Engine</h3><p>WebGL Canvas rendering, projectile trajectory prediction, ragdoll impulse integration, and web deployment pipelines.</p></div></div></section><Footer /></main>;
+  return (
+    <main className="inner-page backstory-page">
+      <PageHeader number="01" kicker="Biography / the backstory" title={<>Ruthless execution.<br /><span>Playable results.</span></>} />
+      <section className="backstory-story page-pad">
+        <div>
+          <Eyebrow>My story</Eyebrow>
+          <p className="lead">My engineering philosophy centers on ruthless execution under constraints. Over the past three years I have spearheaded teams in 24–48 hour competitive hackathons—winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks—alongside earning a Top 45 Indie Finalist selection at IGDC 2024 for City of Aethel.</p>
+          <p>As President of the Elysium Gaming Club at IARE, I oversee campus game development initiatives, Unreal and Unity workshops, and collegiate esports tournaments for a community of more than 200 active students.</p>
+        </div>
+        <div className="backstory-identity"><span>KV</span><strong>Karthik Veeranala</strong><small>Hyderabad, India / B.Tech CSE</small></div>
+      </section>
+      <section className="timeline page-pad">
+        <div className="section-topline"><Eyebrow>Career trajectory</Eyebrow><span className="muted-label">EXPERIENCE & MILESTONE PATH</span></div>
+        {milestones.map(([date, title, copy]) => (
+          <article className="timeline-row" key={title}>
+            <span>{date}</span>
+            <div><h2>{title}</h2><p>{copy}</p></div>
+          </article>
+        ))}
+      </section>
+      <section className="skills-strip page-pad">
+        <Eyebrow>Proficiency & tools</Eyebrow>
+        <h2>Experience with engines<br /><span>& systems.</span></h2>
+        <div className="skills-strip__grid">
+          <div><strong>95%</strong><h3>Unreal Engine 5.7 / 4</h3><p>Engine source builds, C++ core architecture, Slate/UMG UI auto-discovery, Win32 subsystems, Niagara particles, and dedicated servers.</p></div>
+          <div><strong>95%</strong><h3>C++ Systems & Low-Level</h3><p>Memory management, multi-threading, desktop sandboxing, backbuffer pixel streaming to FFmpeg, and state machines.</p></div>
+          <div><strong>85%</strong><h3>Phaser 2D Web Engine</h3><p>WebGL Canvas rendering, projectile trajectory prediction, ragdoll impulse integration, and web deployment pipelines.</p></div>
+        </div>
+      </section>
+      <Footer />
+    </main>
+  );
 }
 
 function Home() {
@@ -370,7 +610,7 @@ function Home() {
       </section>
 
       <section className="reel-band page-pad">
-        <div className="reel-band__copy"><Eyebrow number="03">Demo reel</Eyebrow><h2>A door,<br /><span>left open.</span></h2><p>A 06-second atmosphere study made to test the temperature of a world before a single quest begins.</p><Link href="/demo-reel/" className="button button--outline">Watch the reel <Play size={13} fill="currentColor" /></Link></div>
+        <div className="reel-band__copy"><Eyebrow number="03">Demo reel</Eyebrow><h2>A door,<br /><span>left open.</span></h2><p>A 2-minute comprehensive demonstration of low-level Unreal Engine 5.7 C++ systems, gameplay feel, and interactive prototypes.</p><Link href="/demo-reel/" className="button button--outline">Watch the reel <Play size={13} fill="currentColor" /></Link></div>
         <HeroVideo />
       </section>
 
@@ -411,7 +651,7 @@ function ArcadePage() {
     return () => window.clearTimeout(timeout);
   }, [flipped, cards]);
   const reset = () => { setFlipped([]); setMatched([]); setMoves(0); };
-  return <main className="inner-page arcade-page"><PageHeader number="08" kicker="Arcade / secret room" title={<>Press start.<br /><span>Play a round.</span></>} copy="A tiny memory match hidden inside the portfolio. Find every pair, beat the clock, and unlock the cabinet glow." /><section className="arcade-cabinet page-pad"><div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div><div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div><div className="arcade-cabinet__bottom"><span>{matched.length === cards.length ? "PERFECT RUN! CABINET CLEARED." : "FIND THE PAIRS / NO CHEATING"}</span><button className="button button--tiny" onClick={reset}><RefreshCw size={12} /> Reset</button></div></section><BossFight /><div className="arcade-tips page-pad"><div><Zap size={17} /><p>Click the Pixel Guild mascot to change its mood. Drag it anywhere and it remembers the spot.</p></div><div><MousePointer2 size={17} /><p>Every card, project visual, and video panel has a little hover state waiting for you.</p></div></div><Footer /></main>;
+  return <main className="inner-page arcade-page"><PageHeader number="08" kicker="Arcade / secret room" title={<>Press start.<br /><span>Play a round.</span></>} copy="A tiny memory match hidden inside the portfolio. Find every pair, beat the clock, and unlock the cabinet glow." /><section className="arcade-cabinet page-pad"><div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div><div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div><div className="arcade-cabinet__bottom"><span>{matched.length === cards.length ? "PERFECT RUN! CABINET CLEARED." : "FIND THE PAIRS / NO CHEATING"}</span><button className="button button--tiny" onClick={reset}><RefreshCw size={12} /> Reset</button></div></section><BossFight /><div className="arcade-tips page-pad"><div><Zap size={17} /><p>Click the Karthik V companion mascot to change its mood. Drag it anywhere and it remembers the spot.</p></div><div><MousePointer2 size={17} /><p>Every card, project visual, and video panel has a little hover state waiting for you.</p></div></div><Footer /></main>;
 }
 
 function BossFight() {
@@ -435,13 +675,86 @@ function BossFight() {
   return <section className="boss-arena page-pad"><div className="boss-arena__copy"><Eyebrow number="09">Boss fight / score attack</Eyebrow><h2>Break the<br /><span>logic beast.</span></h2><p>Strike the systems boss before it overloads your player core. Every run is scored locally in this browser.</p><div className="boss-arena__stats"><span>PLAYER <b>{playerHp}%</b></span><span>BOSS <b>{bossHp}%</b></span><span>SCORE <b>{String(score).padStart(4, "0")}</b></span></div></div><div className="boss-arena__cabinet"><div className="boss-arena__screen"><div className="boss-sprite" aria-hidden="true"><i /><i /><i /><b /><b /><em /></div><span className="boss-arena__status">{message}</span><div className="health-bar"><i style={{ width: `${bossHp}%` }} /></div></div><div className="boss-arena__controls"><button className="button" onClick={strike} disabled={bossHp === 0 || playerHp === 0}>Strike <Zap size={14} /></button><button className="button button--tiny" onClick={reset}>Reset <RefreshCw size={12} /></button></div></div><div className="scoreboard"><Eyebrow>Local leaderboard</Eyebrow>{highScores.map((highScore, index) => <div key={`${highScore}-${index}`}><span>0{index + 1}</span><strong>{String(highScore).padStart(4, "0")}</strong><small>{index === 0 ? "SYSTEM BREAKER" : index === 1 ? "FAST PROTOTYPER" : "PLAYER 01"}</small></div>)}</div></section>;
 }
 
-function PageHeader({ number, kicker, title, copy }: { number: string; kicker: string; title: React.ReactNode; copy: string }) {
-  return <section className="page-header page-pad"><div className="page-header__main"><Eyebrow number={number}>{kicker}</Eyebrow><h1>{title}</h1><p>{copy}</p></div><div className="page-header__index" aria-hidden="true"><span>{number}</span><i /><i /><i /><small>SCROLL / PLAY</small></div></section>;
+function PageHeader({ number, kicker, title, copy }: { number: string; kicker: string; title: React.ReactNode; copy?: string }) {
+  return (
+    <section className="page-header page-pad">
+      <div className="page-header__main">
+        <Eyebrow number={number}>{kicker}</Eyebrow>
+        <h1>{title}</h1>
+        {copy && <p>{copy}</p>}
+      </div>
+      <div className="page-header__index" aria-hidden="true">
+        <span>{number}</span><i /><i /><i /><small>SCROLL / PLAY</small>
+      </div>
+    </section>
+  );
 }
 
 function DemoReelPage() {
   const [playing, setPlaying] = useState(false);
-  return <main className="inner-page"><PageHeader number="01" kicker="Demo reel" title={<>Rooms with a<br /><span>pulse.</span></>} copy="A compact atmosphere reel for systems, interaction, and the tiny transitions between one playable idea and the next." /><section className="reel-page__player page-pad"><div className="reel-player"><HeroVideo compact /><button className="reel-player__play" onClick={() => setPlaying((value) => !value)} aria-label={playing ? "Pause reel" : "Play reel"}>{playing ? "Ⅱ" : <Play size={22} fill="currentColor" />}</button><div className="reel-player__bar"><span className="reel-player__progress" style={{ width: playing ? "42%" : "12%" }} /><span className="reel-player__time">00:00:06</span></div></div><div className="reel-page__meta"><div><Eyebrow>Credits</Eyebrow><p>Direction / Karthik Veeranala<br />Sound / Silent cut<br />Engine / Unreal / Unity studies</p></div><div><Eyebrow>Chapters</Eyebrow><p>00:00 — The descent<br />00:02 — A signal wakes<br />00:05 — The threshold</p></div></div></section><section className="chapter-list page-pad"><div className="section-topline"><Eyebrow number="02">Selected chapters</Eyebrow><span className="muted-label">CLICK TO JUMP / SOURCE REEL</span></div>{["The descent", "Glyph language", "A room remembers"].map((item, index) => <button key={item} className="chapter-row"><span>0{index + 1}</span><strong>{item}</strong><small>{index === 0 ? "00:00" : index === 1 ? "00:02" : "00:05"}</small><ArrowRight size={15} /></button>)}</section><Footer /></main>;
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (playing) {
+        videoRef.current.pause();
+      } else {
+        void videoRef.current.play();
+      }
+      setPlaying(!playing);
+    }
+  };
+  return (
+    <main className="inner-page">
+      <PageHeader number="01" kicker="Demo reel" title={<>Systems in<br /><span>motion.</span></>} />
+      <section className="reel-page__player page-pad">
+        <div className="reel-player">
+          <div className="hero-video hero-video--compact">
+            <video ref={videoRef} autoPlay muted loop playsInline preload="metadata" aria-label="Karthik Veeranala Systems & Gameplay Reel">
+              <source src={DEMO_REEL_URL} type="video/mp4" />
+            </video>
+            <div className="hero-video__veil" />
+            <div className="hero-video__hud"><span>MASTER_REEL</span><span>02:20 / 02:20</span></div>
+            <div className="hero-video__caption"><span>SYSTEMS ARCHITECTURE & GAMEPLAY</span><span>Karthik Veeranala / B.Tech CSE</span></div>
+          </div>
+          <button className="reel-player__play" onClick={togglePlay} aria-label={playing ? "Pause reel" : "Play reel"}>
+            {playing ? "Ⅱ" : <Play size={22} fill="currentColor" />}
+          </button>
+          <div className="reel-player__bar">
+            <span className="reel-player__progress" style={{ width: playing ? "68%" : "25%" }} />
+            <span className="reel-player__time">00:02:20</span>
+          </div>
+        </div>
+        <div className="reel-page__meta">
+          <div>
+            <Eyebrow>Credits</Eyebrow>
+            <p>Direction & Systems / Karthik Veeranala<br />Engine Architecture / Unreal Engine 5.7 & 4.21 C++<br />2D Web / Phaser 3 WebGL</p>
+          </div>
+          <div>
+            <Eyebrow>Chapters</Eyebrow>
+            <p>00:00 — Headless E2E Automation Suite (UE 5.7)<br />00:32 — The Interlude (6-DOF Flight Sim)<br />01:05 — ByteOasis & Geek'O'Wars<br />01:40 — City of Aethel & IGDC Arcade</p>
+          </div>
+        </div>
+      </section>
+      <section className="chapter-list page-pad">
+        <div className="section-topline"><Eyebrow number="02">Selected chapters</Eyebrow><span className="muted-label">BREAKDOWN BY PROJECT</span></div>
+        {[
+          ["Headless E2E Automation Suite", "00:00"],
+          ["The Interlude (1st Place CodeDay)", "00:32"],
+          ["ByteOasis: Code to Escape (2nd Place HackRush)", "01:05"],
+          ["Geek'O'Wars (Top 3 MLH FrostHacks)", "01:25"],
+          ["City of Aethel (Top 45 IGDC Finalist)", "01:40"],
+        ].map(([item, time], index) => (
+          <div key={item} className="chapter-row">
+            <span>0{index + 1}</span>
+            <strong>{item}</strong>
+            <small>{time}</small>
+            <ArrowRight size={15} />
+          </div>
+        ))}
+      </section>
+      <Footer />
+    </main>
+  );
 }
 
 function MarketplacePage() {
@@ -460,19 +773,104 @@ function ArticlePage({ slug }: { slug: string }) {
 
 function HobbiesPage() {
   const hobbies = [
-    { title: "Games", label: "COMMUNITY & COMPETITION", copy: "Founding and leading the Elysium Gaming Club at IARE, organizing collegiate LAN tournaments, casting competitive brackets, and analyzing mechanical balance in Valorant, Apex Legends, and CS2.", art: "games", note: "PLAY / LEAD / COMPETE" },
-    { title: "Reading", label: "SYSTEMS & IDEAS", copy: "Digging through engine documentation, graphics papers, design postmortems, and the small technical notes that turn an interesting mechanic into a reliable system.", art: "reading", note: "STUDY / CONNECT / QUESTION" },
-    { title: "Athletics", label: "RHYTHM & DISCIPLINE", copy: "Fast competitive play, tournament pressure, and regular movement keep the feedback loop sharp: react, reset, read the field, and commit to the next move.", art: "athletics", note: "MOVE / RESET / REPEAT" },
-    { title: "Creative", label: "VISUAL COMPOSITION", copy: "Exploring lighting moods, atmospheric volumetric fog, and camera composition studies inside Unreal Engine 5’s Lumen pipeline, alongside custom rigs, cooling loops, and macro pads.", art: "creative", note: "LOOK / LISTEN / MAKE" },
+    {
+      title: "Gaming",
+      label: "RETRO TO MODERN",
+      copy: "Playing everything from retro icons to modern titles to dissect mechanics & feel: AC3, Tomb Raider, FIFA 16, Fortnite, Minecraft, Road Rash, Prince of Persia, OG Wolfenstein 3D, Doom, Tekken, and Mortal Kombat.",
+      art: "games",
+      note: "DISSECT / PLAY / ADAPT",
+    },
+    {
+      title: "Manga & Anime",
+      label: "NARRATIVE & ART",
+      copy: "Avid reader and collector with complete physical manga collections of Jujutsu Kaisen, Demon Slayer, and Attack on Titan, alongside following seasonal and classic anime.",
+      art: "reading",
+      note: "STORY / ART / LORE",
+    },
+    {
+      title: "Football & F1",
+      label: "PACE & TACTICS",
+      copy: "Playing football on the pitch and watching European matchdays with the same adrenaline as following Formula 1 Grand Prix weekends—tracking race strategy, reaction windows, and pacing.",
+      art: "athletics",
+      note: "PACE / RESET / COMMIT",
+    },
+    {
+      title: "Guitar & Loot",
+      label: "CREATIVE & COLLECTIBLES",
+      copy: "Acoustic fingerstyle guitar, kitchen cooking experiments, and curating an ongoing collection of scale figures, rare Pokémon cards, and game posters.",
+      art: "creative",
+      note: "MAKE / TUNE / COLLECT",
+    },
   ];
   const [active, setActive] = useState<string | null>(null);
-  return <main className="inner-page hobbies-page"><PageHeader number="04" kicker="Creative pursuits / source notes" title={<>The things that<br /><span>keep me sharp.</span></>} copy="Competitive gameplay, systems research, physical rhythm, and visual experimentation all feed the way I build playable worlds." /><section className="hobby-field page-pad"><div className="hobby-field__topline"><Eyebrow>4 signals found</Eyebrow><span>HOVER OR SELECT A CARD</span></div><div className="hobby-field__canvas">{hobbies.map((hobby, index) => <button key={hobby.title} className={`hobby-card hobby-card--${hobby.art} ${active === hobby.title ? "is-active" : ""}`} onClick={() => setActive(active === hobby.title ? null : hobby.title)}><span className="hobby-card__index">0{index + 1}</span><span className={`hobby-card__art hobby-card__art--${hobby.art}`} aria-hidden="true"><i /><i /><i /><b /></span><span className="hobby-card__body"><small>{hobby.label}</small><strong>{hobby.title}</strong><em>{hobby.note}</em></span><span className="hobby-card__window"><b>{hobby.title.toUpperCase()} // SIGNAL</b><span>{hobby.copy}</span></span></button>)}</div></section><section className="hobby-note page-pad"><Eyebrow>Why it matters</Eyebrow><p>These are not side quests. They are inputs: competition teaches feedback, reading builds context, athletics tunes timing, and creative work gives systems a point of view.</p></section><Footer /></main>;
+  return (
+    <main className="inner-page hobbies-page">
+      <PageHeader number="04" kicker="Creative pursuits / source notes" title={<>The things that<br /><span>keep me sharp.</span></>} />
+      <section className="hobby-field page-pad">
+        <div className="hobby-field__topline">
+          <Eyebrow>4 signals found</Eyebrow>
+          <span>HOVER OR SELECT A CARD</span>
+        </div>
+        <div className="hobby-field__canvas">
+          {hobbies.map((hobby, index) => (
+            <button key={hobby.title} className={`hobby-card hobby-card--${hobby.art} ${active === hobby.title ? "is-active" : ""}`} onClick={() => setActive(active === hobby.title ? null : hobby.title)}>
+              <span className="hobby-card__index">0{index + 1}</span>
+              <span className={`hobby-card__art hobby-card__art--${hobby.art}`} aria-hidden="true"><i /><i /><i /><b /></span>
+              <span className="hobby-card__body"><small>{hobby.label}</small><strong>{hobby.title}</strong><em>{hobby.note}</em></span>
+              <span className="hobby-card__window"><b>{hobby.title.toUpperCase()} // SIGNAL</b><span>{hobby.copy}</span></span>
+            </button>
+          ))}
+        </div>
+      </section>
+      <section className="hobby-note page-pad">
+        <Eyebrow>Why it matters</Eyebrow>
+        <p>These are not side quests. They are inputs: gaming dissects player feel, manga & anime inspire composition, football & F1 tune reaction speed, and guitar & collecting keep creativity tactile.</p>
+      </section>
+      <Footer />
+    </main>
+  );
 }
-
 
 function BioPage() {
   const [sent, setSent] = useState(false);
-  return <main className="inner-page"><PageHeader number="05" kicker="Bio & Contact" title={<>Let’s make<br /><span>something playable.</span></>} copy="Game developer and engine systems programmer with a strong foundation in low-level graphics, deterministic simulation, and real-time interaction." /><section className="bio-layout page-pad"><div className="bio-copy"><Eyebrow>About the player</Eyebrow><p className="bio-copy__lead">I am a game developer and engine systems programmer currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on computer graphics, systems programming, and algorithms.</p><p>My engineering philosophy centers on ruthless execution under constraints. I have spearheaded teams in 24–48 hour competitive hackathons, winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks. As President of Elysium Gaming Club at IARE, I oversee game development workshops and collegiate esports tournaments for 200+ active students.</p><div className="bio-stats"><div><strong>4+</strong><span>hackathon<br />victories</span></div><div><strong>14+</strong><span>playable<br />prototypes</span></div><div><strong>UE</strong><span>5.7 systems<br />core</span></div></div><StatusPill>OPEN TO SYSTEMS & GAMEPLAY ROLES</StatusPill></div><form className="contact-form" onSubmit={(event) => { event.preventDefault(); setSent(true); }}><Eyebrow>Send a signal</Eyebrow>{sent ? <div className="form-success"><Sparkles size={22} /><h2>Transmission received.</h2><p>Thanks for the placeholder message. I’ll return through the portal soon.</p><button type="button" className="text-link" onClick={() => setSent(false)}>Send another <ArrowRight size={14} /></button></div> : <><label>Name<input required placeholder="Your name" /></label><label>Signal path<input required type="email" placeholder="you@example.com" /></label><label>Message<textarea required placeholder="Tell me about the system or game you want to build..." rows={5} /></label><button className="button" type="submit">Send transmission <Send size={14} /></button></>}</form></section><Footer /></main>;
+  return (
+    <main className="inner-page">
+      <PageHeader number="05" kicker="Bio & Contact" title={<>Let’s make<br /><span>something playable.</span></>} />
+      <section className="bio-layout page-pad">
+        <div className="bio-copy">
+          <Eyebrow>About the player</Eyebrow>
+          <p className="bio-copy__lead">I am a game developer and engine systems programmer currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on computer graphics, systems programming, and algorithms.</p>
+          <p>My engineering philosophy centers on ruthless execution under constraints. I have spearheaded teams in 24–48 hour competitive hackathons, winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks, alongside earning a Top 45 Indie Finalist selection at IGDC 2024 for City of Aethel. As President of Elysium Gaming Club at IARE, I oversee game development workshops and collegiate esports tournaments for 200+ active students.</p>
+          <div className="bio-stats">
+            <div><strong>3</strong><span>hackathon<br />victories</span></div>
+            <div><strong>TOP 45</strong><span>IGDC indie<br />finalist</span></div>
+            <div><strong>14+</strong><span>playable<br />prototypes</span></div>
+            <div><strong>UE</strong><span>5.7 systems<br />core</span></div>
+          </div>
+          <StatusPill>OPEN TO SYSTEMS & GAMEPLAY ROLES</StatusPill>
+        </div>
+        <form className="contact-form" onSubmit={(event) => { event.preventDefault(); setSent(true); }}>
+          <Eyebrow>Send a signal</Eyebrow>
+          {sent ? (
+            <div className="form-success">
+              <Sparkles size={22} />
+              <h2>Transmission received.</h2>
+              <p>Thanks for reaching out! I will get back to you shortly.</p>
+              <button type="button" className="text-link" onClick={() => setSent(false)}>Send another <ArrowRight size={14} /></button>
+            </div>
+          ) : (
+            <>
+              <label>Name<input required placeholder="Your name" /></label>
+              <label>Signal path<input required type="email" placeholder="you@example.com" /></label>
+              <label>Message<textarea required placeholder="Tell me about the system or game you want to build..." rows={5} /></label>
+              <button className="button" type="submit">Send transmission <Send size={14} /></button>
+            </>
+          )}
+        </form>
+      </section>
+      <Footer />
+    </main>
+  );
 }
 
 function GitHubPage() {
@@ -525,7 +923,10 @@ function PortfolioCarousel({ items, onContributions }: { items: typeof projects;
           const isFocus = offset === 0;
           return (
             <button key={project.slug} className={`portfolio-carousel__card ${isFocus ? "is-focus" : ""} ${hovered === index ? "is-hovered" : ""}`} style={{ transform: `translate(-50%, -50%) translate3d(${Math.sign(offset) * Math.pow(Math.abs(offset), 1.45) * 42}px, ${offset * 190}px, ${isFocus ? 140 : -Math.abs(offset) * 115}px) rotateX(${offset * 23}deg) rotateY(${offset * -13}deg) rotateZ(${offset * -2.5}deg) scale(${isFocus ? 1 : .76 - Math.abs(offset) * .025})`, opacity: visible ? (isFocus ? 1 : .58) : 0, zIndex: 20 - Math.abs(offset), pointerEvents: visible ? "auto" : "none" }} onMouseEnter={() => setHovered(index)} onMouseLeave={() => setHovered(null)} onFocus={() => setActive(index)} onClick={() => setSelected(project)}>
-              <div className="portfolio-carousel__poster"><ProjectVisual tone={project.tone} label={project.stat} media={project.media} />{(hovered === index || isFocus) && <video src="/dungeon-reel.mp4" autoPlay muted loop playsInline />}</div>
+              <div className="portfolio-carousel__poster">
+                <ProjectVisual tone={project.tone} label={project.stat} media={project.media} />
+                {(hovered === index || isFocus) && <video src={project.video ?? DEMO_REEL_URL} autoPlay muted loop playsInline />}
+              </div>
               <div className="portfolio-carousel__caption"><span>{project.type}</span><strong>{project.title}</strong><small>{isFocus ? "OPEN DOSSIER ↗" : project.stat}</small></div>
             </button>
           );
@@ -578,7 +979,7 @@ function NotFoundPage() {
 }
 
 function BootSequence() {
-  return <div className="boot-sequence" aria-label="Loading Pixel Guild portfolio"><div className="boot-sequence__logo">KV<span>_</span></div><div className="boot-sequence__bar"><i /></div><div className="boot-sequence__copy"><span>INITIALIZING PLAYER PROFILE</span><strong>LOADING WORLDS / 05</strong><small>UNREAL SYSTEMS // PLAYABLE RESULTS</small></div></div>;
+  return <div className="boot-sequence" aria-label="Loading Karthik Veeranala portfolio"><div className="boot-sequence__logo">KV<span>_</span></div><div className="boot-sequence__bar"><i /></div><div className="boot-sequence__copy"><span>INITIALIZING PLAYER PROFILE</span><strong>LOADING WORLDS / 05</strong><small>UNREAL SYSTEMS // PLAYABLE RESULTS</small></div></div>;
 }
 
 function App() {
