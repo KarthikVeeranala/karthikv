@@ -36,6 +36,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 
 const ACCENT = "#16d6bd";
 let arcadeAudio: AudioContext | null = null;
+let footerControls: { toggleSound: () => void; toggleCabinet: () => void } | null = null;
 function playArcadeTone(kind: "hover" | "click" | "transition" | "hit" | "win") {
   try {
     arcadeAudio ??= new AudioContext();
@@ -100,7 +101,7 @@ function BrandMark() {
   );
 }
 
-function TopNav({ theme, onToggleTheme, soundOn, onToggleSound, cabinet, onToggleCabinet }: { theme: "beige" | "neon"; onToggleTheme: () => void; soundOn: boolean; onToggleSound: () => void; cabinet: boolean; onToggleCabinet: () => void }) {
+function TopNav({ theme, onToggleTheme }: { theme: "beige" | "neon"; onToggleTheme: () => void }) {
   const [location] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [location]);
@@ -118,8 +119,6 @@ function TopNav({ theme, onToggleTheme, soundOn, onToggleSound, cabinet, onToggl
         ))}
         <Link href="/portfolio/" className={`nav-cta ${isActive("/portfolio/", location) ? "is-active" : ""}`}>Portfolio</Link>
       </nav>
-      <button className="cabinet-toggle" onClick={onToggleCabinet} aria-label={cabinet ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"} title={cabinet ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"}><Monitor size={13} /><span>{cabinet ? "CRT ON" : "CRT"}</span></button>
-      <button className="sound-toggle" onClick={onToggleSound} aria-label={soundOn ? "Mute arcade sounds" : "Unmute arcade sounds"} title={soundOn ? "Mute arcade sounds" : "Enable arcade sounds"}>{soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />}<span>{soundOn ? "SFX" : "MUTE"}</span></button>
       <button className="theme-toggle" onClick={onToggleTheme} aria-label={theme === "neon" ? "Switch to beige day mode" : "Switch to neon night mode"} title={theme === "neon" ? "Beige day mode" : "Neon night mode"}>{theme === "neon" ? <Sun size={13} /> : <Moon size={13} />}<span>{theme === "neon" ? "DAY" : "NIGHT"}</span></button>
       <button className="site-nav__menu" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Close menu" : "Open menu"}>
         {menuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -212,6 +211,7 @@ function SiteShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try { localStorage.setItem("pixelguild-theme", theme); } catch { /* optional persistence */ }
   }, [theme]);
+  useEffect(() => { footerControls = { toggleSound: () => setSoundOn((current) => !current), toggleCabinet: () => setCabinet((current) => !current) }; return () => { footerControls = null; }; }, []);
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     if (soundOn) playArcadeTone("transition");
@@ -242,7 +242,7 @@ function SiteShell({ children }: { children: React.ReactNode }) {
     <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""} ${cabinet ? "cabinet-mode" : ""} ${developerMode ? "developer-mode" : ""}`}> 
       <div className="noise" aria-hidden="true" />
       <ArcadeBackground />
-      <TopNav theme={theme} soundOn={soundOn} cabinet={cabinet} onToggleCabinet={() => setCabinet((current) => !current)} onToggleSound={() => setSoundOn((current) => !current)} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
+      <TopNav theme={theme} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
       <PixelMascot />
       {children}
       <SocialRail />
@@ -512,7 +512,7 @@ function PortfolioCarousel({ items, onContributions }: { items: typeof projects;
           const visible = Math.abs(offset) <= 2;
           const isFocus = offset === 0;
           return (
-            <button key={project.slug} className={`portfolio-carousel__card ${isFocus ? "is-focus" : ""} ${hovered === index ? "is-hovered" : ""}`} style={{ transform: `translate(-50%, -50%) translateX(${offset * 270}px) translateZ(${isFocus ? 80 : -Math.abs(offset) * 100}px) rotateY(${offset * -29}deg) scale(${isFocus ? 1 : .78})`, opacity: visible ? (isFocus ? 1 : .62) : 0, zIndex: 20 - Math.abs(offset), pointerEvents: visible ? "auto" : "none" }} onMouseEnter={() => setHovered(index)} onMouseLeave={() => setHovered(null)} onFocus={() => setActive(index)} onClick={() => setSelected(project)}>
+            <button key={project.slug} className={`portfolio-carousel__card ${isFocus ? "is-focus" : ""} ${hovered === index ? "is-hovered" : ""}`} style={{ transform: `translate(-50%, -50%) translateY(${offset * 205}px) translateZ(${isFocus ? 100 : -Math.abs(offset) * 110}px) rotateX(${offset * 28}deg) scale(${isFocus ? 1 : .78})`, opacity: visible ? (isFocus ? 1 : .62) : 0, zIndex: 20 - Math.abs(offset), pointerEvents: visible ? "auto" : "none" }} onMouseEnter={() => setHovered(index)} onMouseLeave={() => setHovered(null)} onFocus={() => setActive(index)} onClick={() => setSelected(project)}>
               <div className="portfolio-carousel__poster"><ProjectVisual tone={project.tone} label={project.stat} media={project.media} />{(hovered === index || isFocus) && <video src="/dungeon-reel.mp4" autoPlay muted loop playsInline />}</div>
               <div className="portfolio-carousel__caption"><span>{project.type}</span><strong>{project.title}</strong><small>{isFocus ? "OPEN DOSSIER ↗" : project.stat}</small></div>
             </button>
@@ -541,7 +541,9 @@ function ProjectPage({ slug }: { slug: string }) {
 }
 
 function Footer() {
-  return <footer className="site-footer page-pad"><div className="site-footer__mark"><BrandMark /><span>KV / KARTHIK VEERANALA</span></div><div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:karthik.veeranala@gmail.com">karthik.veeranala@gmail.com</a></div><div className="site-footer__bottom"><span>© 2026 KARTHIK VEERANALA / GAME SYSTEMS & PROTOTYPING</span><span>Built under constraints <Sparkles size={12} /></span></div></footer>;
+  const [soundOn, setSoundOn] = useState(() => { try { return localStorage.getItem("pixelguild-sound") !== "off"; } catch { return true; } });
+  const [cabinetOn, setCabinetOn] = useState(() => { try { return localStorage.getItem("pixelguild-cabinet") === "on"; } catch { return false; } });
+  return <footer className="site-footer page-pad"><div className="site-footer__mark"><BrandMark /><span>KV / KARTHIK VEERANALA</span></div><div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:karthik.veeranala@gmail.com">karthik.veeranala@gmail.com</a></div><div className="site-footer__controls"><span>ARCADE CONTROLS</span><button className="footer-control" onClick={() => { footerControls?.toggleCabinet(); setCabinetOn((value) => !value); }} aria-label={cabinetOn ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"}><Monitor size={13} /> {cabinetOn ? "CRT ON" : "CRT"}</button><button className="footer-control" onClick={() => { footerControls?.toggleSound(); setSoundOn((value) => !value); }} aria-label={soundOn ? "Mute arcade sounds" : "Unmute arcade sounds"}>{soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />} {soundOn ? "SFX ON" : "SFX OFF"}</button></div><div className="site-footer__bottom"><span>© 2026 KARTHIK VEERANALA / GAME SYSTEMS & PROTOTYPING</span><span>Built under constraints <Sparkles size={12} /></span></div></footer>;
 }
 
 function Router() {
