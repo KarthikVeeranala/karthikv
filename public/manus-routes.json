@@ -1,0 +1,14 @@
+{
+  "routes": [
+    { "path": "/", "title": "Pixel Guild — Home" },
+    { "path": "/demo-reel/", "title": "Demo Reel" },
+    { "path": "/marketplace/", "title": "Marketplace" },
+    { "path": "/blog/", "title": "Blog" },
+    { "path": "/blog/:slug", "title": "Blog Article" },
+    { "path": "/hobbies/", "title": "Hobbies" },
+    { "path": "/bio/", "title": "Bio & Contact" },
+    { "path": "/github/", "title": "GitHub" },
+    { "path": "/portfolio/", "title": "Portfolio" },
+    { "path": "/portfolio/:slug", "title": "Portfolio Project" }
+  ]
+}
