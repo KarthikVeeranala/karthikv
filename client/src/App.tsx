@@ -27,10 +27,31 @@ import {
   Zap,
   X,
   Youtube,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const ACCENT = "#16d6bd";
+let arcadeAudio: AudioContext | null = null;
+function playArcadeTone(kind: "hover" | "click" | "transition" | "hit" | "win") {
+  try {
+    arcadeAudio ??= new AudioContext();
+    const ctx = arcadeAudio;
+    if (ctx.state === "suspended") void ctx.resume();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const frequencies = { hover: 420, click: 180, transition: 110, hit: 75, win: 720 };
+    oscillator.type = kind === "hit" ? "square" : "triangle";
+    oscillator.frequency.setValueAtTime(frequencies[kind], ctx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(kind === "win" ? 980 : frequencies[kind] * .68, ctx.currentTime + (kind === "transition" ? .22 : .09));
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(kind === "hover" ? .018 : .045, ctx.currentTime + .008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (kind === "win" ? .35 : .12));
+    oscillator.connect(gain).connect(ctx.destination);
+    oscillator.start(); oscillator.stop(ctx.currentTime + (kind === "win" ? .36 : .14));
+  } catch { /* audio is an enhancement and may be unavailable */ }
+}
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -76,7 +97,7 @@ function BrandMark() {
   );
 }
 
-function TopNav({ theme, onToggleTheme }: { theme: "beige" | "neon"; onToggleTheme: () => void }) {
+function TopNav({ theme, onToggleTheme, soundOn, onToggleSound }: { theme: "beige" | "neon"; onToggleTheme: () => void; soundOn: boolean; onToggleSound: () => void }) {
   const [location] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [location]);
@@ -94,6 +115,7 @@ function TopNav({ theme, onToggleTheme }: { theme: "beige" | "neon"; onToggleThe
         ))}
         <Link href="/portfolio/" className={`nav-cta ${isActive("/portfolio/", location) ? "is-active" : ""}`}>Portfolio</Link>
       </nav>
+      <button className="sound-toggle" onClick={onToggleSound} aria-label={soundOn ? "Mute arcade sounds" : "Unmute arcade sounds"} title={soundOn ? "Mute arcade sounds" : "Enable arcade sounds"}>{soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />}<span>{soundOn ? "SFX" : "MUTE"}</span></button>
       <button className="theme-toggle" onClick={onToggleTheme} aria-label={theme === "neon" ? "Switch to beige day mode" : "Switch to neon night mode"} title={theme === "neon" ? "Beige day mode" : "Neon night mode"}>{theme === "neon" ? <Sun size={13} /> : <Moon size={13} />}<span>{theme === "neon" ? "DAY" : "NIGHT"}</span></button>
       <button className="site-nav__menu" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Close menu" : "Open menu"}>
         {menuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -176,26 +198,51 @@ function PixelMascot() {
   );
 }
 
+function CursorFX() {
+  const [points, setPoints] = useState(() => Array.from({ length: 8 }, () => ({ x: -100, y: -100 })));
+  useEffect(() => {
+    let frame = 0;
+    const move = (event: PointerEvent) => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => setPoints((current) => [{ x: event.clientX, y: event.clientY }, ...current].slice(0, 8)));
+    };
+    window.addEventListener("pointermove", move);
+    return () => { cancelAnimationFrame(frame); window.removeEventListener("pointermove", move); };
+  }, []);
+  return <div className="cursor-fx" aria-hidden="true">{points.map((point, index) => <i key={index} style={{ left: point.x, top: point.y, opacity: Math.max(0, .75 - index * .09), transform: `scale(${1 - index * .08})` }} />)}</div>;
+}
+
 function SiteShell({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [theme, setTheme] = useState<"beige" | "neon">(() => {
     try { return localStorage.getItem("pixelguild-theme") === "neon" ? "neon" : "beige"; } catch { return "beige"; }
+  });
+  const [soundOn, setSoundOn] = useState(() => {
+    try { return localStorage.getItem("pixelguild-sound") !== "off"; } catch { return true; }
   });
   useEffect(() => {
     try { localStorage.setItem("pixelguild-theme", theme); } catch { /* optional persistence */ }
   }, [theme]);
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    if (soundOn) playArcadeTone("transition");
   }, [location]);
+  useEffect(() => {
+    try { localStorage.setItem("pixelguild-sound", soundOn ? "on" : "off"); } catch { /* optional persistence */ }
+    const over = (event: PointerEvent) => { if (soundOn && (event.target as HTMLElement).closest("a,button")) playArcadeTone("hover"); };
+    const click = (event: MouseEvent) => { if (soundOn && (event.target as HTMLElement).closest("a,button")) playArcadeTone("click"); };
+    window.addEventListener("pointerover", over); window.addEventListener("click", click);
+    return () => { window.removeEventListener("pointerover", over); window.removeEventListener("click", click); };
+  }, [soundOn]);
   return (
     <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""}`}> 
       <div className="noise" aria-hidden="true" />
       <ArcadeBackground />
-      <TopNav theme={theme} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
+      <TopNav theme={theme} soundOn={soundOn} onToggleSound={() => setSoundOn((current) => !current)} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
       <PixelMascot />
       {children}
       <SocialRail />
-      <div className="site-cursor" aria-hidden="true"><span /></div>
+      <CursorFX />
     </div>
   );
 }
@@ -247,15 +294,18 @@ function ProjectVisual({ tone, label, media }: { tone: string; label: string; me
 function ProjectCard({ project, index }: { project: typeof projects[number]; index: number }) {
   return (
     <Link href={`/portfolio/${project.slug}/`} className={`project-card project-card--${index % 2 === 0 ? "left" : "right"}`}>
-      <ProjectVisual tone={project.tone} label={project.stat} media={project.media} />
-      <div className="project-card__body">
-        <div>
-          <span className="project-card__type">{project.type}</span>
-          <h3>{project.title}</h3>
+      <div className="project-card__number"><strong>{String(index + 1).padStart(2, "0")}</strong><span>/ {String(projects.length).padStart(2, "0")}</span></div>
+      <div className="project-card__content">
+        <ProjectVisual tone={project.tone} label={project.stat} media={project.media} />
+        <div className="project-card__body">
+          <div>
+            <span className="project-card__type">{project.type}</span>
+            <h3>{project.title}</h3>
+          </div>
+          <ArrowUpRight className="project-card__arrow" size={18} />
+          <p>{project.description}</p>
+          <div className="tag-row">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
         </div>
-        <ArrowUpRight className="project-card__arrow" size={18} />
-        <p>{project.description}</p>
-        <div className="tag-row">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
       </div>
     </Link>
   );
@@ -352,7 +402,28 @@ function ArcadePage() {
     return () => window.clearTimeout(timeout);
   }, [flipped, cards]);
   const reset = () => { setFlipped([]); setMatched([]); setMoves(0); };
-  return <main className="inner-page arcade-page"><PageHeader number="08" kicker="Arcade / secret room" title={<>Press start.<br /><span>Play a round.</span></>} copy="A tiny memory match hidden inside the portfolio. Find every pair, beat the clock, and unlock the cabinet glow." /><section className="arcade-cabinet page-pad"><div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div><div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div><div className="arcade-cabinet__bottom"><span>{matched.length === cards.length ? "PERFECT RUN! CABINET CLEARED." : "FIND THE PAIRS / NO CHEATING"}</span><button className="button button--tiny" onClick={reset}><RefreshCw size={12} /> Reset</button></div></section><div className="arcade-tips page-pad"><div><Zap size={17} /><p>Click the Pixel Guild mascot to change its mood. Drag it anywhere and it remembers the spot.</p></div><div><MousePointer2 size={17} /><p>Every card, project visual, and video panel has a little hover state waiting for you.</p></div></div><Footer /></main>;
+  return <main className="inner-page arcade-page"><PageHeader number="08" kicker="Arcade / secret room" title={<>Press start.<br /><span>Play a round.</span></>} copy="A tiny memory match hidden inside the portfolio. Find every pair, beat the clock, and unlock the cabinet glow." /><section className="arcade-cabinet page-pad"><div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div><div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div><div className="arcade-cabinet__bottom"><span>{matched.length === cards.length ? "PERFECT RUN! CABINET CLEARED." : "FIND THE PAIRS / NO CHEATING"}</span><button className="button button--tiny" onClick={reset}><RefreshCw size={12} /> Reset</button></div></section><BossFight /><div className="arcade-tips page-pad"><div><Zap size={17} /><p>Click the Pixel Guild mascot to change its mood. Drag it anywhere and it remembers the spot.</p></div><div><MousePointer2 size={17} /><p>Every card, project visual, and video panel has a little hover state waiting for you.</p></div></div><Footer /></main>;
+}
+
+function BossFight() {
+  const [bossHp, setBossHp] = useState(100);
+  const [playerHp, setPlayerHp] = useState(100);
+  const [score, setScore] = useState(0);
+  const [message, setMessage] = useState("BOSS SIGNAL DETECTED");
+  const [highScores, setHighScores] = useState([3200, 2450, 1800]);
+  const strike = () => {
+    if (bossHp <= 0 || playerHp <= 0) return;
+    const damage = 9 + Math.floor(Math.random() * 13);
+    const retaliation = 4 + Math.floor(Math.random() * 10);
+    const nextBoss = Math.max(0, bossHp - damage);
+    const nextPlayer = Math.max(0, playerHp - retaliation);
+    setBossHp(nextBoss); setPlayerHp(nextPlayer); setScore((value) => value + damage * 10);
+    if (nextBoss === 0) { setMessage("BOSS CLEARED / NEW HIGH SCORE"); playArcadeTone("win"); setHighScores((scores) => [...scores, score + damage * 10].sort((a, b) => b - a).slice(0, 3)); }
+    else if (nextPlayer === 0) { setMessage("PLAYER DOWN / INSERT COIN"); playArcadeTone("hit"); }
+    else { setMessage(`DIRECT HIT -${damage} / RETALIATION -${retaliation}`); playArcadeTone("hit"); }
+  };
+  const reset = () => { setBossHp(100); setPlayerHp(100); setScore(0); setMessage("BOSS SIGNAL DETECTED"); };
+  return <section className="boss-arena page-pad"><div className="boss-arena__copy"><Eyebrow number="09">Boss fight / score attack</Eyebrow><h2>Break the<br /><span>logic beast.</span></h2><p>Strike the systems boss before it overloads your player core. Every run is scored locally in this browser.</p><div className="boss-arena__stats"><span>PLAYER <b>{playerHp}%</b></span><span>BOSS <b>{bossHp}%</b></span><span>SCORE <b>{String(score).padStart(4, "0")}</b></span></div></div><div className="boss-arena__cabinet"><div className="boss-arena__screen"><div className="boss-sprite" aria-hidden="true"><i /><i /><i /><b /><b /><em /></div><span className="boss-arena__status">{message}</span><div className="health-bar"><i style={{ width: `${bossHp}%` }} /></div></div><div className="boss-arena__controls"><button className="button" onClick={strike} disabled={bossHp === 0 || playerHp === 0}>Strike <Zap size={14} /></button><button className="button button--tiny" onClick={reset}>Reset <RefreshCw size={12} /></button></div></div><div className="scoreboard"><Eyebrow>Local leaderboard</Eyebrow>{highScores.map((highScore, index) => <div key={`${highScore}-${index}`}><span>0{index + 1}</span><strong>{String(highScore).padStart(4, "0")}</strong><small>{index === 0 ? "SYSTEM BREAKER" : index === 1 ? "FAST PROTOTYPER" : "PLAYER 01"}</small></div>)}</div></section>;
 }
 
 function PageHeader({ number, kicker, title, copy }: { number: string; kicker: string; title: React.ReactNode; copy: string }) {
