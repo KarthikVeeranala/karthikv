@@ -31,6 +31,10 @@
     {
       "path": "/portfolio/:slug",
       "title": "Portfolio Project"
+    },
+    {
+      "path": "/skills/",
+      "title": "Tech Tree"
     }
   ]
 }

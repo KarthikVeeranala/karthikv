@@ -29,6 +29,8 @@ import {
   Youtube,
   Volume2,
   VolumeX,
+  Monitor,
+  Terminal,
 } from "lucide-react";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -60,6 +62,7 @@ const navItems = [
   { label: "Hobbies", href: "/hobbies/" },
   { label: "Bio & Contact", href: "/bio/" },
   { label: "Arcade", href: "/arcade/" },
+  { label: "Tech Tree", href: "/skills/" },
 ];
 
 const projects = [
@@ -97,7 +100,7 @@ function BrandMark() {
   );
 }
 
-function TopNav({ theme, onToggleTheme, soundOn, onToggleSound }: { theme: "beige" | "neon"; onToggleTheme: () => void; soundOn: boolean; onToggleSound: () => void }) {
+function TopNav({ theme, onToggleTheme, soundOn, onToggleSound, cabinet, onToggleCabinet }: { theme: "beige" | "neon"; onToggleTheme: () => void; soundOn: boolean; onToggleSound: () => void; cabinet: boolean; onToggleCabinet: () => void }) {
   const [location] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [location]);
@@ -115,6 +118,7 @@ function TopNav({ theme, onToggleTheme, soundOn, onToggleSound }: { theme: "beig
         ))}
         <Link href="/portfolio/" className={`nav-cta ${isActive("/portfolio/", location) ? "is-active" : ""}`}>Portfolio</Link>
       </nav>
+      <button className="cabinet-toggle" onClick={onToggleCabinet} aria-label={cabinet ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"} title={cabinet ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"}><Monitor size={13} /><span>{cabinet ? "CRT ON" : "CRT"}</span></button>
       <button className="sound-toggle" onClick={onToggleSound} aria-label={soundOn ? "Mute arcade sounds" : "Unmute arcade sounds"} title={soundOn ? "Mute arcade sounds" : "Enable arcade sounds"}>{soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />}<span>{soundOn ? "SFX" : "MUTE"}</span></button>
       <button className="theme-toggle" onClick={onToggleTheme} aria-label={theme === "neon" ? "Switch to beige day mode" : "Switch to neon night mode"} title={theme === "neon" ? "Beige day mode" : "Neon night mode"}>{theme === "neon" ? <Sun size={13} /> : <Moon size={13} />}<span>{theme === "neon" ? "DAY" : "NIGHT"}</span></button>
       <button className="site-nav__menu" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Close menu" : "Open menu"}>
@@ -212,6 +216,23 @@ function CursorFX() {
   return <div className="cursor-fx" aria-hidden="true">{points.map((point, index) => <i key={index} style={{ left: point.x, top: point.y, opacity: Math.max(0, .75 - index * .09), transform: `scale(${1 - index * .08})` }} />)}</div>;
 }
 
+function CheatTerminal({ open, unlocked, onClose, onToggleCabinet, onDeveloper }: { open: boolean; unlocked: boolean; onClose: () => void; onToggleCabinet: () => void; onDeveloper: () => void }) {
+  const [input, setInput] = useState("");
+  const [lines, setLines] = useState<string[]>(["PIXEL GUILD DEV CONSOLE v1.0", "Type HELP for commands."]);
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const command = input.trim().toLowerCase();
+    if (!command) return;
+    const responses: Record<string, string> = { help: "COMMANDS: DEV / CABINET / BOSS / PIXEL / CLEAR", dev: "DEVELOPER MODE ONLINE — hidden grid diagnostics enabled.", cabinet: "CRT CABINET TOGGLE SENT.", boss: "BOSS ARENA READY — open /arcade/.", pixel: "PIXEL TRAIL AMPLIFIED — cursor particles unlocked.", clear: "" };
+    if (command === "cabinet") onToggleCabinet();
+    if (command === "dev" || command === "pixel") onDeveloper();
+    setLines((current) => command === "clear" ? [] : [...current, `> ${command}`, responses[command] ?? "UNKNOWN COMMAND — TRY HELP"]);
+    setInput("");
+  };
+  if (!open) return null;
+  return <div className="cheat-terminal__backdrop" role="dialog" aria-modal="true" aria-label="Developer cheat terminal"><div className="cheat-terminal"><div className="cheat-terminal__bar"><span><Terminal size={13} /> KONAMI // DEV UNLOCK</span><button onClick={onClose} aria-label="Close terminal">×</button></div><div className="cheat-terminal__body"><div className="cheat-terminal__unlock">{unlocked ? "▲ ▲ ▼ ▼ ◀ ▶ ◀ ▶ B A / ACCEPTED" : "ENTER THE CODE"}</div>{lines.map((line, index) => <p key={`${line}-${index}`}>{line}</p>)}<form onSubmit={submit}><span>&gt;</span><input autoFocus value={input} onChange={(event) => setInput(event.target.value)} placeholder="type a command" aria-label="Developer terminal command" /></form></div></div></div>;
+}
+
 function SiteShell({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [theme, setTheme] = useState<"beige" | "neon">(() => {
@@ -220,6 +241,10 @@ function SiteShell({ children }: { children: React.ReactNode }) {
   const [soundOn, setSoundOn] = useState(() => {
     try { return localStorage.getItem("pixelguild-sound") !== "off"; } catch { return true; }
   });
+  const [cabinet, setCabinet] = useState(() => { try { return localStorage.getItem("pixelguild-cabinet") === "on"; } catch { return false; } });
+  const [terminalOpen, setTerminalOpen] = useState(false);
+  const [developerMode, setDeveloperMode] = useState(false);
+  const cheatIndex = useRef(0);
   useEffect(() => {
     try { localStorage.setItem("pixelguild-theme", theme); } catch { /* optional persistence */ }
   }, [theme]);
@@ -228,6 +253,20 @@ function SiteShell({ children }: { children: React.ReactNode }) {
     if (soundOn) playArcadeTone("transition");
   }, [location]);
   useEffect(() => {
+    try { localStorage.setItem("pixelguild-cabinet", cabinet ? "on" : "off"); } catch { /* optional persistence */ }
+  }, [cabinet]);
+  useEffect(() => {
+    const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setTerminalOpen(false); return; }
+      if (event.key.toLowerCase() === code[cheatIndex.current].toLowerCase()) cheatIndex.current += 1;
+      else cheatIndex.current = event.key === code[0] ? 1 : 0;
+      if (cheatIndex.current === code.length) { cheatIndex.current = 0; setTerminalOpen(true); setDeveloperMode(true); playArcadeTone("win"); }
+    };
+    window.addEventListener("keydown", keydown);
+    return () => window.removeEventListener("keydown", keydown);
+  }, []);
+  useEffect(() => {
     try { localStorage.setItem("pixelguild-sound", soundOn ? "on" : "off"); } catch { /* optional persistence */ }
     const over = (event: PointerEvent) => { if (soundOn && (event.target as HTMLElement).closest("a,button")) playArcadeTone("hover"); };
     const click = (event: MouseEvent) => { if (soundOn && (event.target as HTMLElement).closest("a,button")) playArcadeTone("click"); };
@@ -235,14 +274,15 @@ function SiteShell({ children }: { children: React.ReactNode }) {
     return () => { window.removeEventListener("pointerover", over); window.removeEventListener("click", click); };
   }, [soundOn]);
   return (
-    <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""}`}> 
+    <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""} ${cabinet ? "cabinet-mode" : ""} ${developerMode ? "developer-mode" : ""}`}> 
       <div className="noise" aria-hidden="true" />
       <ArcadeBackground />
-      <TopNav theme={theme} soundOn={soundOn} onToggleSound={() => setSoundOn((current) => !current)} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
+      <TopNav theme={theme} soundOn={soundOn} cabinet={cabinet} onToggleCabinet={() => setCabinet((current) => !current)} onToggleSound={() => setSoundOn((current) => !current)} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
       <PixelMascot />
       {children}
       <SocialRail />
       <CursorFX />
+      <CheatTerminal open={terminalOpen} unlocked={developerMode} onClose={() => setTerminalOpen(false)} onToggleCabinet={() => setCabinet((current) => !current)} onDeveloper={() => setDeveloperMode(true)} />
     </div>
   );
 }
@@ -464,11 +504,23 @@ function GitHubPage() {
   return <main className="inner-page"><PageHeader number="06" kicker="GitHub" title={<>Open source,<br /><span>open doors.</span></>} copy="A placeholder activity log for code, tools, experiments, and the useful mess that happens between releases." /><section className="github-layout page-pad"><div className="github-profile"><div className="profile-orbit"><CircleUserRound size={44} /></div><Eyebrow>Player profile</Eyebrow><h2>placeholder-name</h2><p>Systems / tools / game design</p><a href="https://github.com/karthikveeranala" target="_blank" rel="noreferrer" className="text-link">Visit profile <ArrowUpRight size={14} /></a><div className="contribution-grid">{Array.from({ length: 84 }, (_, index) => <i key={index} className={index % 7 === 0 ? "is-hot" : index % 3 === 0 ? "is-warm" : ""} />)}</div><small>CONTRIBUTIONS / PLACEHOLDER / LAST 12 MONTHS</small></div><div className="repo-list"><div className="section-topline"><Eyebrow>Repositories</Eyebrow><span className="muted-label">5 PUBLIC / 0 PRIVATE</span></div>{repos.map((repo, index) => <a href="https://github.com/karthikveeranala" target="_blank" rel="noreferrer" className="repo-row" key={repo}><Code2 size={17} /><div><strong>{repo}</strong><span>Placeholder repository description with a little useful context.</span></div><small>{index % 2 ? "TS" : "C#"}</small><ArrowUpRight size={15} /></a>)}</div></section><Footer /></main>;
 }
 
+const techNodes = [
+  { id: "ue", label: "UNREAL ENGINE", rank: "S+", color: "teal", tools: ["UE 5.7", "UE 4", "Slate / UMG", "Niagara"], usedIn: "Headless E2E Automation Suite, ByteOasis, Geek'O'Wars", copy: "Engine architecture, headless verification, UI auto-discovery, physics, dedicated servers, and gameplay systems." },
+  { id: "cpp", label: "C++ SYSTEMS", rank: "S", color: "rust", tools: ["Memory", "Threads", "Win32", "FFmpeg"], usedIn: "E2E Automation Suite / Cyrus 365", copy: "Low-level foundations for deterministic simulation, isolated desktops, GPU backbuffer streaming, and test orchestration." },
+  { id: "phaser", label: "PHASER / WEBGL", rank: "A", color: "gold", tools: ["Phaser 3", "WebGL", "Canvas", "TypeScript"], usedIn: "City of Aethel & 2D Arcade", copy: "Fast browser prototypes, boss choreography, projectile prediction, ragdoll impulses, and playable web builds." },
+  { id: "gameplay", label: "GAMEPLAY SYSTEMS", rank: "S", color: "pink", tools: ["AI", "Physics", "Combat", "State machines"], usedIn: "The Interlude / 14+ prototypes", copy: "The layer where rules become feel: combat loops, predictive targeting, movement, encounters, and readable feedback." },
+  { id: "tools", label: "TOOLS / PIPELINES", rank: "A", color: "blue", tools: ["Git", "CI", "Automation", "Profiling"], usedIn: "All projects / production systems", copy: "Build, test, profile, and ship workflows that let small teams move fast without losing system clarity." },
+];
+function TechTreePage() {
+  const [selected, setSelected] = useState(techNodes[0]);
+  return <main className="inner-page tech-page"><PageHeader number="10" kicker="Tech-stack inventory / interactive skill tree" title={<>Map the<br /><span>loadout.</span></>} copy="Don’t just read a list of tools. Pick a node to inspect the systems, engines, and projects behind the work." /><section className="tech-tree page-pad"><div className="tech-tree__map"><div className="tech-tree__lines" aria-hidden="true"><i /><i /><i /><i /></div>{techNodes.map((node) => <button key={node.id} className={`tech-node tech-node--${node.color} ${selected.id === node.id ? "is-selected" : ""}`} onClick={() => setSelected(node)}><span>{node.rank}</span><strong>{node.label}</strong><small>SELECT NODE</small></button>)}</div><aside className="tech-inspector"><Eyebrow>Selected node / {selected.rank}</Eyebrow><h2>{selected.label}</h2><p>{selected.copy}</p><div className="tech-inspector__tools">{selected.tools.map((tool) => <span key={tool}>{tool}</span>)}</div><div className="tech-inspector__used"><Eyebrow>Deployed in</Eyebrow><strong>{selected.usedIn}</strong></div><Link href="/portfolio/" className="button button--outline">View project dossiers <ArrowUpRight size={13} /></Link></aside></section><section className="inventory-strip page-pad"><Eyebrow>Inventory readout</Eyebrow><div><span><strong>05</strong> skill nodes</span><span><strong>14+</strong> prototypes</span><span><strong>04</strong> engine lanes</span><span><strong>∞</strong> combinations</span></div></section><Footer /></main>;
+}
+
 function PortfolioPage() {
   const [filter, setFilter] = useState("ALL");
   const tags = ["ALL", "SYSTEMS", "WORLDS", "PROTOTYPES"];
   const filtered = filter === "ALL" ? projects : projects.filter((project) => project.tags.some((tag) => tag.toUpperCase().includes(filter.slice(0, -1))));
-  return <main className="inner-page"><PageHeader number="07" kicker="Portfolio" title={<>Selected<br /><span>levels.</span></>} copy="Selected engine systems, competitive prototypes, and playable experiments from Karthik Veeranala’s portfolio." /><section className="portfolio-page page-pad"><div className="filter-row">{tags.map((tag) => <button key={tag} className={filter === tag ? "is-selected" : ""} onClick={() => setFilter(tag)}>{tag}</button>)}</div><div className="portfolio-grid">{filtered.map((project, index) => <ProjectCard key={project.slug} project={project} index={index} />)}</div></section><Footer /></main>;
+  return <main className="inner-page"><PageHeader number="07" kicker="Portfolio" title={<>Selected<br /><span>levels.</span></>} copy="Selected engine systems, competitive prototypes, and playable experiments from Karthik Veeranala’s portfolio." /><section className="portfolio-page page-pad"><div className="portfolio-loadout"><Eyebrow>Inventory view</Eyebrow><Link href="/skills/" className="text-link">Open interactive tech tree <ArrowUpRight size={14} /></Link></div><div className="filter-row">{tags.map((tag) => <button key={tag} className={filter === tag ? "is-selected" : ""} onClick={() => setFilter(tag)}>{tag}</button>)}</div><div className="portfolio-grid">{filtered.map((project, index) => <ProjectCard key={project.slug} project={project} index={index} />)}</div></section><Footer /></main>;
 }
 
 function ProjectPage({ slug }: { slug: string }) {
@@ -490,6 +542,7 @@ function Router() {
   if (path === "/hobbies/") return <HobbiesPage />;
   if (path === "/bio/") return <BioPage />;
   if (path === "/arcade/") return <ArcadePage />;
+  if (path === "/skills/") return <TechTreePage />;
   if (path === "/portfolio/") return <PortfolioPage />;
   if (path.startsWith("/portfolio/")) return <ProjectPage slug={path.split("/")[2]} />;
   return <NotFoundPage />;
