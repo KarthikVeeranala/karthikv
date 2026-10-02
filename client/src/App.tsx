@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   ArrowDownRight,
@@ -139,7 +139,8 @@ function SocialRail() {
 }
 
 function ArcadeBackground() {
-  return <div className="pixel-field" aria-hidden="true">{Array.from({ length: 18 }, (_, index) => <i key={index} className={`pixel-field__bit pixel-field__bit--${index % 4}`} style={{ left: `${(index * 37) % 97}%`, top: `${(index * 61) % 94}%`, animationDelay: `${(index % 9) * -0.7}s`, animationDuration: `${5 + (index % 5)}s` }} />)}</div>;
+  const glyphs = ["X", "A", "Y", "B", "✦", "＋", "◀", "▶", "A", "B", "X", "Y", "✚", "◆"];
+  return <div className="pixel-field" aria-hidden="true">{glyphs.map((glyph, index) => <span key={`${glyph}-${index}`} className={`pixel-field__glyph pixel-field__glyph--${index % 5}`} style={{ left: `${(index * 37) % 94}%`, top: `${(index * 61) % 90}%`, animationDelay: `${(index % 9) * -0.7}s`, animationDuration: `${7 + (index % 5)}s` }}>{glyph}</span>)}</div>;
 }
 
 function PixelMascot() {
@@ -289,7 +290,7 @@ function HeroVideo({ compact = false }: { compact?: boolean }) {
 function ProjectVisual({ tone, label, media }: { tone: string; label: string; media?: string }) {
   return (
     <div className={`project-visual project-visual--${tone}`}>
-      {media && <img src={media} alt={label} loading="lazy" />}
+      {media && <img src={media} alt={label} loading="lazy" decoding="async" />}
       <div className="project-visual__pixel-corners" aria-hidden="true"><i /><i /><i /><i /></div>
       <span className="project-visual__label">{label}</span>
     </div>
@@ -341,9 +342,6 @@ function Home() {
       <section className="home-hero page-pad" id="home">
         <video className="home-hero__video" autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source src="/landing-worlds-reel.mp4" type="video/mp4" /></video>
         <div className="home-hero__veil" aria-hidden="true" />
-        <div className="hero-orbit hero-orbit--one" aria-hidden="true" />
-        <div className="hero-orbit hero-orbit--two" aria-hidden="true" />
-        <div className="hero-stars" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
         <div className="hero-identity">
           <Eyebrow number="00">Unreal Engine systems & gameplay architecture</Eyebrow>
           <h1>KARTHIK<br /><span>VEERANALA</span></h1>
@@ -500,15 +498,24 @@ function PortfolioCarousel({ items, onContributions }: { items: typeof projects;
   const [hovered, setHovered] = useState<number | null>(null);
   const [selected, setSelected] = useState<typeof projects[number] | null>(null);
   const lastWheel = useRef(0);
-  const rotate = (direction: number) => setActive((value) => (value + direction + list.length) % list.length);
-  const handleWheel = (event: React.WheelEvent) => {
-    const now = performance.now();
-    if (now - lastWheel.current < 240) return;
-    lastWheel.current = now;
-    rotate(event.deltaY > 0 ? 1 : -1);
-  };
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const rotate = useCallback((direction: number) => setActive((value) => (value + direction + list.length) % list.length), [list.length]);
+  useEffect(() => {
+    const node = carouselRef.current;
+    if (!node) return;
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const now = performance.now();
+      if (now - lastWheel.current < 240) return;
+      lastWheel.current = now;
+      rotate(event.deltaY > 0 ? 1 : -1);
+    };
+    node.addEventListener("wheel", onWheel, { passive: false });
+    return () => node.removeEventListener("wheel", onWheel);
+  }, [rotate]);
   return (
-    <div className="portfolio-carousel" onWheel={handleWheel} onKeyDown={(event) => { if (event.key === "ArrowDown") rotate(1); if (event.key === "ArrowUp") rotate(-1); }} tabIndex={0}>
+    <div ref={carouselRef} className="portfolio-carousel" onKeyDown={(event) => { if (event.key === "ArrowDown") rotate(1); if (event.key === "ArrowUp") rotate(-1); }} tabIndex={0}>
       <div className="portfolio-carousel__hint"><Eyebrow>Scroll to rotate / click to inspect</Eyebrow><span>{String(active + 1).padStart(2, "0")} / {String(list.length).padStart(2, "0")}</span></div>
       <div className="portfolio-carousel__stage">
         {list.map((project, index) => {
@@ -517,7 +524,7 @@ function PortfolioCarousel({ items, onContributions }: { items: typeof projects;
           const visible = Math.abs(offset) <= 2;
           const isFocus = offset === 0;
           return (
-            <button key={project.slug} className={`portfolio-carousel__card ${isFocus ? "is-focus" : ""} ${hovered === index ? "is-hovered" : ""}`} style={{ transform: `translate(-50%, -50%) translateY(${offset * 205}px) translateZ(${isFocus ? 100 : -Math.abs(offset) * 110}px) rotateX(${offset * 28}deg) scale(${isFocus ? 1 : .78})`, opacity: visible ? (isFocus ? 1 : .62) : 0, zIndex: 20 - Math.abs(offset), pointerEvents: visible ? "auto" : "none" }} onMouseEnter={() => setHovered(index)} onMouseLeave={() => setHovered(null)} onFocus={() => setActive(index)} onClick={() => setSelected(project)}>
+            <button key={project.slug} className={`portfolio-carousel__card ${isFocus ? "is-focus" : ""} ${hovered === index ? "is-hovered" : ""}`} style={{ transform: `translate(-50%, -50%) translate3d(${Math.sign(offset) * Math.pow(Math.abs(offset), 1.45) * 42}px, ${offset * 190}px, ${isFocus ? 140 : -Math.abs(offset) * 115}px) rotateX(${offset * 23}deg) rotateY(${offset * -13}deg) rotateZ(${offset * -2.5}deg) scale(${isFocus ? 1 : .76 - Math.abs(offset) * .025})`, opacity: visible ? (isFocus ? 1 : .58) : 0, zIndex: 20 - Math.abs(offset), pointerEvents: visible ? "auto" : "none" }} onMouseEnter={() => setHovered(index)} onMouseLeave={() => setHovered(null)} onFocus={() => setActive(index)} onClick={() => setSelected(project)}>
               <div className="portfolio-carousel__poster"><ProjectVisual tone={project.tone} label={project.stat} media={project.media} />{(hovered === index || isFocus) && <video src="/dungeon-reel.mp4" autoPlay muted loop playsInline />}</div>
               <div className="portfolio-carousel__caption"><span>{project.type}</span><strong>{project.title}</strong><small>{isFocus ? "OPEN DOSSIER ↗" : project.stat}</small></div>
             </button>
