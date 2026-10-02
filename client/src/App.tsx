@@ -319,7 +319,7 @@ function ProjectWindow({ project, onClose, onContributions }: { project: typeof 
 
 
 function BackstorySection() {
-  return <section className="backstory-section page-pad" id="backstory"><div className="backstory-section__intro"><Eyebrow number="01">The backstory</Eyebrow><h2>My story is<br /><span>built under pressure.</span></h2><p>I am a game developer and engine systems programmer focused on low-level graphics, deterministic simulation, and real-time interaction. I am currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on graphics, systems programming, and algorithms.</p><Link href="/backstory/" className="text-link">Read the full backstory <ArrowUpRight size={14} /></Link></div><div className="backstory-section__facts"><div><strong>4+</strong><span>Hackathon victories</span></div><div><strong>14+</strong><span>Playable prototypes</span></div><div><strong>200+</strong><span>Student developers in Elysium Gaming Club</span></div><div><strong>UE 5.7</strong><span>Automation core</span></div></div></section>;
+  return <section className="backstory-section backstory-section--highlight page-pad" id="backstory"><div className="backstory-section__stamp">01 / SAVE FILE<br /><strong>THE BACKSTORY</strong></div><div className="backstory-section__intro"><Eyebrow number="01">The backstory</Eyebrow><h2>My story is<br /><span>built under pressure.</span></h2><p>I am a game developer and engine systems programmer focused on low-level graphics, deterministic simulation, and real-time interaction. I am currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on graphics, systems programming, and algorithms.</p><Link href="/backstory/" className="text-link">Read the full backstory <ArrowUpRight size={14} /></Link></div><div className="backstory-section__facts"><div><strong>4+</strong><span>Hackathon victories</span></div><div><strong>14+</strong><span>Playable prototypes</span></div><div><strong>200+</strong><span>Student developers in Elysium Gaming Club</span></div><div><strong>UE 5.7</strong><span>Automation core</span></div></div></section>;
 }
 
 function BackstoryPage() {
@@ -333,16 +333,21 @@ function BackstoryPage() {
 }
 
 function Home() {
+  const roles = ["Game Design", "Combat Design", "Systems Design", "World Building"];
+  const [roleIndex, setRoleIndex] = useState(0);
+  useEffect(() => { const timer = window.setInterval(() => setRoleIndex((index) => (index + 1) % roles.length), 2200); return () => window.clearInterval(timer); }, []);
   return (
     <main>
       <section className="home-hero page-pad" id="home">
+        <video className="home-hero__video" autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source src="/landing-worlds-reel.mp4" type="video/mp4" /></video>
+        <div className="home-hero__veil" aria-hidden="true" />
         <div className="hero-orbit hero-orbit--one" aria-hidden="true" />
         <div className="hero-orbit hero-orbit--two" aria-hidden="true" />
         <div className="hero-stars" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
         <div className="hero-identity">
           <Eyebrow number="00">Unreal Engine systems & gameplay architecture</Eyebrow>
           <h1>KARTHIK<br /><span>VEERANALA</span></h1>
-          <div className="hero-identity__sub"><span>Game</span><b>Developer</b><em>—</em><small>systems / prototyping / play</small></div>
+          <div className="hero-identity__sub"><span key={roles[roleIndex]} className="hero-role">{roles[roleIndex]}</span><b>Developer</b><em>—</em><small>systems / prototyping / play</small></div>
         </div>
         <div className="hero-side-note"><span>SCROLL TO EXPLORE</span><ArrowDownRight size={16} /></div>
         <div className="hero-bottomline"><StatusPill>OPEN TO SYSTEMS & GAMEPLAY ROLES</StatusPill><span>HYDERABAD, INDIA / UTC+05:30</span></div>
