@@ -34,52 +34,19 @@ const ACCENT = "#16d6bd";
 
 const navItems = [
   { label: "Home", href: "/" },
+  { label: "Backstory", href: "/backstory/" },
   { label: "Demo Reel", href: "/demo-reel/" },
-  { label: "Marketplace", href: "/marketplace/" },
-  { label: "Blog", href: "/blog/" },
   { label: "Hobbies", href: "/hobbies/" },
   { label: "Bio & Contact", href: "/bio/" },
-  { label: "GitHub", href: "/github/" },
   { label: "Arcade", href: "/arcade/" },
 ];
 
 const projects = [
-  {
-    slug: "emberline",
-    title: "EMBERLINE",
-    type: "Narrative systems / 2026",
-    description: "A quiet sci-fi traversal study about memory, weather, and the paths players leave behind.",
-    tags: ["Unity", "Systems", "Worldbuilding"],
-    tone: "ember",
-    stat: "01 / 04",
-  },
-  {
-    slug: "moon-archive",
-    title: "MOON ARCHIVE",
-    type: "Puzzle adventure / 2025",
-    description: "A tactile archive of impossible rooms, modular rules, and tiny discoveries hidden in plain sight.",
-    tags: ["Godot", "UX", "Prototyping"],
-    tone: "moon",
-    stat: "02 / 04",
-  },
-  {
-    slug: "hollow-signal",
-    title: "HOLLOW SIGNAL",
-    type: "Action prototype / 2024",
-    description: "An atmospheric combat playground built around rhythm, response, and the tension before a reveal.",
-    tags: ["Unreal", "Combat", "Direction"],
-    tone: "signal",
-    stat: "03 / 04",
-  },
-  {
-    slug: "soft-reset",
-    title: "SOFT RESET",
-    type: "Experimental / 2023",
-    description: "A tiny playable essay about the comfort of restarting and the stories we carry forward.",
-    tags: ["Web", "Interaction", "Writing"],
-    tone: "reset",
-    stat: "04 / 04",
-  },
+  { slug: "e2e-automation-suite", title: "HEADLESS E2E AUTOMATION SUITE", type: "Unreal Engine 5.7 / Systems internship", description: "A project-agnostic Unreal Engine C++ harness for headless test flows, recursive Slate/UMG discovery, physics determinism, replication checks, and GPU backbuffer streaming.", tags: ["Unreal Engine 5.7", "C++", "Win32", "FFmpeg"], tone: "signal", stat: "01 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_suite_workspace.png" },
+  { slug: "the-interlude", title: "THE INTERLUDE", type: "1st place / CodeDay 2.0", description: "A 6-DOF zero-gravity flight simulator built in 24 hours, with predictive lead-target AI, escalating interceptors, and visceral space-combat feel.", tags: ["Unreal Engine 4", "Physics", "AI"], tone: "moon", stat: "02 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg" },
+  { slug: "byteoasis", title: "BYTEOASIS: CODE TO ESCAPE", type: "2nd place / HackRush 2.0", description: "A first-person puzzle survival adventure where a stranded programmer repairs logic terminals, bypasses security grids, and executes commands across a cyber-archipelago.", tags: ["Unreal Engine", "Puzzle", "Terminals"], tone: "reset", stat: "03 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/byte_oasis/byte_oasis_maxres_thumbnail.jpg" },
+  { slug: "geek-o-wars", title: "GEEK'O'WARS", type: "Top 3 / MLH FrostHacks", description: "A third-person survival shooter set inside a laptop motherboard, where microscopic antivirus agents purge infected CPU cores and logic gates.", tags: ["Unreal Engine 4.21", "Shaders", "Combat"], tone: "ember", stat: "04 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/geek_o_wars/01_logo_banner.jpg" },
+  { slug: "city-of-aethel", title: "CITY OF AETHEL & 2D ARCADE", type: "Top 45 finalist / IGDC 2024", description: "A Phaser 3 showcase with multi-phase boss choreography, 5-hit melee combos, i-frame dodges, and eight playable web prototypes.", tags: ["Phaser 3", "Melee", "WebGL"], tone: "ember", stat: "05 / 05", media: "https://temporary-agile-orion-yb206ij.vercel.app/portfolio_media/screenshots/phaser_games/01_city_of_aethel.png" },
 ];
 
 const posts = [
@@ -125,7 +92,6 @@ function TopNav({ theme, onToggleTheme }: { theme: "beige" | "neon"; onToggleThe
             {item.label}
           </Link>
         ))}
-        <a className="nav-link nav-link--github" href="https://github.com/" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={10} /></a>
         <Link href="/portfolio/" className={`nav-cta ${isActive("/portfolio/", location) ? "is-active" : ""}`}>Portfolio</Link>
       </nav>
       <button className="theme-toggle" onClick={onToggleTheme} aria-label={theme === "neon" ? "Switch to beige day mode" : "Switch to neon night mode"} title={theme === "neon" ? "Beige day mode" : "Neon night mode"}>{theme === "neon" ? <Sun size={13} /> : <Moon size={13} />}<span>{theme === "neon" ? "DAY" : "NIGHT"}</span></button>
@@ -139,10 +105,10 @@ function TopNav({ theme, onToggleTheme }: { theme: "beige" | "neon"; onToggleThe
 function SocialRail() {
   return (
     <aside className="social-rail" aria-label="Social links">
-      <a href="https://github.com/" target="_blank" rel="noreferrer" aria-label="GitHub"><Github size={14} /></a>
-      <a href="https://www.youtube.com/" target="_blank" rel="noreferrer" aria-label="YouTube"><Youtube size={14} /></a>
-      <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={14} /></a>
-      <a href="mailto:hello@example.com" aria-label="Email"><Mail size={14} /></a>
+      <a href="https://github.com/karthikveeranala" target="_blank" rel="noreferrer" aria-label="GitHub"><Github size={14} /></a>
+      <a href="https://www.youtube.com/channel/UCUQkvmq6x0K-aLXb2B7yg9A" target="_blank" rel="noreferrer" aria-label="YouTube"><Youtube size={14} /></a>
+      <a href="https://www.linkedin.com/in/karthikveeranala/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={14} /></a>
+      <a href="mailto:karthik.veeranala@gmail.com" aria-label="Email"><Mail size={14} /></a>
     </aside>
   );
 }
@@ -254,14 +220,15 @@ function HeroVideo({ compact = false }: { compact?: boolean }) {
       </div>
       <div className="hero-video__veil" />
       <div className="hero-video__hud"><span>REEL_06</span><span>00:06 / 00:06</span></div>
-      <div className="hero-video__caption"><span>THE UNDERGROUNDS</span><span>Atmosphere study / placeholder</span></div>
+      <div className="hero-video__caption"><span>THE UNDERGROUNDS</span><span>Dark-fantasy systems reel / Karthik Veeranala</span></div>
     </div>
   );
 }
 
-function ProjectVisual({ tone, label }: { tone: string; label: string }) {
+function ProjectVisual({ tone, label, media }: { tone: string; label: string; media?: string }) {
   return (
     <div className={`project-visual project-visual--${tone}`}>
+      {media && <img src={media} alt={label} loading="lazy" />}
       <div className="project-visual__grid" />
       <div className="project-visual__orb" />
       <div className="project-visual__frame"><span>+</span><span>+</span><span>+</span><span>+</span></div>
@@ -273,7 +240,7 @@ function ProjectVisual({ tone, label }: { tone: string; label: string }) {
 function ProjectCard({ project, index }: { project: typeof projects[number]; index: number }) {
   return (
     <Link href={`/portfolio/${project.slug}/`} className={`project-card project-card--${index % 2 === 0 ? "left" : "right"}`}>
-      <ProjectVisual tone={project.tone} label={project.stat} />
+      <ProjectVisual tone={project.tone} label={project.stat} media={project.media} />
       <div className="project-card__body">
         <div>
           <span className="project-card__type">{project.type}</span>
@@ -287,6 +254,21 @@ function ProjectCard({ project, index }: { project: typeof projects[number]; ind
   );
 }
 
+
+function BackstorySection() {
+  return <section className="backstory-section page-pad" id="backstory"><div className="backstory-section__intro"><Eyebrow number="01">The backstory</Eyebrow><h2>My story is<br /><span>built under pressure.</span></h2><p>I am a game developer and engine systems programmer focused on low-level graphics, deterministic simulation, and real-time interaction. I am currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on graphics, systems programming, and algorithms.</p><Link href="/backstory/" className="text-link">Read the full backstory <ArrowUpRight size={14} /></Link></div><div className="backstory-section__facts"><div><strong>4+</strong><span>Hackathon victories</span></div><div><strong>14+</strong><span>Playable prototypes</span></div><div><strong>200+</strong><span>Student developers in Elysium Gaming Club</span></div><div><strong>UE 5.7</strong><span>Automation core</span></div></div></section>;
+}
+
+function BackstoryPage() {
+  const milestones = [
+    ["2026 — PRESENT", "Unreal Engine Systems Intern / Cyrus 365", "Architected an End-to-End Automation & Headless Verification harness in UE 5.7 C++, with Win32 isolated desktops, recursive Slate/UMG discovery, and direct backbuffer FFmpeg streaming."],
+    ["2024 — 2025", "Game Developer & Systems Prototyper / Aicade", "Engineered 14 playable 2D prototypes testing combat feel, rigid-body ragdolls, and boss encounter choreography, including the IGDC finalist City of Aethel."],
+    ["2024 — 2025", "President & Game Jam Organizer / Elysium Gaming Club — IARE", "Directing campus game development workshops, student hackathons, and collegiate esports tournaments for 200+ active student developers."],
+    ["2022 — 2024", "Lead Systems & Gameplay Engineer / MLH & CodeDay", "Won 1st Place Overall at CodeDay 2.0 with The Interlude, 2nd at HackRush with ByteOasis, and Top 3 at FrostHacks with Geek'O'Wars."],
+  ];
+  return <main className="inner-page backstory-page"><PageHeader number="01" kicker="Biography / the backstory" title={<>Ruthless execution.<br /><span>Playable results.</span></>} copy="The long route from systems programming and competitive game jams to engine architecture, community leadership, and high-velocity prototypes." /><section className="backstory-story page-pad"><div><Eyebrow>My story</Eyebrow><p className="lead">My engineering philosophy centers on ruthless execution under constraints. Over the past three years I have spearheaded teams in 24–48 hour competitive hackathons, turning ambitious mechanics into shippable, playable loops.</p><p>As President of the Elysium Gaming Club at IARE, I oversee campus game development initiatives, Unreal and Unity workshops, and collegiate esports tournaments for a community of more than 200 active students.</p></div><div className="backstory-identity"><span>KV</span><strong>Karthik Veeranala</strong><small>Hyderabad, India / B.Tech CSE</small></div></section><section className="timeline page-pad"><div className="section-topline"><Eyebrow>Career trajectory</Eyebrow><span className="muted-label">EXPERIENCE & MILESTONE PATH</span></div>{milestones.map(([date, title, copy]) => <article className="timeline-row" key={title}><span>{date}</span><div><h2>{title}</h2><p>{copy}</p></div></article>)}</section><section className="skills-strip page-pad"><Eyebrow>Proficiency & tools</Eyebrow><h2>Experience with engines<br /><span>& systems.</span></h2><div className="skills-strip__grid"><div><strong>95%</strong><h3>Unreal Engine 5.7 / 4</h3><p>Engine source builds, C++ core architecture, Slate/UMG UI auto-discovery, Win32 subsystems, Niagara particles, and dedicated servers.</p></div><div><strong>95%</strong><h3>C++ Systems & Low-Level</h3><p>Memory management, multi-threading, desktop sandboxing, backbuffer pixel streaming to FFmpeg, and state machines.</p></div><div><strong>85%</strong><h3>Phaser 2D Web Engine</h3><p>WebGL Canvas rendering, projectile trajectory prediction, ragdoll impulse integration, and web deployment pipelines.</p></div></div></section><Footer /></main>;
+}
+
 function Home() {
   return (
     <main>
@@ -295,21 +277,23 @@ function Home() {
         <div className="hero-orbit hero-orbit--two" aria-hidden="true" />
         <div className="hero-stars" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
         <div className="hero-identity">
-          <Eyebrow number="00">Independent game developer / placeholder</Eyebrow>
-          <h1>PIXEL<br /><span>GUILD</span></h1>
-          <div className="hero-identity__sub"><span>Game</span><b>Design</b><em>—</em><small>systems / worlds / play</small></div>
+          <Eyebrow number="00">Unreal Engine systems & gameplay architecture</Eyebrow>
+          <h1>KARTHIK<br /><span>VEERANALA</span></h1>
+          <div className="hero-identity__sub"><span>Game</span><b>Developer</b><em>—</em><small>systems / prototyping / play</small></div>
         </div>
         <div className="hero-side-note"><span>SCROLL TO EXPLORE</span><ArrowDownRight size={16} /></div>
-        <div className="hero-bottomline"><StatusPill /><span>BASED SOMEWHERE ON EARTH / UTC+00</span></div>
+        <div className="hero-bottomline"><StatusPill>OPEN TO SYSTEMS & GAMEPLAY ROLES</StatusPill><span>HYDERABAD, INDIA / UTC+05:30</span></div>
       </section>
+
+      <BackstorySection />
 
       <section className="intro-chapter page-pad page-pad--chapter">
         <div className="chapter-index">01</div>
         <div className="intro-chapter__content">
           <Eyebrow>THE PLAYGROUND</Eyebrow>
-          <h2>Ideas are<br /><span>levels</span> waiting<br />to be played.</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pixel Guild is a placeholder studio practice for curious worlds, expressive systems, and the quiet details that make a player lean closer.</p>
-          <Link href="/bio/" className="text-link">Read the field notes <ArrowUpRight size={14} /></Link>
+          <h2>Systems are<br /><span>feelings</span> waiting<br />to be played.</h2>
+          <p>Game developer and engine programmer with a strong focus on Unreal Engine C++ architecture, headless automation frameworks, and high-velocity gameplay prototyping.</p>
+          <Link href="/portfolio/" className="text-link">Explore the systems portfolio <ArrowUpRight size={14} /></Link>
         </div>
         <div className="intro-chapter__sigil" aria-hidden="true"><span>◈</span><small>PG / 001</small></div>
       </section>
@@ -326,7 +310,7 @@ function Home() {
 
       <section className="manifesto page-pad">
         <div className="manifesto__rail"><span>MORE THAN A PORTFOLIO</span><span>SCROLL / 04</span></div>
-        <div className="manifesto__content"><p>Every system hides a story. Every interface is a little world.</p><div className="manifesto__mark"><BrandMark /><span>PIXEL GUILD / 2026</span></div></div>
+        <div className="manifesto__content"><p>Every system hides a story. Every prototype is a question made playable.</p><div className="manifesto__mark"><BrandMark /><span>KV / 2026</span></div></div>
       </section>
 
       <CoinCatcher />
@@ -370,7 +354,7 @@ function PageHeader({ number, kicker, title, copy }: { number: string; kicker: s
 
 function DemoReelPage() {
   const [playing, setPlaying] = useState(false);
-  return <main className="inner-page"><PageHeader number="01" kicker="Demo reel" title={<>Rooms with a<br /><span>pulse.</span></>} copy="A placeholder cut of atmosphere, interaction, and the tiny transitions between one playable idea and the next." /><section className="reel-page__player page-pad"><div className="reel-player"><HeroVideo compact /><button className="reel-player__play" onClick={() => setPlaying((value) => !value)} aria-label={playing ? "Pause reel" : "Play reel"}>{playing ? "Ⅱ" : <Play size={22} fill="currentColor" />}</button><div className="reel-player__bar"><span className="reel-player__progress" style={{ width: playing ? "42%" : "12%" }} /><span className="reel-player__time">00:00:06</span></div></div><div className="reel-page__meta"><div><Eyebrow>Credits</Eyebrow><p>Direction / Placeholder Name<br />Sound / Silent cut<br />Engine / Whatever feels right</p></div><div><Eyebrow>Chapters</Eyebrow><p>00:00 — The descent<br />00:02 — A signal wakes<br />00:05 — The threshold</p></div></div></section><section className="chapter-list page-pad"><div className="section-topline"><Eyebrow number="02">Selected chapters</Eyebrow><span className="muted-label">CLICK TO JUMP / PLACEHOLDER</span></div>{["The descent", "Glyph language", "A room remembers"].map((item, index) => <button key={item} className="chapter-row"><span>0{index + 1}</span><strong>{item}</strong><small>{index === 0 ? "00:00" : index === 1 ? "00:02" : "00:05"}</small><ArrowRight size={15} /></button>)}</section><Footer /></main>;
+  return <main className="inner-page"><PageHeader number="01" kicker="Demo reel" title={<>Rooms with a<br /><span>pulse.</span></>} copy="A compact atmosphere reel for systems, interaction, and the tiny transitions between one playable idea and the next." /><section className="reel-page__player page-pad"><div className="reel-player"><HeroVideo compact /><button className="reel-player__play" onClick={() => setPlaying((value) => !value)} aria-label={playing ? "Pause reel" : "Play reel"}>{playing ? "Ⅱ" : <Play size={22} fill="currentColor" />}</button><div className="reel-player__bar"><span className="reel-player__progress" style={{ width: playing ? "42%" : "12%" }} /><span className="reel-player__time">00:00:06</span></div></div><div className="reel-page__meta"><div><Eyebrow>Credits</Eyebrow><p>Direction / Karthik Veeranala<br />Sound / Silent cut<br />Engine / Unreal / Unity studies</p></div><div><Eyebrow>Chapters</Eyebrow><p>00:00 — The descent<br />00:02 — A signal wakes<br />00:05 — The threshold</p></div></div></section><section className="chapter-list page-pad"><div className="section-topline"><Eyebrow number="02">Selected chapters</Eyebrow><span className="muted-label">CLICK TO JUMP / SOURCE REEL</span></div>{["The descent", "Glyph language", "A room remembers"].map((item, index) => <button key={item} className="chapter-row"><span>0{index + 1}</span><strong>{item}</strong><small>{index === 0 ? "00:00" : index === 1 ? "00:02" : "00:05"}</small><ArrowRight size={15} /></button>)}</section><Footer /></main>;
 }
 
 function MarketplacePage() {
@@ -388,35 +372,35 @@ function ArticlePage({ slug }: { slug: string }) {
 }
 
 function HobbiesPage() {
-  const sideQuests = [{ title: "World sketching", label: "SIDE QUEST 01", copy: "Loose maps, impossible architecture, and a folder called final-final-2." }, { title: "Ambient collecting", label: "SIDE QUEST 02", copy: "Train stations, rain on glass, and the hum of machines nobody notices." }, { title: "Tiny experiments", label: "SIDE QUEST 03", copy: "One-button games and interfaces that only make sense after midnight." }];
-  return <main className="inner-page"><PageHeader number="04" kicker="Hobbies" title={<>Side quests<br /><span>and odd jobs.</span></>} copy="The small practices around the work that keep the main quest from getting too serious." /><section className="hobby-map page-pad"><div className="hobby-map__topline"><Eyebrow>Personal map / placeholder</Eyebrow><span>3 LOCATIONS FOUND</span></div><div className="hobby-map__canvas"><div className="map-path" /><div className="map-node map-node--a"><span>01</span><b>LOOK</b></div><div className="map-node map-node--b"><span>02</span><b>LISTEN</b></div><div className="map-node map-node--c"><span>03</span><b>MAKE</b></div><div className="map-coordinates">42° 00′ 00″ N<br />PLACEHOLDER / EARTH</div></div></section><section className="side-quests page-pad">{sideQuests.map((quest, index) => <article className="side-quest" key={quest.title}><div className="side-quest__icon">{index === 0 ? "✦" : index === 1 ? "◌" : "⌁"}</div><div><Eyebrow>{quest.label}</Eyebrow><h2>{quest.title}</h2><p>{quest.copy}</p></div><ArrowUpRight size={17} /></article>)}</section><Footer /></main>;
+  const sideQuests = [{ title: "Esports & Tournament Directing", label: "COMMUNITY & COMPETITION", copy: "Founding and leading the Elysium Gaming Club at IARE, organizing collegiate LAN tournaments, casting competitive brackets, and analyzing mechanical balance in Valorant, Apex Legends, and CS2." }, { title: "24–48h Game Jam Sprints", label: "RAPID PROTOTYPING", copy: "Distilling complex gameplay ideas into crisp, playable 2-minute loops under severe time constraints. Cultivates high-velocity iteration, modular engine architecture, and ruthless scope prioritization." }, { title: "Virtual World Photography & Lighting", label: "VISUAL COMPOSITION", copy: "Exploring lighting moods, atmospheric volumetric fog, and camera composition studies inside Unreal Engine 5’s Lumen pipeline to understand player guidance and spatial hierarchy." }, { title: "Custom Rig Building & GPU Tuning", label: "HARDWARE & TINKERING", copy: "Hardware benchmarking, custom liquid cooling loops, low-level OS latency tuning, and configuring programmable mechanical macro pads for Unreal Engine and Visual Studio development." }];
+  return <main className="inner-page"><PageHeader number="04" kicker="Hobbies" title={<>Hobbies &<br /><span>creative passions.</span></>} copy="How competitive gameplay, community leadership, and hardware experimentation directly inform game design decisions and systems architecture." /><section className="hobby-map page-pad"><div className="hobby-map__topline"><Eyebrow>Creative pursuits / source notes</Eyebrow><span>4 SIGNALS FOUND</span></div><div className="hobby-map__canvas"><div className="map-path" /><div className="map-node map-node--a"><span>01</span><b>LOOK</b></div><div className="map-node map-node--b"><span>02</span><b>LISTEN</b></div><div className="map-node map-node--c"><span>03</span><b>MAKE</b></div><div className="map-coordinates">17° 26′ 00″ N<br />HYDERABAD / INDIA</div></div></section><section className="side-quests page-pad">{sideQuests.map((quest, index) => <article className="side-quest" key={quest.title}><div className="side-quest__icon">{index === 0 ? "✦" : index === 1 ? "◌" : "⌁"}</div><div><Eyebrow>{quest.label}</Eyebrow><h2>{quest.title}</h2><p>{quest.copy}</p></div><ArrowUpRight size={17} /></article>)}</section><Footer /></main>;
 }
 
 function BioPage() {
   const [sent, setSent] = useState(false);
-  return <main className="inner-page"><PageHeader number="05" kicker="Bio & Contact" title={<>Let’s make<br /><span>something playable.</span></>} copy="A placeholder bio for the person behind Pixel Guild, currently open to thoughtful collaborations, strange prototypes, and good questions." /><section className="bio-layout page-pad"><div className="bio-copy"><Eyebrow>About the player</Eyebrow><p className="bio-copy__lead">I’m a game developer and systems-minded designer exploring the space between a rule and the feeling it creates.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec ullamcorper nulla non metus auctor fringilla.</p><div className="bio-stats"><div><strong>08</strong><span>years making<br />playable things</span></div><div><strong>24</strong><span>worlds explored<br />in notes & prototypes</span></div><div><strong>∞</strong><span>placeholder<br />curiosity remaining</span></div></div><StatusPill>OPEN TO SELECT PROJECTS</StatusPill></div><form className="contact-form" onSubmit={(event) => { event.preventDefault(); setSent(true); }}><Eyebrow>Send a signal</Eyebrow>{sent ? <div className="form-success"><Sparkles size={22} /><h2>Transmission received.</h2><p>Thanks for the placeholder message. I’ll return through the portal soon.</p><button type="button" className="text-link" onClick={() => setSent(false)}>Send another <ArrowRight size={14} /></button></div> : <><label>Name<input required placeholder="Your name" /></label><label>Signal path<input required type="email" placeholder="you@example.com" /></label><label>Message<textarea required placeholder="Tell me a little about the world you want to build..." rows={5} /></label><button className="button" type="submit">Send transmission <Send size={14} /></button></>}</form></section><Footer /></main>;
+  return <main className="inner-page"><PageHeader number="05" kicker="Bio & Contact" title={<>Let’s make<br /><span>something playable.</span></>} copy="Game developer and engine systems programmer with a strong foundation in low-level graphics, deterministic simulation, and real-time interaction." /><section className="bio-layout page-pad"><div className="bio-copy"><Eyebrow>About the player</Eyebrow><p className="bio-copy__lead">I am a game developer and engine systems programmer currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on computer graphics, systems programming, and algorithms.</p><p>My engineering philosophy centers on ruthless execution under constraints. I have spearheaded teams in 24–48 hour competitive hackathons, winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks. As President of Elysium Gaming Club at IARE, I oversee game development workshops and collegiate esports tournaments for 200+ active students.</p><div className="bio-stats"><div><strong>4+</strong><span>hackathon<br />victories</span></div><div><strong>14+</strong><span>playable<br />prototypes</span></div><div><strong>UE</strong><span>5.7 systems<br />core</span></div></div><StatusPill>OPEN TO SYSTEMS & GAMEPLAY ROLES</StatusPill></div><form className="contact-form" onSubmit={(event) => { event.preventDefault(); setSent(true); }}><Eyebrow>Send a signal</Eyebrow>{sent ? <div className="form-success"><Sparkles size={22} /><h2>Transmission received.</h2><p>Thanks for the placeholder message. I’ll return through the portal soon.</p><button type="button" className="text-link" onClick={() => setSent(false)}>Send another <ArrowRight size={14} /></button></div> : <><label>Name<input required placeholder="Your name" /></label><label>Signal path<input required type="email" placeholder="you@example.com" /></label><label>Message<textarea required placeholder="Tell me about the system or game you want to build..." rows={5} /></label><button className="button" type="submit">Send transmission <Send size={14} /></button></>}</form></section><Footer /></main>;
 }
 
 function GitHubPage() {
   const repos = ["world-builder", "soft-reset", "glyph-kit", "quiet-ui", "weather-system"];
-  return <main className="inner-page"><PageHeader number="06" kicker="GitHub" title={<>Open source,<br /><span>open doors.</span></>} copy="A placeholder activity log for code, tools, experiments, and the useful mess that happens between releases." /><section className="github-layout page-pad"><div className="github-profile"><div className="profile-orbit"><CircleUserRound size={44} /></div><Eyebrow>Player profile</Eyebrow><h2>placeholder-name</h2><p>Systems / tools / game design</p><a href="https://github.com/" target="_blank" rel="noreferrer" className="text-link">Visit profile <ArrowUpRight size={14} /></a><div className="contribution-grid">{Array.from({ length: 84 }, (_, index) => <i key={index} className={index % 7 === 0 ? "is-hot" : index % 3 === 0 ? "is-warm" : ""} />)}</div><small>CONTRIBUTIONS / PLACEHOLDER / LAST 12 MONTHS</small></div><div className="repo-list"><div className="section-topline"><Eyebrow>Repositories</Eyebrow><span className="muted-label">5 PUBLIC / 0 PRIVATE</span></div>{repos.map((repo, index) => <a href="https://github.com/" target="_blank" rel="noreferrer" className="repo-row" key={repo}><Code2 size={17} /><div><strong>{repo}</strong><span>Placeholder repository description with a little useful context.</span></div><small>{index % 2 ? "TS" : "C#"}</small><ArrowUpRight size={15} /></a>)}</div></section><Footer /></main>;
+  return <main className="inner-page"><PageHeader number="06" kicker="GitHub" title={<>Open source,<br /><span>open doors.</span></>} copy="A placeholder activity log for code, tools, experiments, and the useful mess that happens between releases." /><section className="github-layout page-pad"><div className="github-profile"><div className="profile-orbit"><CircleUserRound size={44} /></div><Eyebrow>Player profile</Eyebrow><h2>placeholder-name</h2><p>Systems / tools / game design</p><a href="https://github.com/karthikveeranala" target="_blank" rel="noreferrer" className="text-link">Visit profile <ArrowUpRight size={14} /></a><div className="contribution-grid">{Array.from({ length: 84 }, (_, index) => <i key={index} className={index % 7 === 0 ? "is-hot" : index % 3 === 0 ? "is-warm" : ""} />)}</div><small>CONTRIBUTIONS / PLACEHOLDER / LAST 12 MONTHS</small></div><div className="repo-list"><div className="section-topline"><Eyebrow>Repositories</Eyebrow><span className="muted-label">5 PUBLIC / 0 PRIVATE</span></div>{repos.map((repo, index) => <a href="https://github.com/karthikveeranala" target="_blank" rel="noreferrer" className="repo-row" key={repo}><Code2 size={17} /><div><strong>{repo}</strong><span>Placeholder repository description with a little useful context.</span></div><small>{index % 2 ? "TS" : "C#"}</small><ArrowUpRight size={15} /></a>)}</div></section><Footer /></main>;
 }
 
 function PortfolioPage() {
   const [filter, setFilter] = useState("ALL");
   const tags = ["ALL", "SYSTEMS", "WORLDS", "PROTOTYPES"];
   const filtered = filter === "ALL" ? projects : projects.filter((project) => project.tags.some((tag) => tag.toUpperCase().includes(filter.slice(0, -1))));
-  return <main className="inner-page"><PageHeader number="07" kicker="Portfolio" title={<>Selected<br /><span>levels.</span></>} copy="A placeholder archive of game systems, worlds, interfaces, and small experiments built to be touched." /><section className="portfolio-page page-pad"><div className="filter-row">{tags.map((tag) => <button key={tag} className={filter === tag ? "is-selected" : ""} onClick={() => setFilter(tag)}>{tag}</button>)}</div><div className="portfolio-grid">{filtered.map((project, index) => <ProjectCard key={project.slug} project={project} index={index} />)}</div></section><Footer /></main>;
+  return <main className="inner-page"><PageHeader number="07" kicker="Portfolio" title={<>Selected<br /><span>levels.</span></>} copy="Selected engine systems, competitive prototypes, and playable experiments from Karthik Veeranala’s portfolio." /><section className="portfolio-page page-pad"><div className="filter-row">{tags.map((tag) => <button key={tag} className={filter === tag ? "is-selected" : ""} onClick={() => setFilter(tag)}>{tag}</button>)}</div><div className="portfolio-grid">{filtered.map((project, index) => <ProjectCard key={project.slug} project={project} index={index} />)}</div></section><Footer /></main>;
 }
 
 function ProjectPage({ slug }: { slug: string }) {
   const project = projects.find((item) => item.slug === slug) ?? projects[0];
   const next = projects[(projects.findIndex((item) => item.slug === project.slug) + 1) % projects.length];
-  return <main className="inner-page project-page"><section className="project-page__hero page-pad"><Link href="/portfolio/" className="text-link"><ArrowLeft size={14} /> Back to portfolio</Link><div className="project-page__hero-copy"><Eyebrow>Project / {project.stat}</Eyebrow><h1>{project.title}</h1><p>{project.description}</p></div><ProjectVisual tone={project.tone} label="CASE STUDY / PLACEHOLDER" /></section><section className="project-detail page-pad"><div className="project-detail__facts"><div><Eyebrow>Role</Eyebrow><strong>Design / Direction / Placeholder</strong></div><div><Eyebrow>Stack</Eyebrow><strong>{project.tags.join(" / ")}</strong></div><div><Eyebrow>Status</Eyebrow><StatusPill>CASE STUDY PLACEHOLDER</StatusPill></div></div><div className="project-detail__copy"><p className="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. This is a replaceable case study intro for the core idea, the constraints, and the player-facing outcome.</p><div className="project-detail__columns"><div><h2>01 / The brief</h2><p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Nulla vitae elit libero, a pharetra augue.</p></div><div><h2>02 / The result</h2><p>Maecenas faucibus mollis interdum. Donec id elit non mi porta gravida at eget metus.</p></div></div><div className="project-detail__gallery"><ProjectVisual tone={project.tone} label="MEDIA / 01" /><ProjectVisual tone="signal" label="MEDIA / 02" /></div><Link href={`/portfolio/${next.slug}/`} className="next-project"><span>Next project</span><strong>{next.title}</strong><ArrowRight size={20} /></Link></div></section><Footer /></main>;
+  return <main className="inner-page project-page"><section className="project-page__hero page-pad"><Link href="/portfolio/" className="text-link"><ArrowLeft size={14} /> Back to portfolio</Link><div className="project-page__hero-copy"><Eyebrow>Project / {project.stat}</Eyebrow><h1>{project.title}</h1><p>{project.description}</p></div><ProjectVisual tone={project.tone} label="SOURCE MEDIA / Karthik portfolio" media={project.media} /></section><section className="project-detail page-pad"><div className="project-detail__facts"><div><Eyebrow>Role</Eyebrow><strong>Systems Architecture / Gameplay Engineering</strong></div><div><Eyebrow>Stack</Eyebrow><strong>{project.tags.join(" / ")}</strong></div><div><Eyebrow>Status</Eyebrow><StatusPill>SOURCE PROJECT / CASE STUDY</StatusPill></div></div><div className="project-detail__copy"><p className="lead">This project combines systems architecture with player-facing design. The goal was to make difficult technical constraints feel invisible, responsive, and playable.</p><div className="project-detail__columns"><div><h2>01 / The brief</h2><p>The brief: build a reliable technical foundation under a tight delivery window, then turn it into a readable player experience.</p></div><div><h2>02 / The result</h2><p>The result: a tested prototype with clear systems boundaries, strong feedback, and a concrete path from experiment to shipped feature.</p></div></div><div className="project-detail__gallery"><ProjectVisual tone={project.tone} label="SOURCE MEDIA / 01" media={project.media} /><ProjectVisual tone="signal" label="MEDIA / 02" /></div><Link href={`/portfolio/${next.slug}/`} className="next-project"><span>Next project</span><strong>{next.title}</strong><ArrowRight size={20} /></Link></div></section><Footer /></main>;
 }
 
 function Footer() {
-  return <footer className="site-footer page-pad"><div className="site-footer__mark"><BrandMark /><span>PIXEL GUILD</span></div><div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:hello@example.com">hello@example.com</a></div><div className="site-footer__bottom"><span>© 2026 PIXEL GUILD / PLACEHOLDER STUDIO</span><span>Built for the next level <Sparkles size={12} /></span></div></footer>;
+  return <footer className="site-footer page-pad"><div className="site-footer__mark"><BrandMark /><span>KV / KARTHIK VEERANALA</span></div><div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:karthik.veeranala@gmail.com">karthik.veeranala@gmail.com</a></div><div className="site-footer__bottom"><span>© 2026 KARTHIK VEERANALA / GAME SYSTEMS & PROTOTYPING</span><span>Built under constraints <Sparkles size={12} /></span></div></footer>;
 }
 
 function Router() {
@@ -424,12 +408,9 @@ function Router() {
   const path = normalizePath(location);
   if (path === "/") return <Home />;
   if (path === "/demo-reel/") return <DemoReelPage />;
-  if (path === "/marketplace/") return <MarketplacePage />;
-  if (path === "/blog/") return <BlogPage />;
-  if (path.startsWith("/blog/")) return <ArticlePage slug={path.split("/")[2]} />;
+  if (path === "/backstory/") return <BackstoryPage />;
   if (path === "/hobbies/") return <HobbiesPage />;
   if (path === "/bio/") return <BioPage />;
-  if (path === "/github/") return <GitHubPage />;
   if (path === "/arcade/") return <ArcadePage />;
   if (path === "/portfolio/") return <PortfolioPage />;
   if (path.startsWith("/portfolio/")) return <ProjectPage slug={path.split("/")[2]} />;
@@ -437,7 +418,7 @@ function Router() {
 }
 
 function NotFoundPage() {
-  return <main className="not-found page-pad"><Eyebrow>404 / Uncharted</Eyebrow><h1>This level<br /><span>doesn’t exist.</span></h1><p>Maybe the map changed. Maybe the link was only a placeholder.</p><Link href="/" className="button">Return home <ArrowRight size={14} /></Link></main>;
+  return <main className="not-found page-pad"><Eyebrow>404 / Uncharted</Eyebrow><h1>This level<br /><span>doesn’t exist.</span></h1><p>This level is not in the current loadout. The requested source pages have been retired from navigation.</p><Link href="/" className="button">Return home <ArrowRight size={14} /></Link></main>;
 }
 
 function App() {

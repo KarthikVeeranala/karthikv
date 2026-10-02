@@ -5,20 +5,12 @@
       "title": "Pixel Guild \u2014 Home"
     },
     {
+      "path": "/backstory/",
+      "title": "The Backstory"
+    },
+    {
       "path": "/demo-reel/",
       "title": "Demo Reel"
-    },
-    {
-      "path": "/marketplace/",
-      "title": "Marketplace"
-    },
-    {
-      "path": "/blog/",
-      "title": "Blog"
-    },
-    {
-      "path": "/blog/:slug",
-      "title": "Blog Article"
     },
     {
       "path": "/hobbies/",
@@ -27,10 +19,6 @@
     {
       "path": "/bio/",
       "title": "Bio & Contact"
-    },
-    {
-      "path": "/github/",
-      "title": "GitHub"
     },
     {
       "path": "/arcade/",
