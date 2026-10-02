@@ -113,6 +113,10 @@ function SocialRail() {
   );
 }
 
+function ArcadeBackground() {
+  return <div className="pixel-field" aria-hidden="true">{Array.from({ length: 28 }, (_, index) => <i key={index} className={`pixel-field__bit pixel-field__bit--${index % 4}`} style={{ left: `${(index * 37) % 97}%`, top: `${(index * 61) % 94}%`, animationDelay: `${(index % 9) * -0.7}s`, animationDuration: `${5 + (index % 5)}s` }} />)}</div>;
+}
+
 function PixelMascot() {
   const [position, setPosition] = useState(() => ({ x: 22, y: Math.max(120, window.innerHeight - 155) }));
   const [dragging, setDragging] = useState(false);
@@ -173,15 +177,20 @@ function PixelMascot() {
 }
 
 function SiteShell({ children }: { children: React.ReactNode }) {
+  const [location] = useLocation();
   const [theme, setTheme] = useState<"beige" | "neon">(() => {
     try { return localStorage.getItem("pixelguild-theme") === "neon" ? "neon" : "beige"; } catch { return "beige"; }
   });
   useEffect(() => {
     try { localStorage.setItem("pixelguild-theme", theme); } catch { /* optional persistence */ }
   }, [theme]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  }, [location]);
   return (
     <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""}`}> 
       <div className="noise" aria-hidden="true" />
+      <ArcadeBackground />
       <TopNav theme={theme} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
       <PixelMascot />
       {children}
@@ -229,9 +238,7 @@ function ProjectVisual({ tone, label, media }: { tone: string; label: string; me
   return (
     <div className={`project-visual project-visual--${tone}`}>
       {media && <img src={media} alt={label} loading="lazy" />}
-      <div className="project-visual__grid" />
-      <div className="project-visual__orb" />
-      <div className="project-visual__frame"><span>+</span><span>+</span><span>+</span><span>+</span></div>
+      <div className="project-visual__pixel-corners" aria-hidden="true"><i /><i /><i /><i /></div>
       <span className="project-visual__label">{label}</span>
     </div>
   );
@@ -295,7 +302,7 @@ function Home() {
           <p>Game developer and engine programmer with a strong focus on Unreal Engine C++ architecture, headless automation frameworks, and high-velocity gameplay prototyping.</p>
           <Link href="/portfolio/" className="text-link">Explore the systems portfolio <ArrowUpRight size={14} /></Link>
         </div>
-        <div className="intro-chapter__sigil" aria-hidden="true"><span>◈</span><small>PG / 001</small></div>
+        <div className="intro-chapter__sigil" aria-hidden="true"><span>▦</span><small>KV / 001</small></div>
       </section>
 
       <section className="featured-section page-pad">

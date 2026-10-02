@@ -150,3 +150,38 @@ body { background: #eee3d2; color: #382d26; }
 .skills-strip { padding-top: 85px; padding-bottom: 120px; border-top: 1px solid var(--line); }.skills-strip__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 35px; }.skills-strip__grid > div { position: relative; min-height: 230px; padding: 22px; border: 2px solid var(--line); background: var(--bg-elevated); }.skills-strip__grid strong { position: absolute; top: 20px; right: 20px; color: var(--rust); font: 10px var(--mono); }.skills-strip__grid h3 { margin: 42px 0 15px; color: var(--bone); font: 15px var(--mono); text-transform: uppercase; }.skills-strip__grid p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.3; }
 .site-shell:not(.theme-neon) .project-visual > img { mix-blend-mode: multiply; opacity: .58; filter: saturate(.72) contrast(.98); }.site-shell.theme-neon .project-visual > img { mix-blend-mode: screen; opacity: .58; }
 @media (max-width: 760px) { .backstory-section, .backstory-story { display: block; }.backstory-section__facts { margin-top: 42px; }.backstory-identity { margin-top: 48px; }.timeline-row { grid-template-columns: 1fr; gap: 14px; }.skills-strip__grid { grid-template-columns: 1fr; }.skills-strip__grid > div { min-height: auto; }.backstory-section__intro p { font-size: 18px; } }
+
+/* CLEAN MEDIA + LIVING ARCADE FIELD */
+html { scroll-behavior: smooth; }
+body { overscroll-behavior-y: none; }
+.site-shell { isolation: isolate; }
+.pixel-field { position: fixed; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; opacity: .58; }
+.pixel-field__bit { position: absolute; width: 5px; height: 5px; background: var(--teal); box-shadow: 5px 0 var(--teal), 0 5px var(--teal); opacity: .25; animation: pixel-float 6s steps(5) infinite; }
+.pixel-field__bit--1 { width: 3px; height: 9px; background: var(--rust); box-shadow: none; opacity: .24; }
+.pixel-field__bit--2 { width: 8px; height: 3px; background: #d6a43f; box-shadow: none; opacity: .22; }
+.pixel-field__bit--3 { width: 4px; height: 4px; background: var(--teal); box-shadow: 4px 4px var(--teal), 8px 8px var(--teal); opacity: .18; }
+@keyframes pixel-float { 0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); } 50% { transform: translate3d(9px, -16px, 0) rotate(90deg); } }
+/* Replace the large circular hero geometry with square/pixel geometry. */
+.hero-orbit { border-radius: 0; border-style: dashed; transform: rotate(45deg); animation: pixel-orbit 18s steps(8) infinite; }
+.hero-orbit--one { width: min(60vw, 850px); height: min(60vw, 850px); }
+.hero-orbit--two { width: min(33vw, 460px); height: min(33vw, 460px); }
+.hero-orbit::before { content: ''; position: absolute; inset: 12%; border: 1px solid currentColor; opacity: .24; box-shadow: 14px 0 currentColor, -14px 0 currentColor; }
+@keyframes pixel-orbit { from { transform: rotate(45deg) translate(0, 0); } 50% { transform: rotate(51deg) translate(5px, -8px); } to { transform: rotate(45deg) translate(0, 0); } }
+.intro-chapter__sigil span { display: grid; place-items: center; width: 84px; height: 84px; border: 2px solid currentColor; border-radius: 0; transform: rotate(45deg); font-size: 48px; line-height: 1; }
+.intro-chapter__sigil span::first-letter { transform: rotate(-45deg); }
+/* Project panels are now clean media windows: no tinting, grid, orb, or decorative frame over the artwork. */
+.project-visual { background: #151020; border-radius: 0; aspect-ratio: 16 / 9; }
+.project-visual > img { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; opacity: 1; filter: none; mix-blend-mode: normal; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+.project-visual:hover > img { transform: scale(1.035); opacity: 1; }
+.project-visual__grid, .project-visual__orb, .project-visual__frame { display: none !important; }
+.project-visual__pixel-corners { position: absolute; z-index: 2; inset: 12px; pointer-events: none; }
+.project-visual__pixel-corners i { position: absolute; width: 10px; height: 10px; border-color: #ffd64f; border-style: solid; opacity: .9; }.project-visual__pixel-corners i:nth-child(1) { top: 0; left: 0; border-width: 2px 0 0 2px; }.project-visual__pixel-corners i:nth-child(2) { top: 0; right: 0; border-width: 2px 2px 0 0; }.project-visual__pixel-corners i:nth-child(3) { bottom: 0; left: 0; border-width: 0 0 2px 2px; }.project-visual__pixel-corners i:nth-child(4) { right: 0; bottom: 0; border-width: 0 2px 2px 0; }
+.project-visual__label { z-index: 3; padding: 7px 9px; background: rgba(12,8,20,.82); border: 1px solid rgba(255,214,79,.65); }
+.site-shell:not(.theme-neon) .project-visual { background: #b6a58f; border-color: #8e6f5d; }.site-shell:not(.theme-neon) .project-visual > img { mix-blend-mode: normal; opacity: 1; filter: none; }.site-shell:not(.theme-neon) .project-visual__pixel-corners i { border-color: #eee3d2; }.site-shell:not(.theme-neon) .project-visual__label { background: rgba(56,45,38,.82); color: #eee3d2; border-color: #d6a43f; }
+/* Make card rhythm more editorial and keep source titles from stretching across the whole viewport. */
+.portfolio-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(30px, 5vw, 90px) clamp(20px, 4vw, 65px); align-items: start; }
+.portfolio-grid .project-card, .featured-grid .project-card { display: flex; flex-direction: column; width: 100%; margin: 0; }
+.portfolio-grid .project-card--right, .featured-grid .project-card--right { margin-top: clamp(45px, 9vw, 150px); }
+.project-card__body { padding-top: 18px; }.project-card__body > div:first-child { min-width: 0; }.project-card__body h3 { max-width: 18ch; margin: 10px 0 0; font-size: clamp(22px, 2.5vw, 42px); line-height: .98; overflow-wrap: anywhere; }.project-card__body p { max-width: 48ch; font-size: 16px; line-height: 1.35; }.project-card__arrow { flex: 0 0 auto; }
+.project-card:hover .project-card__arrow { transform: translate(4px, -4px); transition: transform .25s steps(3); }
+@media (max-width: 760px) { .portfolio-grid { display: block; }.portfolio-grid .project-card--right, .featured-grid .project-card--right { margin-top: 45px; }.project-card__body h3 { max-width: 15ch; font-size: clamp(24px, 8vw, 40px); }.project-visual { aspect-ratio: 4 / 3; }.hero-orbit--one { width: 90vw; height: 90vw; }.hero-orbit--two { width: 58vw; height: 58vw; }.pixel-field__bit { transform: scale(.8); } }
