@@ -140,80 +140,44 @@ function SocialRail() {
 }
 
 function ArcadeBackground() {
-  return <div className="pixel-field" aria-hidden="true">{Array.from({ length: 28 }, (_, index) => <i key={index} className={`pixel-field__bit pixel-field__bit--${index % 4}`} style={{ left: `${(index * 37) % 97}%`, top: `${(index * 61) % 94}%`, animationDelay: `${(index % 9) * -0.7}s`, animationDuration: `${5 + (index % 5)}s` }} />)}</div>;
+  return <div className="pixel-field" aria-hidden="true">{Array.from({ length: 18 }, (_, index) => <i key={index} className={`pixel-field__bit pixel-field__bit--${index % 4}`} style={{ left: `${(index * 37) % 97}%`, top: `${(index * 61) % 94}%`, animationDelay: `${(index % 9) * -0.7}s`, animationDuration: `${5 + (index % 5)}s` }} />)}</div>;
 }
 
 function PixelMascot() {
   const [position, setPosition] = useState(() => ({ x: 22, y: Math.max(120, window.innerHeight - 155) }));
   const [dragging, setDragging] = useState(false);
   const [message, setMessage] = useState("DRAG ME");
+  const mascotRef = useRef<HTMLDivElement>(null);
+  const positionRef = useRef(position);
   const dragOffset = useRef({ x: 0, y: 0 });
   const moved = useRef(false);
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("pixelguild-mascot-position");
-      if (saved) setPosition(JSON.parse(saved));
-    } catch { /* use the default spawn point */ }
-  }, []);
-  useEffect(() => {
-    try { localStorage.setItem("pixelguild-mascot-position", JSON.stringify(position)); } catch { /* optional persistence */ }
-  }, [position]);
+  useEffect(() => { try { const saved = localStorage.getItem("pixelguild-mascot-position"); if (saved) { const parsed = JSON.parse(saved); positionRef.current = parsed; setPosition(parsed); } } catch { /* use the default spawn point */ } }, []);
+  useEffect(() => { try { localStorage.setItem("pixelguild-mascot-position", JSON.stringify(position)); } catch { /* optional persistence */ } }, [position]);
   useEffect(() => {
     const move = (event: PointerEvent) => {
       if (!dragging) return;
       moved.current = true;
-      setPosition({
-        x: Math.max(8, Math.min(window.innerWidth - 74, event.clientX - dragOffset.current.x)),
-        y: Math.max(64, Math.min(window.innerHeight - 76, event.clientY - dragOffset.current.y)),
-      });
+      const next = { x: Math.max(8, Math.min(window.innerWidth - 74, event.clientX - dragOffset.current.x)), y: Math.max(64, Math.min(window.innerHeight - 76, event.clientY - dragOffset.current.y)) };
+      positionRef.current = next;
+      if (mascotRef.current) mascotRef.current.style.transform = `translate3d(${next.x}px, ${next.y}px, 0)`;
     };
-    const up = () => setDragging(false);
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
+    const up = () => { if (!dragging) return; setDragging(false); setPosition(positionRef.current); };
+    window.addEventListener("pointermove", move, { passive: true }); window.addEventListener("pointerup", up, { passive: true });
     return () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
   }, [dragging]);
-
-  return (
-    <div
-      className={`pixel-mascot ${dragging ? "is-dragging" : ""}`}
-      style={{ left: position.x, top: position.y }}
-      onPointerDown={(event) => {
-        event.preventDefault();
-        const rect = event.currentTarget.getBoundingClientRect();
-        dragOffset.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-        moved.current = false;
-        setDragging(true);
-      }}
-      onClick={() => {
-        if (!moved.current) setMessage((current) => current === "DRAG ME" ? "HI PLAYER!" : "DRAG ME");
-      }}
-      role="button"
-      tabIndex={0}
-      aria-label="Draggable Pixel Guild mascot"
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") setMessage("READY!");
-      }}
-    >
-      <span className="pixel-mascot__bubble">{message}</span>
-      <span className="pixel-mascot__sprite" aria-hidden="true"><i /><i /><i /><b /><b /><em /></span>
-      <span className="pixel-mascot__tag">PG-01</span>
-    </div>
-  );
+  return <div ref={mascotRef} className={`pixel-mascot ${dragging ? "is-dragging" : ""}`} style={{ left: 0, top: 0, transform: `translate3d(${position.x}px, ${position.y}px, 0)` }} onPointerDown={(event) => { event.preventDefault(); const rect = event.currentTarget.getBoundingClientRect(); dragOffset.current = { x: event.clientX - rect.left, y: event.clientY - rect.top }; moved.current = false; setDragging(true); }} onClick={() => { if (!moved.current) setMessage((current) => current === "DRAG ME" ? "HI PLAYER!" : "DRAG ME"); }} role="button" tabIndex={0} aria-label="Draggable Pixel Guild mascot" onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setMessage("READY!"); }}><span className="pixel-mascot__bubble">{message}</span><span className="pixel-mascot__sprite" aria-hidden="true"><i /><i /><i /><b /><b /><em /></span><span className="pixel-mascot__tag">PG-01</span></div>;
 }
 
 function CursorFX() {
-  const [points, setPoints] = useState(() => Array.from({ length: 8 }, () => ({ x: -100, y: -100 })));
+  const trailRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const pointer = useRef({ x: -100, y: -100 });
+  const frame = useRef(0);
   useEffect(() => {
-    let frame = 0;
-    const move = (event: PointerEvent) => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setPoints((current) => [{ x: event.clientX, y: event.clientY }, ...current].slice(0, 8)));
-    };
-    window.addEventListener("pointermove", move);
-    return () => { cancelAnimationFrame(frame); window.removeEventListener("pointermove", move); };
+    const move = (event: PointerEvent) => { pointer.current = { x: event.clientX, y: event.clientY }; if (!frame.current) frame.current = requestAnimationFrame(() => { frame.current = 0; trailRefs.current.forEach((node, index) => { if (node) node.style.transform = `translate3d(${pointer.current.x + index * 3}px, ${pointer.current.y + index * 3}px, 0) scale(${1 - index * .08})`; }); }); };
+    window.addEventListener("pointermove", move, { passive: true });
+    return () => { window.removeEventListener("pointermove", move); if (frame.current) cancelAnimationFrame(frame.current); };
   }, []);
-  return <div className="cursor-fx" aria-hidden="true">{points.map((point, index) => <i key={index} style={{ left: point.x, top: point.y, opacity: Math.max(0, .75 - index * .09), transform: `scale(${1 - index * .08})` }} />)}</div>;
+  return <div className="cursor-fx" aria-hidden="true">{Array.from({ length: 6 }, (_, index) => <span key={index} ref={(node) => { trailRefs.current[index] = node; }} style={{ opacity: Math.max(0, .75 - index * .1) }} />)}</div>;
 }
 
 function CheatTerminal({ open, unlocked, onClose, onToggleCabinet, onDeveloper }: { open: boolean; unlocked: boolean; onClose: () => void; onToggleCabinet: () => void; onDeveloper: () => void }) {
@@ -268,7 +232,8 @@ function SiteShell({ children }: { children: React.ReactNode }) {
   }, []);
   useEffect(() => {
     try { localStorage.setItem("pixelguild-sound", soundOn ? "on" : "off"); } catch { /* optional persistence */ }
-    const over = (event: PointerEvent) => { if (soundOn && (event.target as HTMLElement).closest("a,button")) playArcadeTone("hover"); };
+    let lastHover = 0;
+    const over = (event: PointerEvent) => { const now = performance.now(); if (soundOn && now - lastHover > 90 && (event.target as HTMLElement).closest("a,button")) { lastHover = now; playArcadeTone("hover"); } };
     const click = (event: MouseEvent) => { if (soundOn && (event.target as HTMLElement).closest("a,button")) playArcadeTone("click"); };
     window.addEventListener("pointerover", over); window.addEventListener("click", click);
     return () => { window.removeEventListener("pointerover", over); window.removeEventListener("click", click); };
@@ -331,24 +296,20 @@ function ProjectVisual({ tone, label, media }: { tone: string; label: string; me
   );
 }
 
-function ProjectCard({ project, index }: { project: typeof projects[number]; index: number }) {
-  return (
-    <Link href={`/portfolio/${project.slug}/`} className={`project-card project-card--${index % 2 === 0 ? "left" : "right"}`}>
-      <div className="project-card__number"><strong>{String(index + 1).padStart(2, "0")}</strong><span>/ {String(projects.length).padStart(2, "0")}</span></div>
-      <div className="project-card__content">
-        <ProjectVisual tone={project.tone} label={project.stat} media={project.media} />
-        <div className="project-card__body">
-          <div>
-            <span className="project-card__type">{project.type}</span>
-            <h3>{project.title}</h3>
-          </div>
-          <ArrowUpRight className="project-card__arrow" size={18} />
-          <p>{project.description}</p>
-          <div className="tag-row">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-        </div>
-      </div>
-    </Link>
-  );
+function ProjectCard({ project, index, onContributions }: { project: typeof projects[number]; index: number; onContributions?: (project: typeof projects[number]) => void }) {
+  return <article className={`project-card project-card--${index % 2 === 0 ? "left" : "right"}`}><div className="project-card__number"><strong>{String(index + 1).padStart(2, "0")}</strong><span>/ {String(projects.length).padStart(2, "0")}</span></div><div className="project-card__content"><Link href={`/portfolio/${project.slug}/`} className="project-card__link"><ProjectVisual tone={project.tone} label={project.stat} media={project.media} /><div className="project-card__body"><div><span className="project-card__type">{project.type}</span><h3>{project.title}</h3></div><ArrowUpRight className="project-card__arrow" size={18} /><p>{project.description}</p><div className="tag-row">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div></Link>{onContributions && <button className="project-card__contrib" onClick={() => onContributions(project)}>My contributions <ArrowRight size={13} /></button>}</div></article>;
+}
+
+function ContributionDrawer({ project, onClose }: { project: typeof projects[number]; onClose: () => void }) {
+  const details: Record<string, [string, string, string]> = {
+    "e2e-automation-suite": ["Systems architecture / technical direction", "Architected the headless Unreal Engine C++ harness, recursive Slate/UMG discovery, isolated Win32 desktop flows, physics determinism checks, and GPU backbuffer streaming into FFmpeg.", "Verification-first systems that turn hard-to-see engine state into repeatable, reviewable evidence."],
+    "the-interlude": ["Gameplay systems / AI", "Designed the 6-DOF flight model, predictive lead-target AI, interceptor escalation, and the combat feedback loop during a 24-hour CodeDay sprint.", "A small, readable systems surface that made zero-gravity combat feel immediate instead of weightless."],
+    byteoasis: ["Puzzle systems / interaction design", "Built the logic-terminal puzzle flow, security-grid state machines, command feedback, and the progression rules that turned debugging into exploration.", "The contribution was making code-like interactions legible as playable decisions."],
+    "geek-o-wars": ["Combat architecture / shaders", "Implemented the microscopic combat loop, enemy purge behavior, motherboard navigation, and shader-driven threat cues for the MLH FrostHacks prototype.", "A compact ruleset where visual language and mechanical balance reinforce each other."],
+    "city-of-aethel": ["Gameplay engineering / encounter design", "Built multi-phase boss choreography, five-hit melee chains, i-frame dodges, and the browser-ready Phaser 3 prototype pipeline.", "Fast iteration with enough structure to keep every hit, dodge, and phase change readable."],
+  };
+  const [role, copy, result] = details[project.slug] ?? ["Systems / gameplay engineering", project.description, "A focused contribution across architecture, iteration, and playability."];
+  return <div className="contribution-drawer__backdrop" role="dialog" aria-modal="true" aria-label={`${project.title} contributions`} onClick={onClose}><aside className="contribution-drawer" onClick={(event) => event.stopPropagation()}><button className="contribution-drawer__close" onClick={onClose} aria-label="Close contributions">×</button><Eyebrow>My contributions / {project.stat}</Eyebrow><h2>{project.title}</h2><div className="contribution-drawer__block"><Eyebrow>Role & scope</Eyebrow><strong>{role}</strong></div><div className="contribution-drawer__block"><Eyebrow>Core systems architected</Eyebrow><p>{copy}</p></div><div className="contribution-drawer__block"><Eyebrow>Verification & performance highlights</Eyebrow><p>{result}</p></div><div className="contribution-drawer__code"><span>CONTRIBUTION_LOG // OPEN</span><code>systems.register("{project.slug}");</code><code>playability.signal = "clear";</code></div></aside></div>;
 }
 
 
@@ -467,7 +428,7 @@ function BossFight() {
 }
 
 function PageHeader({ number, kicker, title, copy }: { number: string; kicker: string; title: React.ReactNode; copy: string }) {
-  return <section className="page-header page-pad"><Eyebrow number={number}>{kicker}</Eyebrow><h1>{title}</h1><p>{copy}</p></section>;
+  return <section className="page-header page-pad"><div className="page-header__main"><Eyebrow number={number}>{kicker}</Eyebrow><h1>{title}</h1><p>{copy}</p></div><aside className="page-header__aside" aria-hidden="true"><div className="page-header__meter"><i /><i /><i /><i /><i /></div><span>LOADOUT / {number}</span><strong>READY</strong><small>INPUTS ONLINE<br />SYSTEMS IN MOTION</small></aside></section>;
 }
 
 function DemoReelPage() {
@@ -490,9 +451,16 @@ function ArticlePage({ slug }: { slug: string }) {
 }
 
 function HobbiesPage() {
-  const sideQuests = [{ title: "Esports & Tournament Directing", label: "COMMUNITY & COMPETITION", copy: "Founding and leading the Elysium Gaming Club at IARE, organizing collegiate LAN tournaments, casting competitive brackets, and analyzing mechanical balance in Valorant, Apex Legends, and CS2." }, { title: "24–48h Game Jam Sprints", label: "RAPID PROTOTYPING", copy: "Distilling complex gameplay ideas into crisp, playable 2-minute loops under severe time constraints. Cultivates high-velocity iteration, modular engine architecture, and ruthless scope prioritization." }, { title: "Virtual World Photography & Lighting", label: "VISUAL COMPOSITION", copy: "Exploring lighting moods, atmospheric volumetric fog, and camera composition studies inside Unreal Engine 5’s Lumen pipeline to understand player guidance and spatial hierarchy." }, { title: "Custom Rig Building & GPU Tuning", label: "HARDWARE & TINKERING", copy: "Hardware benchmarking, custom liquid cooling loops, low-level OS latency tuning, and configuring programmable mechanical macro pads for Unreal Engine and Visual Studio development." }];
-  return <main className="inner-page"><PageHeader number="04" kicker="Hobbies" title={<>Hobbies &<br /><span>creative passions.</span></>} copy="How competitive gameplay, community leadership, and hardware experimentation directly inform game design decisions and systems architecture." /><section className="hobby-map page-pad"><div className="hobby-map__topline"><Eyebrow>Creative pursuits / source notes</Eyebrow><span>4 SIGNALS FOUND</span></div><div className="hobby-map__canvas"><div className="map-path" /><div className="map-node map-node--a"><span>01</span><b>LOOK</b></div><div className="map-node map-node--b"><span>02</span><b>LISTEN</b></div><div className="map-node map-node--c"><span>03</span><b>MAKE</b></div><div className="map-coordinates">17° 26′ 00″ N<br />HYDERABAD / INDIA</div></div></section><section className="side-quests page-pad">{sideQuests.map((quest, index) => <article className="side-quest" key={quest.title}><div className="side-quest__icon">{index === 0 ? "✦" : index === 1 ? "◌" : "⌁"}</div><div><Eyebrow>{quest.label}</Eyebrow><h2>{quest.title}</h2><p>{quest.copy}</p></div><ArrowUpRight size={17} /></article>)}</section><Footer /></main>;
+  const hobbies = [
+    { title: "Games", label: "COMMUNITY & COMPETITION", copy: "Founding and leading the Elysium Gaming Club at IARE, organizing collegiate LAN tournaments, casting competitive brackets, and analyzing mechanical balance in Valorant, Apex Legends, and CS2.", art: "games", note: "PLAY / LEAD / COMPETE" },
+    { title: "Reading", label: "SYSTEMS & IDEAS", copy: "Digging through engine documentation, graphics papers, design postmortems, and the small technical notes that turn an interesting mechanic into a reliable system.", art: "reading", note: "STUDY / CONNECT / QUESTION" },
+    { title: "Athletics", label: "RHYTHM & DISCIPLINE", copy: "Fast competitive play, tournament pressure, and regular movement keep the feedback loop sharp: react, reset, read the field, and commit to the next move.", art: "athletics", note: "MOVE / RESET / REPEAT" },
+    { title: "Creative", label: "VISUAL COMPOSITION", copy: "Exploring lighting moods, atmospheric volumetric fog, and camera composition studies inside Unreal Engine 5’s Lumen pipeline, alongside custom rigs, cooling loops, and macro pads.", art: "creative", note: "LOOK / LISTEN / MAKE" },
+  ];
+  const [active, setActive] = useState<string | null>(null);
+  return <main className="inner-page hobbies-page"><PageHeader number="04" kicker="Creative pursuits / source notes" title={<>The things that<br /><span>keep me sharp.</span></>} copy="Competitive gameplay, systems research, physical rhythm, and visual experimentation all feed the way I build playable worlds." /><section className="hobby-field page-pad"><div className="hobby-field__topline"><Eyebrow>4 signals found</Eyebrow><span>HOVER OR SELECT A CARD</span></div><div className="hobby-field__canvas">{hobbies.map((hobby, index) => <button key={hobby.title} className={`hobby-card hobby-card--${hobby.art} ${active === hobby.title ? "is-active" : ""}`} onClick={() => setActive(active === hobby.title ? null : hobby.title)}><span className="hobby-card__index">0{index + 1}</span><span className={`hobby-card__art hobby-card__art--${hobby.art}`} aria-hidden="true"><i /><i /><i /><b /></span><span className="hobby-card__body"><small>{hobby.label}</small><strong>{hobby.title}</strong><em>{hobby.note}</em></span><span className="hobby-card__window"><b>{hobby.title.toUpperCase()} // SIGNAL</b><span>{hobby.copy}</span></span></button>)}</div></section><section className="hobby-note page-pad"><Eyebrow>Why it matters</Eyebrow><p>These are not side quests. They are inputs: competition teaches feedback, reading builds context, athletics tunes timing, and creative work gives systems a point of view.</p></section><Footer /></main>;
 }
+
 
 function BioPage() {
   const [sent, setSent] = useState(false);
@@ -518,9 +486,10 @@ function TechTreePage() {
 
 function PortfolioPage() {
   const [filter, setFilter] = useState("ALL");
+  const [contribution, setContribution] = useState<typeof projects[number] | null>(null);
   const tags = ["ALL", "SYSTEMS", "WORLDS", "PROTOTYPES"];
   const filtered = filter === "ALL" ? projects : projects.filter((project) => project.tags.some((tag) => tag.toUpperCase().includes(filter.slice(0, -1))));
-  return <main className="inner-page"><PageHeader number="07" kicker="Portfolio" title={<>Selected<br /><span>levels.</span></>} copy="Selected engine systems, competitive prototypes, and playable experiments from Karthik Veeranala’s portfolio." /><section className="portfolio-page page-pad"><div className="portfolio-loadout"><Eyebrow>Inventory view</Eyebrow><Link href="/skills/" className="text-link">Open interactive tech tree <ArrowUpRight size={14} /></Link></div><div className="filter-row">{tags.map((tag) => <button key={tag} className={filter === tag ? "is-selected" : ""} onClick={() => setFilter(tag)}>{tag}</button>)}</div><div className="portfolio-grid">{filtered.map((project, index) => <ProjectCard key={project.slug} project={project} index={index} />)}</div></section><Footer /></main>;
+  return <main className="inner-page"><PageHeader number="07" kicker="Portfolio" title={<>Selected<br /><span>levels.</span></>} copy="Selected engine systems, competitive prototypes, and playable experiments from Karthik Veeranala’s portfolio." /><section className="portfolio-page page-pad"><div className="portfolio-loadout"><Eyebrow>Inventory view</Eyebrow><Link href="/skills/" className="text-link">Open interactive tech tree <ArrowUpRight size={14} /></Link></div><div className="filter-row">{tags.map((tag) => <button key={tag} className={filter === tag ? "is-selected" : ""} onClick={() => setFilter(tag)}>{tag}</button>)}</div><div className="portfolio-grid">{filtered.map((project, index) => <ProjectCard key={project.slug} project={project} index={index} onContributions={setContribution} />)}</div></section>{contribution && <ContributionDrawer project={contribution} onClose={() => setContribution(null)} />}<Footer /></main>;
 }
 
 function ProjectPage({ slug }: { slug: string }) {
