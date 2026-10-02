@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   ArrowDownRight,
@@ -8,16 +8,23 @@ import {
   ChevronDown,
   CircleUserRound,
   Code2,
+  Gamepad2,
   Github,
   Instagram,
   Linkedin,
+  MousePointer2,
   Mail,
   Menu,
+  Moon,
+  Sun,
   MoveUpRight,
   Play,
+  RefreshCw,
   Send,
   Sparkles,
+  Trophy,
   Twitch,
+  Zap,
   X,
   Youtube,
 } from "lucide-react";
@@ -33,6 +40,7 @@ const navItems = [
   { label: "Hobbies", href: "/hobbies/" },
   { label: "Bio & Contact", href: "/bio/" },
   { label: "GitHub", href: "/github/" },
+  { label: "Arcade", href: "/arcade/" },
 ];
 
 const projects = [
@@ -101,7 +109,7 @@ function BrandMark() {
   );
 }
 
-function TopNav() {
+function TopNav({ theme, onToggleTheme }: { theme: "beige" | "neon"; onToggleTheme: () => void }) {
   const [location] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [location]);
@@ -120,6 +128,7 @@ function TopNav() {
         <a className="nav-link nav-link--github" href="https://github.com/" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={10} /></a>
         <Link href="/portfolio/" className={`nav-cta ${isActive("/portfolio/", location) ? "is-active" : ""}`}>Portfolio</Link>
       </nav>
+      <button className="theme-toggle" onClick={onToggleTheme} aria-label={theme === "neon" ? "Switch to beige day mode" : "Switch to neon night mode"} title={theme === "neon" ? "Beige day mode" : "Neon night mode"}>{theme === "neon" ? <Sun size={13} /> : <Moon size={13} />}<span>{theme === "neon" ? "DAY" : "NIGHT"}</span></button>
       <button className="site-nav__menu" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Close menu" : "Open menu"}>
         {menuOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
@@ -138,11 +147,77 @@ function SocialRail() {
   );
 }
 
-function SiteShell({ children }: { children: React.ReactNode }) {
+function PixelMascot() {
+  const [position, setPosition] = useState(() => ({ x: 22, y: Math.max(120, window.innerHeight - 155) }));
+  const [dragging, setDragging] = useState(false);
+  const [message, setMessage] = useState("DRAG ME");
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const moved = useRef(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("pixelguild-mascot-position");
+      if (saved) setPosition(JSON.parse(saved));
+    } catch { /* use the default spawn point */ }
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem("pixelguild-mascot-position", JSON.stringify(position)); } catch { /* optional persistence */ }
+  }, [position]);
+  useEffect(() => {
+    const move = (event: PointerEvent) => {
+      if (!dragging) return;
+      moved.current = true;
+      setPosition({
+        x: Math.max(8, Math.min(window.innerWidth - 74, event.clientX - dragOffset.current.x)),
+        y: Math.max(64, Math.min(window.innerHeight - 76, event.clientY - dragOffset.current.y)),
+      });
+    };
+    const up = () => setDragging(false);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    return () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+  }, [dragging]);
+
   return (
-    <div className="site-shell">
+    <div
+      className={`pixel-mascot ${dragging ? "is-dragging" : ""}`}
+      style={{ left: position.x, top: position.y }}
+      onPointerDown={(event) => {
+        event.preventDefault();
+        const rect = event.currentTarget.getBoundingClientRect();
+        dragOffset.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        moved.current = false;
+        setDragging(true);
+      }}
+      onClick={() => {
+        if (!moved.current) setMessage((current) => current === "DRAG ME" ? "HI PLAYER!" : "DRAG ME");
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label="Draggable Pixel Guild mascot"
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") setMessage("READY!");
+      }}
+    >
+      <span className="pixel-mascot__bubble">{message}</span>
+      <span className="pixel-mascot__sprite" aria-hidden="true"><i /><i /><i /><b /><b /><em /></span>
+      <span className="pixel-mascot__tag">PG-01</span>
+    </div>
+  );
+}
+
+function SiteShell({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<"beige" | "neon">(() => {
+    try { return localStorage.getItem("pixelguild-theme") === "neon" ? "neon" : "beige"; } catch { return "beige"; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem("pixelguild-theme", theme); } catch { /* optional persistence */ }
+  }, [theme]);
+  return (
+    <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""}`}> 
       <div className="noise" aria-hidden="true" />
-      <TopNav />
+      <TopNav theme={theme} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
+      <PixelMascot />
       {children}
       <SocialRail />
       <div className="site-cursor" aria-hidden="true"><span /></div>
@@ -254,9 +329,39 @@ function Home() {
         <div className="manifesto__content"><p>Every system hides a story. Every interface is a little world.</p><div className="manifesto__mark"><BrandMark /><span>PIXEL GUILD / 2026</span></div></div>
       </section>
 
+      <CoinCatcher />
       <Footer />
     </main>
   );
+}
+
+
+function CoinCatcher() {
+  const [score, setScore] = useState(0);
+  const [coin, setCoin] = useState({ left: 64, top: 34 });
+  const collect = () => {
+    setScore((value) => value + 1);
+    setCoin({ left: 16 + Math.random() * 68, top: 18 + Math.random() * 62 });
+  };
+  return <section className="coin-catcher page-pad"><div className="coin-catcher__copy"><Eyebrow number="04">Easter egg / coin hunt</Eyebrow><h2>Catch the<br /><span>glitch coin.</span></h2><p>Tap the coin before it jumps. A tiny reward for exploring the page.</p><strong>SCORE {String(score).padStart(2, "0")}</strong></div><div className="coin-catcher__screen"><span className="coin-catcher__scanline" /><button className="glitch-coin" style={{ left: `${coin.left}%`, top: `${coin.top}%` }} onClick={collect} aria-label="Collect glitch coin">✦</button><span className="coin-catcher__hint">CLICK THE STAR / +10 XP</span></div></section>;
+}
+
+function ArcadePage() {
+  const cards = useMemo(() => ["★", "★", "◆", "◆", "●", "●", "✦", "✦", "☾", "☾", "▣", "▣"].sort(() => Math.random() - 0.5), []);
+  const [flipped, setFlipped] = useState<number[]>([]);
+  const [matched, setMatched] = useState<number[]>([]);
+  const [moves, setMoves] = useState(0);
+  useEffect(() => {
+    if (flipped.length !== 2) return;
+    setMoves((value) => value + 1);
+    const timeout = window.setTimeout(() => {
+      if (cards[flipped[0]] === cards[flipped[1]]) setMatched((value) => [...value, ...flipped]);
+      setFlipped([]);
+    }, 560);
+    return () => window.clearTimeout(timeout);
+  }, [flipped, cards]);
+  const reset = () => { setFlipped([]); setMatched([]); setMoves(0); };
+  return <main className="inner-page arcade-page"><PageHeader number="08" kicker="Arcade / secret room" title={<>Press start.<br /><span>Play a round.</span></>} copy="A tiny memory match hidden inside the portfolio. Find every pair, beat the clock, and unlock the cabinet glow." /><section className="arcade-cabinet page-pad"><div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div><div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div><div className="arcade-cabinet__bottom"><span>{matched.length === cards.length ? "PERFECT RUN! CABINET CLEARED." : "FIND THE PAIRS / NO CHEATING"}</span><button className="button button--tiny" onClick={reset}><RefreshCw size={12} /> Reset</button></div></section><div className="arcade-tips page-pad"><div><Zap size={17} /><p>Click the Pixel Guild mascot to change its mood. Drag it anywhere and it remembers the spot.</p></div><div><MousePointer2 size={17} /><p>Every card, project visual, and video panel has a little hover state waiting for you.</p></div></div><Footer /></main>;
 }
 
 function PageHeader({ number, kicker, title, copy }: { number: string; kicker: string; title: React.ReactNode; copy: string }) {
@@ -325,6 +430,7 @@ function Router() {
   if (path === "/hobbies/") return <HobbiesPage />;
   if (path === "/bio/") return <BioPage />;
   if (path === "/github/") return <GitHubPage />;
+  if (path === "/arcade/") return <ArcadePage />;
   if (path === "/portfolio/") return <PortfolioPage />;
   if (path.startsWith("/portfolio/")) return <ProjectPage slug={path.split("/")[2]} />;
   return <NotFoundPage />;
