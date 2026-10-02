@@ -6,33 +6,41 @@ import {
   ArrowRight,
   ArrowUpRight,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   CircleUserRound,
   Code2,
   Gamepad2,
   Github,
-  Instagram,
   Linkedin,
   MousePointer2,
   Mail,
+  Maximize2,
   Menu,
   Moon,
-  Sun,
-  MoveUpRight,
+  Pause,
   Play,
   RefreshCw,
   Send,
   Sparkles,
+  Sun,
+  Terminal,
   Trophy,
-  Twitch,
-  Zap,
-  X,
-  Youtube,
   Volume2,
   VolumeX,
+  X,
+  Youtube,
+  Zap,
   Monitor,
-  Terminal,
 } from "lucide-react";
 import ErrorBoundary from "./components/ErrorBoundary";
+
+function assetUrl(path: string) {
+  const base = import.meta.env.BASE_URL || "/";
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+  const cleanBase = base.endsWith("/") ? base : `${base}/`;
+  return `${cleanBase}${cleanPath}`;
+}
 
 const ACCENT = "#16d6bd";
 let arcadeAudio: AudioContext | null = null;
@@ -66,7 +74,14 @@ const navItems = [
   { label: "Tech Tree", href: "/skills/" },
 ];
 
-const DEMO_REEL_URL = "https://temporary-rushing-bugle-cnroga2.vercel.app/karthik_veeranala_demo_reel.mp4";
+const DEMO_REEL_URL = assetUrl("karthik_veeranala_demo_reel.mp4");
+
+export interface ProjectMediaItem {
+  type: "video" | "image";
+  url: string;
+  title: string;
+  caption: string;
+}
 
 const projects = [
   {
@@ -77,8 +92,46 @@ const projects = [
     tags: ["Unreal Engine 5.7", "C++", "Win32", "FFmpeg"],
     tone: "signal",
     stat: "01 / 05",
-    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_suite_workspace.png",
-    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/e2e_automation_suite_reel.mp4",
+    media: assetUrl("portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_suite_workspace.png"),
+    video: assetUrl("videos/02_e2e_automation_suite.mp4"),
+    gallery: [
+      {
+        type: "video" as const,
+        url: assetUrl("videos/02_e2e_automation_suite.mp4"),
+        title: "E2E Automation Harness Reel",
+        caption: "15s Windmill procedural assembly test + 10s UE5 Editor Slate plugin runner",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_suite_workspace.png"),
+        title: "UE5 Editor Automation Workspace",
+        caption: "Central test orchestration harness running natively inside Unreal Engine 5.7",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_suite_panel.png"),
+        title: "Slate Test Runner & Discovery Panel",
+        caption: "Recursive Slate/UMG widget tree inspection with dynamic state validation",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_progress_window.png"),
+        title: "Live Execution Progress Tree",
+        caption: "Real-time automated step verification with deterministic timing markers",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/e2e_plugin/11_e2e_simulation_game_launch.png"),
+        title: "Procedural Windmill Assembly",
+        caption: "Automated physics and procedural component placement test flow",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/e2e_plugin/e2e_automation_architecture.svg"),
+        title: "Sandboxed Subsystem Architecture",
+        caption: "Win32 isolated desktop harness & raw backbuffer streaming to FFmpeg stdin",
+      },
+    ],
   },
   {
     slug: "the-interlude",
@@ -88,8 +141,46 @@ const projects = [
     tags: ["Unreal Engine 4", "Physics", "AI"],
     tone: "moon",
     stat: "02 / 05",
-    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg",
-    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/the_interlude_reel.mp4",
+    media: assetUrl("portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg"),
+    video: assetUrl("videos/01_the_interlude.mp4"),
+    gallery: [
+      {
+        type: "video" as const,
+        url: assetUrl("videos/01_the_interlude.mp4"),
+        title: "The Interlude Gameplay Reel",
+        caption: "24-Hour CodeDay 1st Place: 6-DOF zero-gravity flight and intercept AI dogfight",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg"),
+        title: "Interceptor Starfighter Key Art",
+        caption: "Custom starfighter model with multi-directional thrusters and cockpit hud",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/the_interlude/action_captures/interlude_frame_01_00m05s.jpg"),
+        title: "Zero-G Asteroid Field Navigation",
+        caption: "Newtonian physics momentum with responsive pitch/yaw/roll torque dampening",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/the_interlude/action_captures/interlude_frame_02_00m11s.jpg"),
+        title: "Predictive Lead-Target Intercept",
+        caption: "State-machine enemy AI calculating velocity vectors and lead-intercept angles",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/the_interlude/action_captures/interlude_frame_03_00m19s.jpg"),
+        title: "Evasive Slalom Maneuvers",
+        caption: "High-G asteroid slalom testing dynamic physics collision boundaries",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/the_interlude/action_captures/interlude_frame_04_00m26s.jpg"),
+        title: "Laser Salvo & Niagara Trails",
+        caption: "Dual hitscan/ballistic laser trails with procedural camera kickback",
+      },
+    ],
   },
   {
     slug: "byteoasis",
@@ -99,8 +190,46 @@ const projects = [
     tags: ["Unreal Engine", "Puzzle", "Terminals"],
     tone: "reset",
     stat: "03 / 05",
-    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/byte_oasis/byte_oasis_maxres_thumbnail.jpg",
-    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/byteoasis_reel.mp4",
+    media: assetUrl("portfolio_media/screenshots/byte_oasis/byte_oasis_maxres_thumbnail.jpg"),
+    video: assetUrl("videos/03_byte_oasis.mp4"),
+    gallery: [
+      {
+        type: "video" as const,
+        url: assetUrl("videos/03_byte_oasis.mp4"),
+        title: "ByteOasis Gameplay Reel",
+        caption: "48-Hour HackRush 2nd Place: In-game terminal parsing and environmental logic puzzles",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/byte_oasis/byte_oasis_maxres_thumbnail.jpg"),
+        title: "Cyber-Archipelago Key Art",
+        caption: "Stranded programmer exploring an island network protected by logic barriers",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/byte_oasis/action_captures/byte_oasis_frame_01_00m06s.jpg"),
+        title: "Island Traversal & Atmosphere",
+        caption: "Custom water reflection shaders and dynamic day/night lighting cycles",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/byte_oasis/action_captures/byte_oasis_frame_02_00m13s.jpg"),
+        title: "Diegetic Terminal Interface",
+        caption: "In-game terminal screen parsing commandline input, flags, and system state",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/byte_oasis/action_captures/byte_oasis_frame_03_00m21s.jpg"),
+        title: "Security Grid Override",
+        caption: "Executing commands to bypass security perimeters and unlock drawbridges",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/byte_oasis/action_captures/byte_oasis_frame_04_00m30s.jpg"),
+        title: "Logic Gate Circuit Bypass",
+        caption: "Connecting circuits across islands to restore power grids and escape",
+      },
+    ],
   },
   {
     slug: "geek-o-wars",
@@ -110,8 +239,46 @@ const projects = [
     tags: ["Unreal Engine 4.21", "Shaders", "Combat"],
     tone: "ember",
     stat: "04 / 05",
-    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/geek_o_wars/01_logo_banner.jpg",
-    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/geek_o_wars_reel.mp4",
+    media: assetUrl("portfolio_media/screenshots/geek_o_wars/01_logo_banner.jpg"),
+    video: assetUrl("videos/04_geek_o_wars.mp4"),
+    gallery: [
+      {
+        type: "video" as const,
+        url: assetUrl("videos/04_geek_o_wars.mp4"),
+        title: "Geek'O'Wars TPS Gameplay Reel",
+        caption: "MLH FrostHacks Top 3 Winner: Antivirus third-person survival combat inside a motherboard",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/geek_o_wars/01_logo_banner.jpg"),
+        title: "Geek'O'Wars Key Art",
+        caption: "Microscopic cyber antivirus agent defending infected CPU hardware",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/geek_o_wars/02_cyber_encounter_1.jpg"),
+        title: "Motherboard Circuit Arena",
+        caption: "Custom neon PCB trace materials, heat sink towers, and CPU socket architecture",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/geek_o_wars/03_cyber_encounter_2.jpg"),
+        title: "Emissive Trace Shaders",
+        caption: "Reactive pulse shaders illuminating circuit pathways during combat",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/geek_o_wars/04_gameplay_still_1.jpg"),
+        title: "Weapon Heat Dissipation",
+        caption: "TPS weapon mechanics with overheating thresholds and recoil smoothing",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/geek_o_wars/action_captures/geek_o_wars_frame_04_00m35s.jpg"),
+        title: "Malware Swarm Wave Encounter",
+        caption: "Multi-class malware rushers and flanking AI pathfinding across logic gates",
+      },
+    ],
   },
   {
     slug: "city-of-aethel",
@@ -121,15 +288,47 @@ const projects = [
     tags: ["Phaser 3", "Melee", "WebGL"],
     tone: "ember",
     stat: "05 / 05",
-    media: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/screenshots/phaser_games/01_city_of_aethel.png",
-    video: "https://temporary-rushing-bugle-cnroga2.vercel.app/portfolio_media/videos/city_of_aethel_reel.mp4",
+    media: assetUrl("portfolio_media/screenshots/phaser_games/01_city_of_aethel.png"),
+    video: assetUrl("videos/05_city_of_aethel.mp4"),
+    gallery: [
+      {
+        type: "video" as const,
+        url: assetUrl("videos/05_city_of_aethel.mp4"),
+        title: "City of Aethel Boss Arena Reel",
+        caption: "IGDC 2024 Top 45 Finalist: 5-hit melee combos, dodge i-frames, and boss choreography",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/phaser_games/01_city_of_aethel.png"),
+        title: "City of Aethel Key Art",
+        caption: "Atmospheric pixel-art city ruins and story-driven action platformer setting",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/phaser_games/fixed_city_of_aethel_arena.png"),
+        title: "Multi-Phase Boss Arena",
+        caption: "Telegraphed ground hazards, attack cancel windows, and posture break mechanics",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/phaser_games/00_main_hub.png"),
+        title: "Aicade 14-Prototype Arcade Launcher",
+        caption: "Web arcade deployment containing 14 distinct gameplay & physics prototypes",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/phaser_games/03_angle_trajectory_shooter.png"),
+        title: "Ballistic Trajectory Prediction",
+        caption: "Parabolic trajectory calculations with real-time arc visualizers",
+      },
+      {
+        type: "image" as const,
+        url: assetUrl("portfolio_media/screenshots/phaser_games/05_kickthebuddy.png"),
+        title: "Verlet Integration Ragdoll",
+        caption: "Rigid-body impulse physics with particle impact sparks and cloth simulation",
+      },
+    ],
   },
-];
-
-const posts = [
-  { slug: "building-worlds-from-rules", category: "FIELD NOTES", date: "OCT 02, 2026", title: "Building worlds from rules that want to be broken", excerpt: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. Integer a felis at justo finibus." },
-  { slug: "the-pause-between-inputs", category: "DESIGN LOG", date: "SEP 18, 2026", title: "The pause between inputs is where the feeling lives", excerpt: "Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean lacinia bibendum nulla sed consectetur." },
-  { slug: "notes-on-quiet-ui", category: "SCREENSHOTS", date: "AUG 11, 2026", title: "Notes on quiet UI, noisy worlds, and useful friction", excerpt: "Vestibulum id ligula porta felis euismod semper. Morbi leo risus, porta ac consectetur ac, vestibulum at eros." },
 ];
 
 function normalizePath(path: string) {
@@ -580,7 +779,7 @@ function Home() {
   return (
     <main>
       <section className="home-hero page-pad" id="home">
-        <video className="home-hero__video" autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source src="/landing-worlds-reel.mp4" type="video/mp4" /></video>
+        <video className="home-hero__video" autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source src={assetUrl("landing-worlds-reel.mp4")} type="video/mp4" /></video>
         <div className="home-hero__veil" aria-hidden="true" />
         <div className="hero-identity">
           <Eyebrow number="00">Unreal Engine systems & gameplay architecture</Eyebrow>
@@ -757,19 +956,7 @@ function DemoReelPage() {
   );
 }
 
-function MarketplacePage() {
-  const items = ["Modular dungeon kit", "UI glyph pack", "Ambient loop studies", "Quest log template", "Pixel shader notes", "Field recording bundle"];
-  return <main className="inner-page"><PageHeader number="02" kicker="Marketplace" title={<>Tools for<br /><span>other worlds.</span></>} copy="Placeholder resources for teams, solo builders, and anyone who likes their prototypes with a little atmosphere." /><section className="marketplace-grid page-pad">{items.map((item, index) => <article className="market-card" key={item}><div className={`market-card__art market-card__art--${index % 4}`}><span>{String(index + 1).padStart(2, "0")}</span><Sparkles size={18} /></div><div className="market-card__body"><span className="market-card__category">{index % 2 ? "TEMPLATE / DIGITAL" : "ASSET / DIGITAL"}</span><h2>{item}</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Placeholder pack description.</p><div className="market-card__footer"><strong>€—.—</strong><button className="button button--tiny">View item <ArrowUpRight size={12} /></button></div></div></article>)}</section><section className="callout-strip page-pad"><span>NEED A DIFFERENT LOADOUT?</span><Link href="/bio/" className="text-link">Start a conversation <ArrowUpRight size={14} /></Link></section><Footer /></main>;
-}
 
-function BlogPage() {
-  return <main className="inner-page"><PageHeader number="03" kicker="Blog" title={<>Notes from<br /><span>the workbench.</span></>} copy="Field notes, design fragments, and placeholder thoughts on building worlds that feel good to inhabit." /><section className="blog-list page-pad">{posts.map((post, index) => <Link href={`/blog/${post.slug}/`} key={post.slug} className="blog-row"><div className="blog-row__number">0{index + 1}</div><div className="blog-row__content"><div className="blog-row__meta"><span>{post.category}</span><span>{post.date}</span></div><h2>{post.title}</h2><p>{post.excerpt}</p></div><ArrowUpRight className="blog-row__arrow" size={18} /></Link>)}</section><Footer /></main>;
-}
-
-function ArticlePage({ slug }: { slug: string }) {
-  const post = posts.find((item) => item.slug === slug) ?? posts[0];
-  return <main className="inner-page article-page"><PageHeader number="03 / ARTICLE" kicker={post.category} title={<>{post.title}</>} copy={`${post.date} / 7 min placeholder read`} /><article className="article-body page-pad"><div className="article-body__hero"><ProjectVisual tone="moon" label="FIELD NOTE / 001" /></div><div className="article-body__copy"><p className="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur blandit tempus porttitor. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p><p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean lacinia bibendum nulla sed consectetur. Donec sed odio dui. Nulla vitae elit libero, a pharetra augue.</p><h2>The useful edge of friction</h2><p>Vestibulum id ligula porta felis euismod semper. Cras mattis consectetur purus sit amet fermentum. Maecenas faucibus mollis interdum. Etiam porta sem malesuada magna mollis euismod.</p><blockquote>“A good interface tells you where to look without telling you what to feel.”</blockquote><p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Sed posuere consectetur est at lobortis. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p><div className="article-body__footer"><Link href="/blog/" className="text-link"><ArrowLeft size={14} /> Back to notes</Link><span>END OF TRANSMISSION</span></div></div></article><Footer /></main>;
-}
 
 function HobbiesPage() {
   const hobbies = [
@@ -873,10 +1060,7 @@ function BioPage() {
   );
 }
 
-function GitHubPage() {
-  const repos = ["world-builder", "soft-reset", "glyph-kit", "quiet-ui", "weather-system"];
-  return <main className="inner-page"><PageHeader number="06" kicker="GitHub" title={<>Open source,<br /><span>open doors.</span></>} copy="A placeholder activity log for code, tools, experiments, and the useful mess that happens between releases." /><section className="github-layout page-pad"><div className="github-profile"><div className="profile-orbit"><CircleUserRound size={44} /></div><Eyebrow>Player profile</Eyebrow><h2>placeholder-name</h2><p>Systems / tools / game design</p><a href="https://github.com/karthikveeranala" target="_blank" rel="noreferrer" className="text-link">Visit profile <ArrowUpRight size={14} /></a><div className="contribution-grid">{Array.from({ length: 84 }, (_, index) => <i key={index} className={index % 7 === 0 ? "is-hot" : index % 3 === 0 ? "is-warm" : ""} />)}</div><small>CONTRIBUTIONS / PLACEHOLDER / LAST 12 MONTHS</small></div><div className="repo-list"><div className="section-topline"><Eyebrow>Repositories</Eyebrow><span className="muted-label">5 PUBLIC / 0 PRIVATE</span></div>{repos.map((repo, index) => <a href="https://github.com/karthikveeranala" target="_blank" rel="noreferrer" className="repo-row" key={repo}><Code2 size={17} /><div><strong>{repo}</strong><span>Placeholder repository description with a little useful context.</span></div><small>{index % 2 ? "TS" : "C#"}</small><ArrowUpRight size={15} /></a>)}</div></section><Footer /></main>;
-}
+
 
 const techNodes = [
   { id: "ue", label: "UNREAL ENGINE", rank: "S+", color: "teal", tools: ["UE 5.7", "UE 4", "Slate / UMG", "Niagara"], usedIn: "Headless E2E Automation Suite, ByteOasis, Geek'O'Wars", copy: "Engine architecture, headless verification, UI auto-discovery, physics, dedicated servers, and gameplay systems." },
@@ -947,10 +1131,286 @@ function PortfolioPage() {
 }
 
 
+function ProjectMediaGallery({ gallery, tone, stat }: { gallery: ProjectMediaItem[]; tone: string; stat: string }) {
+  const [active, setActive] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [lightbox, setLightbox] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const current = gallery[active] ?? gallery[0];
+
+  const next = useCallback(() => {
+    playArcadeTone("hover");
+    setActive((prev) => (prev + 1) % gallery.length);
+  }, [gallery.length]);
+
+  const prev = useCallback(() => {
+    playArcadeTone("hover");
+    setActive((prev) => (prev - 1 + gallery.length) % gallery.length);
+  }, [gallery.length]);
+
+  useEffect(() => {
+    setIsPlaying(true);
+  }, [active]);
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) videoRef.current.pause();
+      else void videoRef.current.play();
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  return (
+    <div className="project-media-gallery">
+      <div className="project-media-gallery__stage">
+        {current.type === "video" ? (
+          <div className="project-media-gallery__video-wrap">
+            <video
+              ref={videoRef}
+              src={current.url}
+              autoPlay
+              muted={isMuted}
+              loop
+              playsInline
+              key={current.url}
+            />
+            <div className="project-media-gallery__video-controls">
+              <button
+                type="button"
+                className="media-ctrl-btn"
+                onClick={togglePlay}
+                aria-label={isPlaying ? "Pause video" : "Play video"}
+              >
+                {isPlaying ? <Pause size={14} /> : <Play size={14} fill="currentColor" />}
+              </button>
+              <button
+                type="button"
+                className="media-ctrl-btn"
+                onClick={() => setIsMuted((m) => !m)}
+                aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+              >
+                {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+              </button>
+              <button
+                type="button"
+                className="media-ctrl-btn"
+                onClick={() => setLightbox(true)}
+                aria-label="Expand fullscreen"
+              >
+                <Maximize2 size={14} />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="project-media-gallery__image-wrap" onClick={() => setLightbox(true)}>
+            <img src={current.url} alt={current.title} loading="lazy" />
+            <button
+              type="button"
+              className="project-media-gallery__expand"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightbox(true);
+              }}
+              title="Expand image"
+              aria-label="Expand image"
+            >
+              <Maximize2 size={14} />
+            </button>
+          </div>
+        )}
+
+        <div className="project-media-gallery__pixel-corners" aria-hidden="true">
+          <i /><i /><i /><i />
+        </div>
+
+        <button
+          type="button"
+          className="project-media-gallery__nav project-media-gallery__nav--prev"
+          onClick={prev}
+          aria-label="Previous media"
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <button
+          type="button"
+          className="project-media-gallery__nav project-media-gallery__nav--next"
+          onClick={next}
+          aria-label="Next media"
+        >
+          <ChevronRight size={24} />
+        </button>
+
+        <div className="project-media-gallery__hud">
+          <div className="project-media-gallery__hud-badge">
+            <span className={`badge-pill badge-pill--${current.type}`}>
+              {current.type === "video" ? "1080P REEL" : "SCREENSHOT"}
+            </span>
+            <span>{String(active + 1).padStart(2, "0")} / {String(gallery.length).padStart(2, "0")}</span>
+          </div>
+          <div className="project-media-gallery__hud-info">
+            <strong>{current.title}</strong>
+            <p>{current.caption}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="project-media-gallery__filmstrip">
+        {gallery.map((item, idx) => (
+          <button
+            key={item.url + idx}
+            type="button"
+            className={`filmstrip-thumb ${active === idx ? "is-active" : ""}`}
+            onClick={() => {
+              playArcadeTone("click");
+              setActive(idx);
+            }}
+            aria-label={`Select media slide ${idx + 1}: ${item.title}`}
+          >
+            <span className="filmstrip-thumb__idx">{String(idx + 1).padStart(2, "0")}</span>
+            {item.type === "video" ? (
+              <div className="filmstrip-thumb__video-placeholder">
+                <Play size={14} fill="currentColor" />
+                <small>REEL</small>
+              </div>
+            ) : (
+              <img src={item.url} alt={item.title} loading="lazy" />
+            )}
+            <span className="filmstrip-thumb__title">{item.title}</span>
+          </button>
+        ))}
+      </div>
+
+      {lightbox && (
+        <div
+          className="project-media-gallery__lightbox"
+          onClick={() => setLightbox(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            className="lightbox-close"
+            onClick={() => setLightbox(false)}
+            aria-label="Close lightbox"
+          >
+            ×
+          </button>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            {current.type === "video" ? (
+              <video src={current.url} controls autoPlay />
+            ) : (
+              <img src={current.url} alt={current.title} />
+            )}
+            <div className="lightbox-caption">
+              <strong>{current.title}</strong>
+              <p>{current.caption}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ProjectPage({ slug }: { slug: string }) {
   const project = projects.find((item) => item.slug === slug) ?? projects[0];
   const next = projects[(projects.findIndex((item) => item.slug === project.slug) + 1) % projects.length];
-  return <main className="inner-page project-page"><section className="project-page__hero page-pad"><Link href="/portfolio/" className="text-link"><ArrowLeft size={14} /> Back to portfolio</Link><div className="project-page__hero-copy"><Eyebrow>Project / {project.stat}</Eyebrow><h1>{project.title}</h1><p>{project.description}</p></div><ProjectVisual tone={project.tone} label="SOURCE MEDIA / Karthik portfolio" media={project.media} /></section><section className="project-detail page-pad"><div className="project-detail__facts"><div><Eyebrow>Role</Eyebrow><strong>Systems Architecture / Gameplay Engineering</strong></div><div><Eyebrow>Stack</Eyebrow><strong>{project.tags.join(" / ")}</strong></div><div><Eyebrow>Status</Eyebrow><StatusPill>SOURCE PROJECT / CASE STUDY</StatusPill></div></div><div className="project-detail__copy"><p className="lead">This project combines systems architecture with player-facing design. The goal was to make difficult technical constraints feel invisible, responsive, and playable.</p><div className="project-detail__columns"><div><h2>01 / The brief</h2><p>The brief: build a reliable technical foundation under a tight delivery window, then turn it into a readable player experience.</p></div><div><h2>02 / The result</h2><p>The result: a tested prototype with clear systems boundaries, strong feedback, and a concrete path from experiment to shipped feature.</p></div></div><div className="project-detail__gallery"><ProjectVisual tone={project.tone} label="SOURCE MEDIA / 01" media={project.media} /><ProjectVisual tone="signal" label="MEDIA / 02" /></div><Link href={`/portfolio/${next.slug}/`} className="next-project"><span>Next project</span><strong>{next.title}</strong><ArrowRight size={20} /></Link></div></section><Footer /></main>;
+  const detail = contributionDetails[project.slug] ?? contributionDetails["e2e-automation-suite"];
+  const [showCode, setShowCode] = useState(false);
+
+  return (
+    <main className="inner-page project-page">
+      <section className="project-page__hero page-pad">
+        <Link href="/portfolio/" className="text-link">
+          <ArrowLeft size={14} /> Back to portfolio
+        </Link>
+        <div className="project-page__hero-copy">
+          <div className="project-page__hero-meta">
+            <Eyebrow>Project / {project.stat}</Eyebrow>
+            <StatusPill>{project.type}</StatusPill>
+          </div>
+          <h1>{project.title}</h1>
+          <p className="project-page__lead">{project.description}</p>
+        </div>
+
+        <ProjectMediaGallery gallery={project.gallery} tone={project.tone} stat={project.stat} />
+      </section>
+
+      <section className="project-detail page-pad">
+        <div className="project-detail__facts">
+          <div>
+            <Eyebrow>Role & Scope</Eyebrow>
+            <strong>{detail.role}</strong>
+          </div>
+          <div>
+            <Eyebrow>Tech Stack</Eyebrow>
+            <strong>{project.tags.join(" • ")}</strong>
+          </div>
+          <div>
+            <Eyebrow>Status / Accolade</Eyebrow>
+            <StatusPill>{project.type}</StatusPill>
+          </div>
+        </div>
+
+        <div className="project-detail__copy">
+          <div className="project-detail__section">
+            <Eyebrow>Core Systems Architected</Eyebrow>
+            <ul className="project-systems-list">
+              {detail.systems.map((item, idx) => {
+                const parts = item.split(": ");
+                const sysTitle = parts[0];
+                const sysDesc = parts.slice(1).join(": ");
+                return (
+                  <li key={idx}>
+                    <strong>{sysTitle}</strong>
+                    {sysDesc && <span>: {sysDesc}</span>}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className="project-detail__section">
+            <Eyebrow>Verification & Performance Highlights</Eyebrow>
+            <div className="project-detail__metrics">
+              {detail.metrics.map((metric) => (
+                <div key={metric} className="metric-pill">
+                  <span>{metric}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="project-detail__code-block">
+            <div className="code-block-header">
+              <Eyebrow>Implementation Snippet (C++)</Eyebrow>
+              <button
+                type="button"
+                className="button button--tiny"
+                onClick={() => setShowCode((v) => !v)}
+              >
+                {showCode ? "Hide C++ Source" : "Inspect C++ Source"}
+              </button>
+            </div>
+            {showCode && (
+              <pre className="contribution-code">
+                <code>{detail.snippet}</code>
+              </pre>
+            )}
+          </div>
+
+          <Link href={`/portfolio/${next.slug}/`} className="next-project">
+            <span>Next project</span>
+            <strong>{next.title}</strong>
+            <ArrowRight size={20} />
+          </Link>
+        </div>
+      </section>
+      <Footer />
+    </main>
+  );
 }
 
 function Footer() {
