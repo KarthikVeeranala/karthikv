@@ -3358,10 +3358,11 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   text-shadow: none !important;
 }
 
-/* 7. Standardized Page Header Rhythm */
+/* 7. Standardized Page Header Rhythm & Tighter Section Spacing */
 .page-header {
-  padding-top: clamp(80px, 12vw, 130px) !important;
-  padding-bottom: clamp(24px, 4vw, 40px) !important;
+  min-height: 0 !important;
+  padding-top: clamp(65px, 8vw, 95px) !important;
+  padding-bottom: clamp(14px, 2vw, 22px) !important;
   border-bottom: 1px solid var(--line);
 }
 .page-header .eyebrow {
@@ -3369,13 +3370,104 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   letter-spacing: 0.08em;
 }
 .page-header h1 {
-  margin: 18px 0 14px !important;
-  font-size: clamp(32px, 5vw, 64px) !important;
+  margin: 12px 0 10px !important;
+  font-size: clamp(28px, 4.5vw, 56px) !important;
   line-height: 1.05 !important;
 }
 .page-header p {
   max-width: 680px !important;
-  font-size: clamp(14px, 1.4vw, 16px) !important;
-  line-height: 1.6 !important;
+  font-size: clamp(13px, 1.2vw, 15px) !important;
+  line-height: 1.5 !important;
+}
+
+/* Eliminate large gap between subpage header and actual content */
+.inner-page.backstory-page .backstory-story,
+.backstory-page .backstory-story,
+.backstory-story {
+  padding-top: clamp(24px, 3.5vw, 42px) !important;
+}
+.tech-page .tech-tree,
+.tech-tree {
+  padding-top: clamp(24px, 3.5vw, 42px) !important;
+}
+.hobbies-page .hobby-field,
+.hobby-field {
+  padding-top: clamp(24px, 3.5vw, 42px) !important;
+}
+.bio-layout {
+  padding-top: clamp(24px, 3.5vw, 42px) !important;
+}
+.portfolio-page-new,
+.portfolio-page-new .portfolio-page,
+.portfolio-page {
+  padding-top: clamp(20px, 3vw, 36px) !important;
+}
+
+/* Home Demo Reel Video Container & Play/Pause Controls */
+.hero-video {
+  position: relative;
+  min-height: 0 !important;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line-strong);
+  overflow: hidden;
+  background: #0a0612;
+}
+.hero-video video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero-video__controls {
+  position: absolute;
+  z-index: 5;
+  right: 14px;
+  bottom: 14px;
+}
+.hero-video__ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(10, 6, 18, 0.88);
+  border: 1px solid var(--teal);
+  color: var(--teal);
+  font: 10px var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+.hero-video__ctrl-btn:hover {
+  background: var(--teal);
+  color: var(--bg);
+  box-shadow: 0 0 12px rgba(22, 214, 189, 0.4);
+}
+
+/* Featured Work Carousel Visual Wrap (Precise 16:9 bounds & intact pixel corners) */
+.featured-carousel__visual-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #0d0918;
+  border: 1px solid var(--line-strong);
+  overflow: hidden;
+}
+.featured-carousel__visual-wrap video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+.featured-carousel__visual-wrap .project-visual__pixel-corners {
+  position: absolute;
+  z-index: 4;
+  inset: 10px;
+  pointer-events: none;
 }
 

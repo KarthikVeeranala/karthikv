@@ -1224,11 +1224,47 @@ function StatusPill({ children = "AVAILABLE FOR COLLABORATION" }: { children?: R
 }
 
 function HeroVideo({ compact = false }: { compact?: boolean }) {
+  const [isPlaying, setIsPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      void videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
   return (
     <div className={`hero-video ${compact ? "hero-video--compact" : ""}`}>
-      <video autoPlay muted loop playsInline preload="metadata" aria-label="Karthik Veeranala Gameplay Master Reel">
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label="Karthik Veeranala Gameplay Master Reel"
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+      >
         <source src={DEMO_REEL_URL} type="video/mp4" />
       </video>
+      <div className="hero-video__controls" aria-label="Demo Reel Controls">
+        <button
+          type="button"
+          className="hero-video__ctrl-btn"
+          onClick={togglePlay}
+          aria-label={isPlaying ? "Pause Demo Reel" : "Play Demo Reel"}
+          title={isPlaying ? "Pause" : "Play"}
+        >
+          {isPlaying ? <Pause size={14} /> : <Play size={14} fill="currentColor" />}
+          <span>{isPlaying ? "PAUSE" : "PLAY"}</span>
+        </button>
+      </div>
     </div>
   );
 }
@@ -1279,8 +1315,8 @@ function FeaturedWorkCarousel({ onContributions }: { onContributions: (project: 
 
       <div className="featured-carousel__card">
         <div className="featured-carousel__visual-wrap">
-          <ProjectVisual tone={current.tone} label={current.stat} media={current.media} />
-          <video src={current.video ?? DEMO_REEL_URL} autoPlay muted loop playsInline />
+          <video src={current.video ?? DEMO_REEL_URL} autoPlay muted loop playsInline preload="metadata" />
+          <div className="project-visual__pixel-corners" aria-hidden="true"><i /><i /><i /><i /></div>
           <div className="featured-carousel__badge">
             <span className="badge-stat">{current.stat}</span>
             <span className="badge-name">{current.title}</span>
