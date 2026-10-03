@@ -1589,16 +1589,6 @@ function Home() {
 
       <BackstorySection />
 
-      <section className="intro-chapter page-pad page-pad--chapter">
-        <div className="intro-chapter__content">
-          <Eyebrow>THE PLAYGROUND</Eyebrow>
-          <h2>Games are<br /><span>feelings</span> waiting<br />to be played.</h2>
-          <p>Game developer and designer focused on Unreal Engine C++ gameplay architecture, fluid combat mechanics, responsive controls, and high-velocity playable prototypes.</p>
-          <Link href="/portfolio/" className="text-link">Explore the game portfolio <ArrowUpRight size={14} /></Link>
-        </div>
-        <div className="intro-chapter__sigil" aria-hidden="true"><span>▦</span><small>KV / 001</small></div>
-      </section>
-
       <section className="featured-section page-pad">
         <div className="section-topline"><Eyebrow number="02">Featured work</Eyebrow><Link href="/portfolio/" className="text-link">Open portfolio <ArrowUpRight size={14} /></Link></div>
         <FeaturedWorkCarousel onContributions={setContribModal} />
@@ -1854,11 +1844,6 @@ function AicadeCabinetModal({ game, onClose }: { game: AicadeGame; onClose: () =
 }
 
 function ArcadePage() {
-  const cards = useMemo(() => ["★", "★", "◆", "◆", "●", "●", "✦", "✦", "☾", "☾", "▣", "▣"].sort(() => Math.random() - 0.5), []);
-  const [flipped, setFlipped] = useState<number[]>([]);
-  const [matched, setMatched] = useState<number[]>([]);
-  const [moves, setMoves] = useState(0);
-
   const [activeGame, setActiveGame] = useState<AicadeGame | null>(null);
   const [vaultModalOpen, setVaultModalOpen] = useState(false);
   const [vaultCategory, setVaultCategory] = useState<string>("All");
@@ -1890,17 +1875,6 @@ function ArcadePage() {
     return aicadeGames.filter((g) => g.category === vaultCategory);
   }, [vaultCategory]);
 
-  useEffect(() => {
-    if (flipped.length !== 2) return;
-    setMoves((value) => value + 1);
-    const timeout = window.setTimeout(() => {
-      if (cards[flipped[0]] === cards[flipped[1]]) setMatched((value) => [...value, ...flipped]);
-      setFlipped([]);
-    }, 560);
-    return () => window.clearTimeout(timeout);
-  }, [flipped, cards]);
-
-  const reset = () => { setFlipped([]); setMatched([]); setMoves(0); };
 
   return (
     <main className="inner-page arcade-page">
@@ -2058,56 +2032,8 @@ function ArcadePage() {
         </div>
       </section>
 
-      {/* Retro Memory Match Mini-Game */}
-      <section className="arcade-cabinet page-pad">
-        <div className="arcade-cabinet__top">
-          <span>MINI-GAME // MEMORY MATRIX</span>
-          <span>MOVES // {String(moves).padStart(2, "0")}</span>
-          <span>MATCHED // {matched.length / 2} / 6</span>
-        </div>
-
-        <div className="memory-grid">
-          {cards.map((sym, index) => {
-            const isFlipped = flipped.includes(index) || matched.includes(index);
-            const isMatched = matched.includes(index);
-            return (
-              <button
-                key={index}
-                type="button"
-                className={`memory-card ${isFlipped ? "is-face-up" : ""} ${isMatched ? "is-matched" : ""}`}
-                onClick={() => {
-                  if (flipped.length === 2 || isFlipped) return;
-                  playArcadeTone("click");
-                  setFlipped((current) => [...current, index]);
-                }}
-                disabled={isMatched}
-                aria-label={`Card ${index + 1}`}
-              >
-                {isFlipped ? sym : "?"}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="arcade-cabinet__bottom">
-          <span>PAIR ALL MATCHES TO REVEAL SECRETS</span>
-          <button type="button" className="text-link" onClick={reset}>
-            Reset Matrix
-          </button>
-        </div>
-      </section>
-
-      {/* Mini Games Tips Footer */}
-      <section className="arcade-tips page-pad">
-        <div>
-          <Terminal size={18} />
-          <p>PRESS TILDE (~) OR ESCAPE ANYWHERE ON THE SITE TO ACTIVATE DEVELOPER CONSOLE</p>
-        </div>
-        <div>
-          <Gamepad2 size={18} />
-          <p>TRY OUT SPEEDRUNNING ENCOUNTERS IN THE BOSS REFLEX ARENA ON THE HOMEPAGE</p>
-        </div>
-      </section>
+      {/* Reflex Combat Boss Fight Arena */}
+      <BossFight />
 
       {/* Cabinet Play Modal */}
       {activeGame && (
@@ -2425,7 +2351,7 @@ function BossFight() {
   return (
     <section className="boss-arena page-pad">
       <div className="boss-arena__copy">
-        <Eyebrow number="09">Reflex combat / boss arena</Eyebrow>
+        <Eyebrow number="02">Reflex combat / boss arena</Eyebrow>
         <h2>Break the<br /><span>{isEnraged ? "ENRAGED BEAST" : "LOGIC BEAST"}</span></h2>
         <p>A timing-based reflex combat encounter. Watch the charging meter: when it enters the <strong>GOLD PARRY ZONE</strong>, hit <strong>PARRY</strong> to stun the boss and land critical hits!</p>
         <div className="boss-arena__stats">
