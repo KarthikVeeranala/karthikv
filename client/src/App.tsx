@@ -1653,6 +1653,111 @@ const BACKSTORY_ACTS: BackstoryAct[] = [
   }
 ];
 
+function DocumentaryActView({ act, index }: { act: BackstoryAct; index: number }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const totalDistance = rect.height - windowHeight;
+
+      if (totalDistance <= 0) {
+        setScrollProgress(0);
+        return;
+      }
+
+      // Calculate progress from 0 (entry) to 1 (exit of this 180vh track)
+      const currentScroll = -rect.top;
+      const progress = Math.max(0, Math.min(1, currentScroll / totalDistance));
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Exact math from Option 1 in the simulator:
+  // Phase 1 (0 to 0.42): Title Slate visible, shrinks slightly & dissolves out
+  // Phase 2 (0.42 to 1.0): Narrative story slides up and dissolves in on the exact same stage
+  const slateOpacity = Math.max(0, 1 - scrollProgress * 2.4);
+  const slateScale = Math.max(0.85, 1 - scrollProgress * 0.18);
+  const slateTranslateY = scrollProgress * -36;
+
+  const narrativeOpacity = scrollProgress < 0.38 ? 0 : Math.min(1, (scrollProgress - 0.38) / 0.42);
+  const narrativeTranslateY = scrollProgress < 0.38 ? 40 : Math.max(0, (1 - narrativeOpacity) * 35);
+  const isNarrativeActive = scrollProgress >= 0.38;
+
+  return (
+    <div id={act.id} ref={containerRef} className="doc-scroll-track">
+      <div className="doc-sticky-stage page-pad">
+        {/* Background Ambient Glow */}
+        <div className="doc-stage-glow" aria-hidden="true" />
+
+        {/* Phase A: Bold Theatrical Title Slate */}
+        <div
+          className="doc-stage-slate"
+          style={{
+            opacity: slateOpacity,
+            transform: `scale(${slateScale}) translateY(${slateTranslateY}px)`,
+            pointerEvents: slateOpacity > 0.1 ? "auto" : "none",
+          }}
+        >
+          <div className="doc-act__slate-badge">
+            <span>{act.actNumber}</span>
+            <em>{act.year}</em>
+          </div>
+          <h2>{act.title}</h2>
+          <p className="doc-act__subtitle">{act.subtitle}</p>
+          <div className="doc-act__scroll-prompt">
+            <ChevronDown size={14} className="animate-bounce" />
+            <span>KEEP SCROLLING INTO STORY</span>
+          </div>
+        </div>
+
+        {/* Phase B: Narrative Story Card on the EXACT SAME STAGE */}
+        <div
+          className="doc-stage-story"
+          style={{
+            opacity: narrativeOpacity,
+            transform: `translateY(${narrativeTranslateY}px)`,
+            pointerEvents: isNarrativeActive ? "auto" : "none",
+          }}
+        >
+          <div className="doc-act__narrative">
+            <div className="doc-act__summary-card">
+              <Eyebrow>Chapter Overview // {act.actNumber}</Eyebrow>
+              <p className="doc-act__lead">{act.summary}</p>
+              <div className="doc-act__metrics">
+                {act.metrics.map((m) => (
+                  <div key={m.label} className="doc-metric">
+                    <strong>{m.value}</strong>
+                    <small>{m.label}</small>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="doc-act__prose">
+              {act.paragraphs.map((p, pIdx) => (
+                <p key={pIdx}>{p}</p>
+              ))}
+              <div className="tag-row doc-act__tags">
+                {act.tags.map((tag) => (
+                  <span key={tag}>{tag}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BackstoryPage() {
   const [activeActId, setActiveActId] = useState("act-1");
 
@@ -1671,7 +1776,7 @@ function BackstoryPage() {
         number="02"
         kicker="Backstory"
         title={<span>FROM OCEAN OF GAMES<br /><span style={{ color: "var(--teal)" }}>TO UNREAL ENGINE 5.7 C++</span></span>}
-        copy="A cinematic chronicle of childhood curiosity, self-taught code, hackathon failures, and production systems."
+        copy="A scroll-driven cinematic documentary. Scroll down to watch each chapter title dissolve directly into the story."
       />
 
       {/* QUICK JUMPER DOCK */}
@@ -1695,50 +1800,9 @@ function BackstoryPage() {
       </nav>
 
       {/* CINEMATIC DOCUMENTARY SCROLL ACTS */}
-      <section className="documentary-acts page-pad">
+      <section className="documentary-scroll-series">
         {BACKSTORY_ACTS.map((act, index) => (
-          <article key={act.id} id={act.id} className="doc-act">
-            {/* 1. Title Slate (Appears first like a film chapter title) */}
-            <div className="doc-act__title-slate">
-              <div className="doc-act__slate-badge">
-                <span>{act.actNumber}</span>
-                <em>{act.year}</em>
-              </div>
-              <h2>{act.title}</h2>
-              <p className="doc-act__subtitle">{act.subtitle}</p>
-              <div className="doc-act__scroll-prompt">
-                <ChevronDown size={14} className="animate-bounce" />
-                <span>SCROLL INTO STORY</span>
-              </div>
-            </div>
-
-            {/* 2. Narrative Content Block */}
-            <div className="doc-act__narrative">
-              <div className="doc-act__summary-card">
-                <Eyebrow>Chapter Overview</Eyebrow>
-                <p className="doc-act__lead">{act.summary}</p>
-                <div className="doc-act__metrics">
-                  {act.metrics.map((m) => (
-                    <div key={m.label} className="doc-metric">
-                      <strong>{m.value}</strong>
-                      <small>{m.label}</small>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="doc-act__prose">
-                {act.paragraphs.map((p, pIdx) => (
-                  <p key={pIdx}>{p}</p>
-                ))}
-                <div className="tag-row doc-act__tags">
-                  {act.tags.map((tag) => (
-                    <span key={tag}>{tag}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </article>
+          <DocumentaryActView key={act.id} act={act} index={index} />
         ))}
       </section>
 
