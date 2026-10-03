@@ -25,25 +25,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 10.18.0
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
+          cache: "npm"
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: npm install
 
       - name: Build static site
-        run: pnpm run build:static
-
-      - name: Ensure 404 fallback for SPA routing
-        run: cp dist/public/index.html dist/public/404.html
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -51,7 +43,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "dist/public"
+          path: "dist"
 
       - name: Deploy to GitHub Pages
         id: deployment

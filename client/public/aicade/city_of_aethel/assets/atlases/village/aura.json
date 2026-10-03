@@ -1,0 +1,127 @@
+{
+  "frames": {
+    "aura_0.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 270
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 270
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 270
+      }
+    },
+    "aura_1.png": {
+      "frame": {
+        "x": 250,
+        "y": 0,
+        "w": 240,
+        "h": 270
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 270
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 270
+      }
+    },
+    "aura_2.png": {
+      "frame": {
+        "x": 500,
+        "y": 0,
+        "w": 240,
+        "h": 270
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 270
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 270
+      }
+    },
+    "aura_3.png": {
+      "frame": {
+        "x": 0,
+        "y": 280,
+        "w": 240,
+        "h": 270
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 270
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 270
+      }
+    },
+    "aura_4.png": {
+      "frame": {
+        "x": 250,
+        "y": 280,
+        "w": 240,
+        "h": 270
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 270
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 270
+      }
+    },
+    "aura_5.png": {
+      "frame": {
+        "x": 500,
+        "y": 280,
+        "w": 240,
+        "h": 270
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 270
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 270
+      }
+    }
+  },
+  "meta": {
+    "scale": "1"
+  }
+}

@@ -784,6 +784,7 @@ function CursorFX() {
 function CheatTerminal({
   open,
   unlocked,
+  theme,
   onClose,
   onToggleCabinet,
   onDeveloper,
@@ -795,6 +796,7 @@ function CheatTerminal({
 }: {
   open: boolean;
   unlocked: boolean;
+  theme: "beige" | "neon";
   onClose: () => void;
   onToggleCabinet: () => void;
   onDeveloper: () => void;
@@ -810,6 +812,19 @@ function CheatTerminal({
     "=== KARTHIK V DEV CONSOLE v2.0 ===",
     "Type HELP for available commands.",
   ]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKey, true);
+    return () => window.removeEventListener("keydown", handleKey, true);
+  }, [open, onClose]);
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -956,6 +971,9 @@ function CheatTerminal({
         const pal = parts[1];
         if (["cobalt", "bloodmoon", "matrix", "tokyo", "neon"].includes(pal)) {
           onSetPalette(pal === "neon" ? "" : pal);
+          if (pal !== "neon" && theme !== "neon") {
+            onToggleTheme();
+          }
           setLines((prev) => [...prev, `> ${raw}`, `COLOR PALETTE SWITCHED TO: ${pal.toUpperCase()}`]);
           playArcadeTone("click");
           setInput("");
@@ -1007,7 +1025,17 @@ function CheatTerminal({
 
   if (!open) return null;
   return (
-    <div className="cheat-terminal__backdrop" role="dialog" aria-modal="true" aria-label="Developer cheat terminal">
+    <div
+      className="cheat-terminal__backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Developer cheat terminal"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div className="cheat-terminal">
         <div className="cheat-terminal__bar">
           <span><Terminal size={13} /> KONAMI // DEV CONSOLE v2.0</span>
@@ -1026,6 +1054,13 @@ function CheatTerminal({
               autoFocus
               value={input}
               onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onClose();
+                }
+              }}
               placeholder="type 'help' or 'cd/arcade'..."
               aria-label="Developer terminal command"
             />
@@ -1055,6 +1090,28 @@ function SiteShell({ children }: { children: React.ReactNode }) {
   });
 
   const cheatIndex = useRef(0);
+  const savedScrollRef = useRef(0);
+
+  const handleOpenTerminal = useCallback(() => {
+    savedScrollRef.current = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    setTerminalOpen(true);
+    document.body.style.overflow = "hidden";
+  }, []);
+
+  const handleCloseTerminal = useCallback(() => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    document.body.style.overflow = "";
+    setTerminalOpen(false);
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: savedScrollRef.current,
+        left: 0,
+        behavior: "instant" as ScrollBehavior,
+      });
+    });
+  }, []);
 
   useEffect(() => {
     try { localStorage.setItem("pixelguild-theme", theme); } catch { /* optional persistence */ }
@@ -1091,14 +1148,26 @@ function SiteShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
     const keydown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") { setTerminalOpen(false); return; }
+      if (event.key === "Escape") {
+        if (terminalOpen) {
+          event.preventDefault();
+          event.stopPropagation();
+          handleCloseTerminal();
+          return;
+        }
+      }
       if (event.key.toLowerCase() === code[cheatIndex.current].toLowerCase()) cheatIndex.current += 1;
       else cheatIndex.current = event.key === code[0] ? 1 : 0;
-      if (cheatIndex.current === code.length) { cheatIndex.current = 0; setTerminalOpen(true); setDeveloperMode(true); playArcadeTone("win"); }
+      if (cheatIndex.current === code.length) {
+        cheatIndex.current = 0;
+        handleOpenTerminal();
+        setDeveloperMode(true);
+        playArcadeTone("win");
+      }
     };
     window.addEventListener("keydown", keydown);
     return () => window.removeEventListener("keydown", keydown);
-  }, []);
+  }, [terminalOpen, handleOpenTerminal, handleCloseTerminal]);
 
   useEffect(() => {
     try { localStorage.setItem("pixelguild-sound", soundOn ? "on" : "off"); } catch { /* optional persistence */ }
@@ -1123,14 +1192,20 @@ function SiteShell({ children }: { children: React.ReactNode }) {
       <CheatTerminal
         open={terminalOpen}
         unlocked={developerMode}
-        onClose={() => setTerminalOpen(false)}
+        theme={theme}
+        onClose={handleCloseTerminal}
         onToggleCabinet={() => setCabinet((current) => !current)}
         onDeveloper={() => setDeveloperMode(true)}
         onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")}
         onPartyMode={() => setPartyMode((v) => !v)}
         onMatrixMode={() => setMatrixMode((v) => !v)}
         onBigheadMode={() => setBigheadMode((v) => !v)}
-        onSetPalette={(pal) => setPalette(pal)}
+        onSetPalette={(pal) => {
+          setPalette(pal);
+          if (pal && theme !== "neon") {
+            setTheme("neon");
+          }
+        }}
       />
     </div>
   );
@@ -1586,11 +1661,257 @@ function CoinCatcher() {
   return <section className="coin-catcher page-pad"><div className="coin-catcher__copy"><Eyebrow number="05">Easter egg / coin hunt</Eyebrow><h2>Catch the<br /><span>glitch coin.</span></h2><p>Tap the coin before it jumps. A tiny reward for exploring the page.</p><strong>SCORE {String(score).padStart(2, "0")}</strong></div><div className="coin-catcher__screen"><span className="coin-catcher__scanline" /><button className="glitch-coin" style={{ left: `${coin.left}%`, top: `${coin.top}%` }} onClick={collect} aria-label="Collect glitch coin">✦</button><span className="coin-catcher__hint">CLICK THE STAR / +10 XP</span></div></section>;
 }
 
+export interface AicadeGame {
+  id: string;
+  title: string;
+  category: "Action & Combat" | "Physics & Ragdoll" | "Platformer & Exploration";
+  path: string;
+  thumbnail: string;
+  aspect: "16:9 Landscape" | "9:16 Portrait";
+  badge?: string;
+  tagline: string;
+  description: string;
+  controls: string;
+  tech: string[];
+}
+
+const aicadeGames: AicadeGame[] = [
+  {
+    id: "city_of_aethel",
+    title: "City of Aethel",
+    category: "Action & Combat",
+    path: "city_of_aethel/index.html",
+    thumbnail: assetUrl("portfolio_media/screenshots/phaser_games/01_city_of_aethel.png"),
+    aspect: "16:9 Landscape",
+    badge: "IGDC 2024 Top 45 Finalist",
+    tagline: "Fast-Paced Melee Combat with Attack Chains & Dodge Rolls",
+    description: "Award-nominated top-down action game featuring 5-hit attack combo buffering, 180ms i-frame dodge rolls, posture-breaking parries, and multi-phase arena encounters.",
+    controls: "WASD: Move | J: Attack / Combo | K: Dodge Roll | Space: Interact",
+    tech: ["Phaser 3", "Combo Buffer", "i-Frames", "Finite State Machine"],
+  },
+  {
+    id: "angle_trajectory_shooter",
+    title: "Total Crush: Demolition Ballistics",
+    category: "Physics & Ragdoll",
+    path: "angle_trajectory_shooter/index.html",
+    thumbnail: assetUrl("portfolio_media/screenshots/phaser_games/03_angle_trajectory_shooter.png"),
+    aspect: "16:9 Landscape",
+    badge: "Matter.js Rigid Body",
+    tagline: "Predictive Trajectory Simulation & Destructible Structures",
+    description: "Physics-based siege launcher simulating projectile parabolas, angular velocity, impact force impulses, and chain-reaction structural collapse.",
+    controls: "Mouse Drag & Release: Aim Angle & Launch Velocity",
+    tech: ["Matter.js Physics", "Parabolic Trajectory", "Impulse Forces"],
+  },
+  {
+    id: "canon_forcareer",
+    title: "Cannon Rampart",
+    category: "Action & Combat",
+    path: "canon_forcareer/index.html",
+    thumbnail: assetUrl("portfolio_media/screenshots/phaser_games/04_canon_forcareer.png"),
+    aspect: "16:9 Landscape",
+    badge: "Wave Defense",
+    tagline: "Defensive Turret Ballistics & Horde Pacing",
+    description: "Fortress defense prototype balancing reload cooldowns, projectile travel time, dynamic enemy wave pacing, and explosive splash radiuses.",
+    controls: "Mouse Aim & Click: Fire Cannon | 1-3: Select Ammo Type",
+    tech: ["Ballistic Arc", "Wave Spawner", "Area-of-Effect"],
+  },
+  {
+    id: "kickthebuddy",
+    title: "Ragdoll Rampage",
+    category: "Physics & Ragdoll",
+    path: "kickthebuddy/index.html",
+    thumbnail: assetUrl("portfolio_media/screenshots/phaser_games/05_kickthebuddy.png"),
+    aspect: "16:9 Landscape",
+    badge: "Ragdoll Simulation",
+    tagline: "Multi-Joint Skeletal Physics & Impact Impulse",
+    description: "Interactive ragdoll playground with multi-joint Verlet constraints, collision sound feedback, dynamic spring stiffness, and velocity-scaled particle impacts.",
+    controls: "Mouse Click & Drag: Grab & Toss Ragdoll | Weapon Bar: Select Toy",
+    tech: ["Verlet Integration", "Multi-Joint Skeletal", "Impulse Dynamics"],
+  },
+  {
+    id: "vertical_canon",
+    title: "Skyward Cannon: Mobile Defense",
+    category: "Action & Combat",
+    path: "vertical_canon/index.html",
+    thumbnail: assetUrl("portfolio_media/screenshots/phaser_games/06_vertical_canon.png"),
+    aspect: "9:16 Portrait",
+    badge: "Mobile Portrait Layout",
+    tagline: "Vertical Precision Interception & Screen Shake",
+    description: "Mobile portrait arcade shooter engineered for vertical screen real estate, fast-twitch projectile deflection, combo multipliers, and juicy screen shake feedback.",
+    controls: "Touch / Click & Drag: Aim & Auto-Fire Skyward",
+    tech: ["Portrait Viewport", "Screen Shake FX", "Combo Multipliers"],
+  },
+  {
+    id: "harrypotter",
+    title: "Into the Beastverse",
+    category: "Action & Combat",
+    path: "harrypotter/index.html",
+    thumbnail: assetUrl("portfolio_media/screenshots/phaser_games/07_harrypotter.png"),
+    aspect: "16:9 Landscape",
+    badge: "Narrative Encounter",
+    tagline: "Spell Slinging, Magic Missiles & Narrative Beats",
+    description: "Thematic fantasy action prototype with projectile homing spells, shielding wards, dynamic boss mana phases, and atmospheric narrative dialogue triggers.",
+    controls: "Arrow Keys / WASD: Move | Click / Space: Cast Spell | Q: Shield Ward",
+    tech: ["Spell Projectiles", "Dialogue Triggers", "Homing Ballistics"],
+  },
+  {
+    id: "maze_runner",
+    title: "Maze Runner",
+    category: "Platformer & Exploration",
+    path: "maze_runner/index.html",
+    thumbnail: assetUrl("portfolio_media/screenshots/phaser_games/08_maze_runner.png"),
+    aspect: "16:9 Landscape",
+    badge: "Waypoint AI Patrols",
+    tagline: "Grid Navigation, Line-of-Sight & Stealth Routing",
+    description: "Top-down labyrinth stealth game with patrol node pathfinding, enemy vision cones, keycard security gates, and fog-of-war tilemap exploration.",
+    controls: "WASD / Arrow Keys: Move Runner | Shift: Sprint",
+    tech: ["Tilemap Collision", "Patrol AI Nodes", "Vision Cones"],
+  },
+  {
+    id: "vertical_maze",
+    title: "Tower Ascent: Dungeon Escape",
+    category: "Platformer & Exploration",
+    path: "vertical_maze/index.html",
+    thumbnail: assetUrl("portfolio_media/screenshots/phaser_games/09_vertical_maze.png"),
+    aspect: "16:9 Landscape",
+    badge: "Vertical Platformer",
+    tagline: "Vertical Traversal, Ladder State Machines & Hazard Timing",
+    description: "Vertical ascent platformer featuring ladder climbing states, moving spike hazards, falling platforms, gravity manipulation, and precision jump buffering.",
+    controls: "A/D or Left/Right: Run | W/Up: Climb Ladders | Space: Jump",
+    tech: ["Platform Physics", "Climbing State Machine", "Hazard Triggers"],
+  },
+];
+
+function AicadeCabinetModal({ game, onClose }: { game: AicadeGame; onClose: () => void }) {
+  const [fullscreen, setFullscreen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKey, true);
+    return () => window.removeEventListener("keydown", handleKey, true);
+  }, [onClose]);
+
+  const toggleFullscreen = () => {
+    if (!containerRef.current) return;
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().then(() => setFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => setFullscreen(false)).catch(() => {});
+    }
+  };
+
+  const isPortrait = game.aspect.includes("Portrait");
+
+  return (
+    <div
+      className="aicade-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${game.title} Playable Cabinet`}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        ref={containerRef}
+        className={`aicade-modal ${isPortrait ? "aicade-modal--portrait" : ""}`}
+      >
+        <div className="aicade-modal__header">
+          <div className="aicade-modal__header-left">
+            <Gamepad2 size={16} />
+            <strong>{game.title.toUpperCase()}</strong>
+            <span>• {game.category} • {game.aspect}</span>
+          </div>
+          <div className="aicade-modal__header-actions">
+            <button
+              type="button"
+              className="aicade-modal__btn"
+              onClick={toggleFullscreen}
+              title="Toggle Fullscreen"
+            >
+              <Maximize2 size={12} /> {fullscreen ? "WINDOW" : "FULLSCREEN"}
+            </button>
+            <a
+              href={assetUrl(`aicade/${game.path}`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="aicade-modal__btn"
+              title="Open prototype in separate browser tab"
+            >
+              <ArrowUpRight size={12} /> NEW TAB
+            </a>
+            <button
+              type="button"
+              className="aicade-modal__close-btn"
+              onClick={onClose}
+              aria-label="Close cabinet"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <div className={`aicade-modal__viewport ${isPortrait ? "aicade-modal__viewport--portrait" : "aicade-modal__viewport--landscape"}`}>
+          <iframe
+            src={assetUrl(`aicade/${game.path}`)}
+            title={game.title}
+            className="aicade-modal__iframe"
+            allow="fullscreen; gamepad"
+          />
+        </div>
+
+        <div className="aicade-modal__footer">
+          <div className="aicade-modal__controls">
+            <strong>CONTROLS:</strong> {game.controls}
+          </div>
+          <div className="aicade-modal__tech">
+            <strong>TECH STACK:</strong>
+            {game.tech.map((t) => (
+              <span key={t}>[{t}]</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ArcadePage() {
   const cards = useMemo(() => ["★", "★", "◆", "◆", "●", "●", "✦", "✦", "☾", "☾", "▣", "▣"].sort(() => Math.random() - 0.5), []);
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
+
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeGame, setActiveGame] = useState<AicadeGame | null>(null);
+
+  // Read URL query parameter "?game=city_of_aethel"
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const gameParam = params.get("game");
+      if (gameParam) {
+        const found = aicadeGames.find((g) => g.id === gameParam);
+        if (found) {
+          setActiveGame(found);
+        }
+      }
+    }
+  }, []);
+
+  const categories = ["All", "Action & Combat", "Physics & Ragdoll", "Platformer & Exploration"];
+
+  const filteredGames = useMemo(() => {
+    if (activeCategory === "All") return aicadeGames;
+    return aicadeGames.filter((g) => g.category === activeCategory);
+  }, [activeCategory]);
+
   useEffect(() => {
     if (flipped.length !== 2) return;
     setMoves((value) => value + 1);
@@ -1600,23 +1921,133 @@ function ArcadePage() {
     }, 560);
     return () => window.clearTimeout(timeout);
   }, [flipped, cards]);
+
   const reset = () => { setFlipped([]); setMatched([]); setMoves(0); };
+
   return (
     <main className="inner-page arcade-page">
       <section className="arcade-hero page-pad">
         <Eyebrow number="06">Playable Prototypes & Mini-Games</Eyebrow>
         <h2>Take a break.<br /><span>Play the prototypes.</span></h2>
         <p className="lead">
-          Done reviewing the systems and demo reel? Jump into these retro-inspired arcade builds engineered with custom state machines, timing reflexes, and memory logic.
+          Done exploring the systems and demo reel? Jump into these retro-inspired arcade builds and production Phaser prototypes engineered with custom state machines, timing reflexes, and physics simulations.
         </p>
       </section>
+
+      {/* 8 Playable Phaser 2D Prototypes Showcase */}
+      <section className="aicade-section page-pad">
+        <div className="aicade-header">
+          <Eyebrow number="01 / 02">Phaser 3 Game Engine Portfolio</Eyebrow>
+          <h2>Rapid Prototypes &amp; <span>Combat Mechanics</span></h2>
+          <p>
+            During my gameplay engineering and combat design tenure at Aicade, I architected 8 production-grade 2D web prototypes to test feel, combat buffering, rigid-body physics, and AI navigation. All 8 games run live in your browser below.
+          </p>
+        </div>
+
+        <div className="aicade-filters">
+          {categories.map((cat) => {
+            const count = cat === "All" ? aicadeGames.length : aicadeGames.filter((g) => g.category === cat).length;
+            return (
+              <button
+                key={cat}
+                type="button"
+                className={`aicade-filter-btn ${activeCategory === cat ? "is-active" : ""}`}
+                onClick={() => {
+                  playArcadeTone("click");
+                  setActiveCategory(cat);
+                }}
+              >
+                {cat} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="aicade-grid">
+          {filteredGames.map((game) => (
+            <article key={game.id} className="aicade-card">
+              <div
+                className="aicade-card__media"
+                onClick={() => {
+                  playArcadeTone("transition");
+                  setActiveGame(game);
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Play ${game.title}`}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    playArcadeTone("transition");
+                    setActiveGame(game);
+                  }
+                }}
+              >
+                <img src={game.thumbnail} alt={game.title} loading="lazy" />
+                <span className="aicade-card__scanline" />
+                <div className="aicade-card__badge-overlay">
+                  <span className="aicade-card__pill">{game.category}</span>
+                  {game.badge && (
+                    <span className="aicade-card__pill aicade-card__pill--accolade">
+                      ★ {game.badge}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="aicade-card__content">
+                <div className="aicade-card__meta">
+                  <span>{game.aspect}</span>
+                  <span>PHASER 3</span>
+                </div>
+                <h3>{game.title}</h3>
+                <p className="aicade-card__tagline">{game.tagline}</p>
+                <p className="aicade-card__desc">{game.description}</p>
+                <div className="aicade-card__tags">
+                  {game.tech.map((t) => (
+                    <span key={t}>{t}</span>
+                  ))}
+                </div>
+                <div className="aicade-card__actions">
+                  <button
+                    type="button"
+                    className="aicade-card__play-btn"
+                    onClick={() => {
+                      playArcadeTone("transition");
+                      setActiveGame(game);
+                    }}
+                  >
+                    <Play size={12} /> Play Prototype
+                  </button>
+                  <span className="aicade-card__aspect">{game.aspect}</span>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Mini-Games Retention Lab */}
       <section className="arcade-cabinet page-pad">
+        <Eyebrow number="02 / 02">Memory Matrix Mini-Game</Eyebrow>
         <div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div>
         <div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div>
         <div className="arcade-cabinet__bottom"><span>{matched.length === cards.length ? "PERFECT RUN! CABINET CLEARED." : "FIND THE PAIRS / NO CHEATING"}</span><button className="button button--tiny" onClick={reset}><RefreshCw size={12} /> Reset</button></div>
       </section>
+
       <BossFight />
-      <div className="arcade-tips page-pad"><div><Zap size={17} /><p>Click the Karthik V companion mascot to change its mood. Drag it anywhere and it remembers the spot.</p></div><div><MousePointer2 size={17} /><p>Every card, project visual, and video panel has a little hover state waiting for you.</p></div></div>
+
+      <div className="arcade-tips page-pad">
+        <div><Zap size={17} /><p>Click the Karthik V companion mascot to pause/resume its movement. Drag it anywhere on screen!</p></div>
+        <div><MousePointer2 size={17} /><p>Each playable prototype features custom physics, state machines, and responsive control binds.</p></div>
+      </div>
+
+      {activeGame && (
+        <AicadeCabinetModal
+          game={activeGame}
+          onClose={() => setActiveGame(null)}
+        />
+      )}
+
       <Footer />
     </main>
   );
@@ -2815,6 +3246,21 @@ function ProjectPage({ slug }: { slug: string }) {
         </div>
 
         <div className="project-detail__copy">
+          {project.slug === "city-of-aethel" && (
+            <div className="aicade-project-banner">
+              <div className="aicade-project-banner__info">
+                <Eyebrow>Playable Web Prototypes</Eyebrow>
+                <h3>Play City of Aethel & All 8 Arcade Prototypes</h3>
+                <p>
+                  Experience the award-nominated 5-hit attack combo buffering, 180ms i-frame dodge rolls, and boss posture mechanics directly in your browser.
+                </p>
+              </div>
+              <Link href="/arcade/?game=city_of_aethel" className="button button--primary aicade-launch-btn">
+                <Gamepad2 size={16} /> Launch Arcade Cabinet ↗
+              </Link>
+            </div>
+          )}
+
           <div className="project-detail__section">
             <Eyebrow>Core Gameplay Mechanics & Features</Eyebrow>
             <ul className="project-systems-list">

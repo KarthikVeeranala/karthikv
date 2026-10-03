@@ -74,11 +74,20 @@ button { color: inherit; border: 0; background: none; }
   --sans: 'VT323', monospace;
   --mono: 'Press Start 2P', monospace;
 }
-body { background: #100820; image-rendering: pixelated; }
-.site-shell { background: radial-gradient(circle at 50% 12%, rgba(178,76,255,.14), transparent 30%), linear-gradient(180deg, #100820 0%, #130724 55%, #0c0618 100%); }
+body { background: var(--bg); color: var(--ink); image-rendering: pixelated; }
+.site-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: radial-gradient(circle at 50% 12%, rgba(255,255,255,0.04), transparent 30%), linear-gradient(180deg, var(--bg) 0%, var(--bg-elevated) 55%, var(--bg) 100%) !important;
+}
 .site-shell::before { opacity: .22; background-image: linear-gradient(rgba(86,247,210,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(86,247,210,.08) 1px, transparent 1px); background-size: 32px 32px; }
 .noise { opacity: .08; }
-.site-nav { border-bottom: 2px solid rgba(178,76,255,.35); background: rgba(16,8,32,.92); box-shadow: 0 4px 0 rgba(0,0,0,.2), 0 0 24px rgba(178,76,255,.18); }
+.site-nav {
+  border-bottom: 2px solid var(--line) !important;
+  background: var(--bg-elevated) !important;
+  box-shadow: 0 4px 0 rgba(0,0,0,.2), 0 0 24px rgba(0,0,0,.2);
+}
 .site-nav__name, .site-footer__mark, .hero-identity h1, .page-header h1, .project-card h3, .market-card h2, .blog-row h2, .side-quest h2, .github-profile h2, .next-project strong { text-shadow: 3px 3px 0 rgba(178,76,255,.22); }
 .site-nav__name { font-family: var(--mono); font-size: 10px; }.nav-link, .nav-cta, .eyebrow, .muted-label, .text-link, .button, .status-pill, .hero-bottomline, .hero-side-note, .site-footer__bottom, .project-card__type, .project-visual__label, .market-card__category, .blog-row__meta, .reel-page__meta p, .chapter-row span, .chapter-row small { font-family: var(--mono); }
 .nav-link:hover, .nav-link.is-active { color: var(--teal); text-shadow: 0 0 8px rgba(86,247,210,.7); }.nav-link.is-active::before { background: #ffd64f; box-shadow: 0 0 10px #ffd64f; }.nav-cta { color: #ffd64f; border: 2px solid #ffd64f; background: rgba(255,214,79,.08); box-shadow: 3px 3px 0 rgba(255,107,157,.38); }.nav-cta:hover, .nav-cta.is-active { color: #100820; background: #ffd64f; border-color: #ffd64f; }
@@ -220,9 +229,13 @@ body { overscroll-behavior-y: none; }
 /* AUDIO CONTROL */
 .sound-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 27px; padding: 0 8px; color: #382d26; border: 2px solid #2f7063; background: rgba(255,255,255,.24); box-shadow: 2px 2px 0 rgba(183,91,69,.32); font: 8px var(--mono); transition: background .2s, color .2s, transform .2s; }
 .sound-toggle:hover { color: #eee3d2; background: #2f7063; transform: translateY(-2px); }.sound-toggle svg { color: #2f7063; }.sound-toggle:hover svg { color: #eee3d2; }.theme-neon .sound-toggle { color: #ffd64f; border-color: #56f7d2; background: rgba(86,247,210,.08); box-shadow: 2px 2px 0 #ff6b9d; }.theme-neon .sound-toggle svg { color: #56f7d2; }.theme-neon .sound-toggle:hover { color: #100820; background: #56f7d2; }
-/* CUSTOM PIXEL POINTER + TRAIL */
-.cursor-fx { position: fixed; z-index: 9999 !important; inset: 0; pointer-events: none; mix-blend-mode: screen; }.cursor-fx i { position: absolute; width: 9px; height: 9px; background: var(--teal); box-shadow: 4px 0 var(--teal), 0 4px var(--teal); transform-origin: center; transition: left .08s linear, top .08s linear; }.cursor-fx i:first-child { width: 13px; height: 13px; background: transparent; border: 2px solid var(--rust); box-shadow: 4px 4px 0 var(--teal); }.site-shell, .site-shell * { cursor: none !important; }
-@media (pointer: coarse), (max-width: 760px) { .cursor-fx { display: none; }.site-shell, .site-shell * { cursor: auto !important; }.sound-toggle { min-height: 25px; padding: 0 6px; font-size: 7px; } }
+.cursor-fx { position: fixed; z-index: 999999 !important; inset: 0; pointer-events: none !important; mix-blend-mode: screen; }
+.cursor-fx i { position: absolute; width: 9px; height: 9px; background: var(--teal); box-shadow: 4px 0 var(--teal), 0 4px var(--teal); transform-origin: center; transition: left .08s linear, top .08s linear; }
+.cursor-fx i:first-child { width: 13px; height: 13px; background: transparent; border: 2px solid var(--rust); box-shadow: 4px 4px 0 var(--teal); }
+body { cursor: default; }
+a, button { cursor: pointer; }
+input, textarea { cursor: text; }
+@media (pointer: coarse), (max-width: 760px) { .cursor-fx { display: none; } .sound-toggle { min-height: 25px; padding: 0 6px; font-size: 7px; } }
 /* REFERENCE-STYLE NUMBERED PORTFOLIO DOSSIER */
 .portfolio-grid { display: block; max-width: 1320px; margin: 0 auto; }.portfolio-grid .project-card, .featured-grid .project-card { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 18px; width: 100%; padding: 42px 0 52px; border-top: 1px solid var(--line); }.portfolio-grid .project-card--right, .featured-grid .project-card--right { margin-top: 0; }.project-card__number { display: flex; flex-direction: column; align-items: flex-start; padding-top: 3px; color: var(--rust); font: 11px var(--mono); }.project-card__number strong { color: var(--bone); font-size: 24px; line-height: 1; }.project-card__number span { margin-top: 7px; color: var(--muted-2); }.project-card__content { min-width: 0; }.project-card__content .project-visual { width: 100%; }.project-card__body { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px 24px; align-items: start; padding-top: 20px; }.project-card__body h3 { max-width: 16ch; font-size: clamp(23px, 3vw, 44px); letter-spacing: -.06em; }.project-card__body p { grid-column: 1 / -1; max-width: 76ch; margin: 0; }.project-card__body .tag-row { grid-column: 1 / -1; }.project-card__arrow { margin-top: 8px; }.portfolio-page { padding-top: 55px; }.portfolio-page .filter-row { margin-bottom: 14px; }
 /* BOSS FIGHT + LOCAL SCOREBOARD */
@@ -1778,61 +1791,563 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   transform-origin: center center;
 }
 
-/* 16. NIGHT MODE COLOR PALETTES (Token Overrides Only - Layout Preserved 100%) */
+/* 16. NIGHT MODE COLOR PALETTES (Full Theme Overrides: Navbar, Background, Accent Tokens) */
 /* Option 1: Deep Cobalt (Slate Blue & Neon Cyan) */
 .palette-cobalt {
   --bg: #070b14 !important;
   --bg-elevated: #0d1527 !important;
+  --bg-soft: #131f38 !important;
   --teal: #38bdf8 !important;
+  --teal-dim: #0284c7 !important;
   --rust: #f43f5e !important;
   --pink: #818cf8 !important;
   --gold: #38bdf8 !important;
   --bone: #f0f6fc !important;
+  --ink: #f0f6fc !important;
   --muted: #94a3b8 !important;
-  --line: rgba(56, 189, 248, 0.18) !important;
-  --line-strong: rgba(56, 189, 248, 0.38) !important;
+  --muted-2: #64748b !important;
+  --line: rgba(56, 189, 248, 0.22) !important;
+  --line-strong: rgba(56, 189, 248, 0.45) !important;
+}
+.palette-cobalt.site-shell, .palette-cobalt .site-shell {
+  background: radial-gradient(circle at 50% 12%, rgba(56, 189, 248, 0.12), transparent 35%), linear-gradient(180deg, #070b14 0%, #0d1527 55%, #070b14 100%) !important;
+}
+.palette-cobalt .site-nav {
+  background: #0d1527 !important;
+  border-bottom: 2px solid rgba(56, 189, 248, 0.3) !important;
 }
 
 /* Option 2: Blood Moon (Crimson Gold & Ruby) */
 .palette-bloodmoon {
   --bg: #14080a !important;
   --bg-elevated: #220e12 !important;
+  --bg-soft: #301319 !important;
   --teal: #fbbf24 !important;
+  --teal-dim: #b91c1c !important;
   --rust: #f43f5e !important;
   --pink: #fb7185 !important;
   --gold: #f59e0b !important;
   --bone: #fff1f2 !important;
+  --ink: #fff1f2 !important;
   --muted: #fda4af !important;
-  --line: rgba(244, 63, 94, 0.22) !important;
-  --line-strong: rgba(244, 63, 94, 0.45) !important;
+  --muted-2: #f43f5e !important;
+  --line: rgba(244, 63, 94, 0.25) !important;
+  --line-strong: rgba(244, 63, 94, 0.5) !important;
+}
+.palette-bloodmoon.site-shell, .palette-bloodmoon .site-shell {
+  background: radial-gradient(circle at 50% 12%, rgba(244, 63, 94, 0.15), transparent 35%), linear-gradient(180deg, #14080a 0%, #220e12 55%, #14080a 100%) !important;
+}
+.palette-bloodmoon .site-nav {
+  background: #220e12 !important;
+  border-bottom: 2px solid rgba(244, 63, 94, 0.35) !important;
 }
 
 /* Option 3: Emerald Matrix (Phosphor Green & Terminal Mint) */
 .palette-matrix {
   --bg: #05100a !important;
   --bg-elevated: #091b11 !important;
+  --bg-soft: #0e291b !important;
   --teal: #10b981 !important;
+  --teal-dim: #047857 !important;
   --rust: #f59e0b !important;
   --pink: #34d399 !important;
   --gold: #10b981 !important;
   --bone: #ecfdf5 !important;
+  --ink: #ecfdf5 !important;
   --muted: #6ee7b7 !important;
-  --line: rgba(16, 185, 129, 0.2) !important;
-  --line-strong: rgba(16, 185, 129, 0.42) !important;
+  --muted-2: #059669 !important;
+  --line: rgba(16, 185, 129, 0.25) !important;
+  --line-strong: rgba(16, 185, 129, 0.48) !important;
+}
+.palette-matrix.site-shell, .palette-matrix .site-shell, body:has(.palette-matrix) {
+  background: radial-gradient(circle at 50% 12%, rgba(16, 185, 129, 0.14), transparent 35%), linear-gradient(180deg, #05100a 0%, #091b11 55%, #05100a 100%) !important;
+}
+.palette-matrix .site-nav, .palette-matrix.site-shell .site-nav {
+  background: #091b11 !important;
+  border-bottom: 2px solid rgba(16, 185, 129, 0.32) !important;
 }
 
 /* Option 4: Tokyo Midnight (Synthwave Violet & Electric Cyan) */
 .palette-tokyo {
   --bg: #0b0716 !important;
   --bg-elevated: #160f2a !important;
+  --bg-soft: #231644 !important;
   --teal: #22d3ee !important;
+  --teal-dim: #7c3aed !important;
   --rust: #f43f5e !important;
   --pink: #d946ef !important;
   --gold: #facc15 !important;
   --bone: #faf5ff !important;
+  --ink: #faf5ff !important;
   --muted: #c084fc !important;
-  --line: rgba(217, 70, 239, 0.2) !important;
-  --line-strong: rgba(217, 70, 239, 0.42) !important;
+  --muted-2: #9333ea !important;
+  --line: rgba(217, 70, 239, 0.25) !important;
+  --line-strong: rgba(217, 70, 239, 0.48) !important;
+}
+.palette-tokyo.site-shell, .palette-tokyo .site-shell, body:has(.palette-tokyo) {
+  background: radial-gradient(circle at 50% 12%, rgba(217, 70, 239, 0.15), transparent 35%), linear-gradient(180deg, #0b0716 0%, #160f2a 55%, #0b0716 100%) !important;
+}
+.palette-tokyo .site-nav, .palette-tokyo.site-shell .site-nav {
+  background: #160f2a !important;
+  border-bottom: 2px solid rgba(217, 70, 239, 0.32) !important;
+}
+
+/* Specific body + shell sync for Cobalt and Bloodmoon */
+body:has(.palette-cobalt) {
+  background: radial-gradient(circle at 50% 12%, rgba(56, 189, 248, 0.12), transparent 35%), linear-gradient(180deg, #070b14 0%, #0d1527 55%, #070b14 100%) !important;
+}
+.palette-cobalt.site-shell .site-nav {
+  background: #0d1527 !important;
+  border-bottom: 2px solid rgba(56, 189, 248, 0.3) !important;
+}
+body:has(.palette-bloodmoon) {
+  background: radial-gradient(circle at 50% 12%, rgba(244, 63, 94, 0.15), transparent 35%), linear-gradient(180deg, #14080a 0%, #220e12 55%, #14080a 100%) !important;
+}
+.palette-bloodmoon.site-shell .site-nav {
+  background: #220e12 !important;
+  border-bottom: 2px solid rgba(244, 63, 94, 0.35) !important;
+}
+
+/* 17. AICADE PLAYABLE SHOWCASE & CABINET MODAL */
+.aicade-section {
+  padding-top: 24px;
+  padding-bottom: 70px;
+}
+.aicade-header {
+  margin-bottom: 24px;
+}
+.aicade-header h2 {
+  font: clamp(24px, 3.6vw, 36px) / 1.1 var(--mono);
+  margin: 10px 0 12px;
+  color: var(--bone);
+}
+.aicade-header h2 span {
+  color: var(--teal);
+}
+.aicade-header p {
+  max-width: 780px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 0;
+}
+.aicade-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0 32px;
+}
+.aicade-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-elevated);
+  color: var(--muted);
+  font: 10px var(--mono);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.aicade-filter-btn:hover {
+  color: var(--bone);
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+.aicade-filter-btn.is-active {
+  background: var(--teal);
+  color: #100820;
+  border-color: var(--teal);
+  box-shadow: 0 0 12px rgba(86, 247, 210, 0.45);
+  font-weight: 700;
+}
+.aicade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+.aicade-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elevated);
+  border: 2px solid var(--line-strong);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  overflow: hidden;
+  position: relative;
+}
+.aicade-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--teal);
+  box-shadow: 7px 7px 0 var(--teal-dim), 0 0 18px rgba(86, 247, 210, 0.25);
+}
+.aicade-card__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #090514;
+  overflow: hidden;
+  cursor: pointer;
+}
+.aicade-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.aicade-card:hover .aicade-card__media img {
+  transform: scale(1.04);
+}
+.aicade-card__scanline {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 2px, transparent 2px 4px);
+  pointer-events: none;
+  opacity: 0.6;
+}
+.aicade-card__badge-overlay {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  gap: 6px;
+}
+.aicade-card__pill {
+  padding: 4px 8px;
+  background: rgba(16, 8, 32, 0.88);
+  border: 1px solid var(--teal);
+  color: var(--teal);
+  font: 8px var(--mono);
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(4px);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+}
+.aicade-card__pill--accolade {
+  border-color: #ffd64f;
+  color: #ffd64f;
+}
+.aicade-card__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 18px;
+}
+.aicade-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font: 9px var(--mono);
+  color: var(--rust);
+}
+.aicade-card__content h3 {
+  font: 14px var(--mono);
+  color: var(--bone);
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+.aicade-card__tagline {
+  font-size: 13px;
+  color: var(--teal);
+  margin: 0 0 10px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.aicade-card__desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0 0 14px;
+  flex: 1;
+}
+.aicade-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.aicade-card__tags span {
+  padding: 3px 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font: 8px var(--mono);
+}
+.aicade-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  margin-top: auto;
+}
+.aicade-card__play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--teal);
+  color: #100820;
+  font: 10px var(--mono);
+  font-weight: 700;
+  border: 1px solid var(--teal);
+  box-shadow: 3px 3px 0 var(--teal-dim);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+.aicade-card__play-btn:hover {
+  background: #fff4c7;
+  border-color: #fff4c7;
+  transform: translate(-1px, -1px);
+}
+.aicade-card__aspect {
+  font: 8px var(--mono);
+  color: var(--muted-2);
+}
+
+/* AICADE CABINET MODAL */
+.aicade-modal-backdrop {
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
+  background: rgba(4, 2, 8, 0.88);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+.aicade-modal {
+  position: relative;
+  width: min(1060px, 98vw);
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  background: #0d0818;
+  border: 3px solid var(--teal);
+  box-shadow: 10px 10px 0 var(--teal-dim), 0 0 50px rgba(86, 247, 210, 0.35);
+  animation: modal-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.aicade-modal--portrait {
+  width: min(520px, 98vw);
+}
+@keyframes modal-fade-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.aicade-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--teal);
+  color: #100820;
+  font: 11px var(--mono);
+  border-bottom: 2px solid #100820;
+}
+.aicade-modal__header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.aicade-modal__header-left strong {
+  font-weight: 700;
+  font-size: 12px;
+}
+.aicade-modal__header-left span {
+  font-size: 9px;
+  opacity: 0.85;
+}
+.aicade-modal__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.aicade-modal__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  background: #100820;
+  color: var(--teal);
+  border: 1px solid #100820;
+  font: 9px var(--mono);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.aicade-modal__btn:hover {
+  background: #fff4c7;
+  color: #100820;
+}
+.aicade-modal__close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #ff6b9d;
+  color: #100820;
+  border: 1px solid #100820;
+  font: 14px var(--mono);
+  font-weight: 700;
+  cursor: pointer;
+}
+.aicade-modal__close-btn:hover {
+  background: #fff;
+}
+.aicade-modal__viewport {
+  position: relative;
+  width: 100%;
+  background: #000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.aicade-modal__viewport--landscape {
+  aspect-ratio: 16 / 10;
+  max-height: 66vh;
+}
+.aicade-modal__viewport--portrait {
+  aspect-ratio: 9 / 16;
+  max-height: 66vh;
+}
+.aicade-modal__iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.aicade-modal__footer {
+  padding: 12px 18px;
+  background: #150d26;
+  border-top: 2px solid var(--line-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font: 10px var(--mono);
+}
+.aicade-modal__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffd64f;
+  flex-wrap: wrap;
+}
+.aicade-modal__controls strong {
+  color: var(--bone);
+}
+.aicade-modal__tech {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 9px;
+  flex-wrap: wrap;
+}
+.aicade-modal__tech span {
+  color: var(--teal);
+}
+
+/* AICADE PROJECT BANNER IN DOSSIER */
+.aicade-project-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 26px;
+  margin-bottom: 32px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--teal);
+  box-shadow: 6px 6px 0 var(--teal-dim), inset 0 0 30px rgba(86, 247, 210, 0.12);
+}
+.aicade-project-banner__info h3 {
+  font: 18px var(--mono);
+  color: var(--bone);
+  margin: 6px 0 8px;
+}
+.aicade-project-banner__info p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 620px;
+}
+.aicade-launch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+@media (max-width: 768px) {
+  .aicade-project-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* DAY MODE (site-shell:not(.theme-neon)) OVERRIDES FOR AICADE */
+.site-shell:not(.theme-neon) .aicade-filter-btn {
+  background: #e6d6bf;
+  color: #665a50;
+  border-color: rgba(61, 47, 37, 0.25);
+}
+.site-shell:not(.theme-neon) .aicade-filter-btn.is-active {
+  background: #2f7063;
+  color: #eee3d2;
+  border-color: #2f7063;
+  box-shadow: 0 0 10px rgba(47, 112, 99, 0.35);
+}
+.site-shell:not(.theme-neon) .aicade-card {
+  background: #e6d6bf;
+  border-color: rgba(61, 47, 37, 0.3);
+  box-shadow: 4px 4px 0 rgba(61, 47, 37, 0.15);
+}
+.site-shell:not(.theme-neon) .aicade-card:hover {
+  border-color: #2f7063;
+  box-shadow: 6px 6px 0 #b75b45, 0 0 14px rgba(47, 112, 99, 0.2);
+}
+.site-shell:not(.theme-neon) .aicade-card__pill {
+  background: rgba(238, 227, 210, 0.95);
+  color: #2f7063;
+  border-color: #2f7063;
+}
+.site-shell:not(.theme-neon) .aicade-card__pill--accolade {
+  color: #b75b45;
+  border-color: #b75b45;
+}
+.site-shell:not(.theme-neon) .aicade-card__content h3 {
+  color: #382d26;
+}
+.site-shell:not(.theme-neon) .aicade-card__tagline {
+  color: #2f7063;
+}
+.site-shell:not(.theme-neon) .aicade-card__desc {
+  color: #665a50;
+}
+.site-shell:not(.theme-neon) .aicade-card__play-btn {
+  background: #2f7063;
+  color: #eee3d2;
+  border-color: #2f7063;
+  box-shadow: 3px 3px 0 #b75b45;
+}
+.site-shell:not(.theme-neon) .aicade-project-banner {
+  background: #e6d6bf;
+  border-color: #2f7063;
+  box-shadow: 6px 6px 0 #b75b45;
+}
+.site-shell:not(.theme-neon) .aicade-project-banner__info h3 {
+  color: #382d26;
+}
+.site-shell:not(.theme-neon) .aicade-project-banner__info p {
+  color: #665a50;
 }
 
 
