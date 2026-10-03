@@ -3303,13 +3303,26 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   opacity: 0.22 !important;
 }
 
-/* 2. Quiet Background Glyphs: soften floating arcade characters */
+/* 2. Quiet Subtle Background Glyphs: gentle floating arcade characters & keys */
 .pixel-field {
-  opacity: 0.12 !important;
+  opacity: 0.55 !important;
 }
 .pixel-field__glyph {
-  opacity: 0.04 !important;
-  animation: none !important;
+  opacity: 0.16 !important;
+  animation: controller-float 14s ease-in-out infinite alternate !important;
+  pointer-events: none !important;
+}
+.pixel-field__glyph--pill {
+  width: auto !important;
+  padding: 2px 6px !important;
+  font-size: 8px !important;
+}
+.site-shell:not(.theme-neon) .pixel-field__glyph {
+  opacity: 0.22 !important;
+  background: rgba(244, 234, 217, 0.45) !important;
+  border-color: rgba(47, 112, 99, 0.35) !important;
+  color: var(--teal) !important;
+  box-shadow: 2px 2px 0 rgba(183, 91, 69, 0.25) !important;
 }
 
 /* 3. Subdued Scanlines & Glitch Animations */

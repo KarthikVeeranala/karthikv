@@ -432,8 +432,31 @@ function SocialRail() {
 }
 
 function ArcadeBackground() {
-  const glyphs = ["X", "A", "Y", "B", "✦", "＋", "◀", "▶", "A", "B", "X", "Y", "✚", "◆"];
-  return <div className="pixel-field" aria-hidden="true">{glyphs.map((glyph, index) => <span key={`${glyph}-${index}`} className={`pixel-field__glyph pixel-field__glyph--${index % 5}`} style={{ left: `${(index * 37) % 94}%`, top: `${(index * 61) % 90}%`, animationDelay: `${(index % 9) * -0.7}s`, animationDuration: `${7 + (index % 5)}s` }}>{glyph}</span>)}</div>;
+  const glyphs = [
+    "W", "A", "S", "D",
+    "A", "B", "X", "Y",
+    "◀", "▲", "▶", "▼",
+    "W", "A", "S", "D",
+    "✦", "＋", "◆", "SPACE"
+  ];
+  return (
+    <div className="pixel-field" aria-hidden="true">
+      {glyphs.map((glyph, index) => (
+        <span
+          key={`${glyph}-${index}`}
+          className={`pixel-field__glyph pixel-field__glyph--${index % 5} ${glyph.length > 1 ? "pixel-field__glyph--pill" : ""}`}
+          style={{
+            left: `${(index * 21 + 5) % 94}%`,
+            top: `${(index * 31 + 8) % 90}%`,
+            animationDelay: `${(index % 8) * -1.8}s`,
+            animationDuration: `${12 + (index % 4) * 3}s`,
+          }}
+        >
+          {glyph}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 interface Pellet {
