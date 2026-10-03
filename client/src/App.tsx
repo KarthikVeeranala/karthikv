@@ -1422,7 +1422,7 @@ function BackstorySection() {
     X: { title: "GAMEPLAY & COMBAT", copy: "Deterministic simulation, 5-hit melee combos, 180ms i-frame dodge rolls, and predictive lead-target AI." },
     A: { title: "UNREAL ENGINE & C++", copy: "Production UE 5.7 C++ engine architecture, isolated desktop sandboxing, Slate/UMG automation, and streaming." },
     Y: { title: "3X HACKATHON VICTORIES", copy: "1st at CodeDay 2.0 (The Interlude), 2nd at HackRush (ByteOasis), and Top 3 at MLH FrostHacks (Geek'O'Wars)." },
-    B: { title: "COMMUNITY & LEADERSHIP", copy: "President of Elysium Gaming Club directing collegiate esports and mentoring 200+ student game developers." },
+    B: { title: "COMMUNITY & LEADERSHIP", copy: "President of Elysium Gaming Club organizing campus gaming culture and collegiate esports tournaments." },
   };
 
   const handleBtnClick = (btn: "X" | "A" | "Y" | "B") => {
@@ -1553,29 +1553,198 @@ function BackstorySection() {
   );
 }
 
+interface BackstoryAct {
+  id: string;
+  actNumber: string;
+  year: string;
+  title: string;
+  subtitle: string;
+  summary: string;
+  paragraphs: string[];
+  tags: string[];
+  metrics: { label: string; value: string }[];
+}
+
+const BACKSTORY_ACTS: BackstoryAct[] = [
+  {
+    id: "act-1",
+    actNumber: "ACT I",
+    year: "2006 — CHILDHOOD",
+    title: "DAD'S PC & OCEAN OF GAMES",
+    subtitle: "ROAD RASH • PRINCE OF PERSIA • WOLFENSTEIN 3D",
+    summary: "The childhood spark that proved games weren't just entertainment—they were living, responsive worlds.",
+    paragraphs: [
+      "I was born in 2006. My earliest gaming memories were not retro floppy disks—they were huddled around my dad's monitor, playing cracked titles he downloaded off Ocean of Games.",
+      "Dodging traffic and kicking rival bikers in Road Rash, timing pixel-perfect sword parries in Prince of Persia, and navigating labyrinthian corridors in Wolfenstein 3D sparked an obsession that never left. I wasn't just trying to beat high scores; I was fascinated by the underlying clockwork: How does the camera calculate physics? Why do hits feel heavy? How does code make a machine feel alive?"
+    ],
+    tags: ["Ocean of Games", "Dad's PC", "Road Rash", "Prince of Persia", "Wolfenstein 3D"],
+    metrics: [
+      { label: "Origin Year", value: "2006" },
+      { label: "First PC Hook", value: "Combat Feel & Velocity" },
+    ]
+  },
+  {
+    id: "act-2",
+    actNumber: "ACT II",
+    year: "EARLY TEENS",
+    title: "FIRST CODE: FROM SCRATCH TO C++",
+    subtitle: "BLOCK LOGIC • TRIGONOMETRY • SELF-TAUGHT CORE",
+    summary: "Snapping logic blocks together for the first time, followed by diving into self-taught text code and game math.",
+    paragraphs: [
+      "Curiosity naturally pushed me to build my first game on Scratch. Snapping visual logic blocks together to make sprites move, jump, and collide gave me an instant rush of adrenaline: I had created something playable with my own hands.",
+      "From there, visual scripts weren't enough. I made the leap into text-based programming—teaching myself C++, coordinate trigonometry, velocity vectors, and game engine concepts entirely through public documentation, tutorials, trial, error, and sheer persistence."
+    ],
+    tags: ["Scratch", "Self-Taught", "C++", "Trigonometry", "Game Loops"],
+    metrics: [
+      { label: "First Prototype", value: "Scratch (Age 11)" },
+      { label: "Language", value: "Self-Taught C++" },
+    ]
+  },
+  {
+    id: "act-3",
+    actNumber: "ACT III",
+    year: "2022 — 2024",
+    title: "THE CRUCIBLE: 24–48H HACKATHONS",
+    subtitle: "FAILED BUILDS • RUTHLESS SCOPE • 3X PODIUM WINS",
+    summary: "High-pressure competitive game jams where failing fast forged ruthless scoping and combat feel discipline.",
+    paragraphs: [
+      "I threw myself into competitive game jams and hackathons under brutal 24-to-48 hour clocks. In the beginning, I failed. Ideas were overscoped, mechanics collapsed under time pressure, and projects barely held together before submission deadlines.",
+      "Every failure became my best teacher. I learned to cut fluff ruthlessly, prioritize core player feedback loops, tune camera shake, and execute under intense constraints. That trial by fire paid off: 1st Place Overall at CodeDay 2.0 (The Interlude), 2nd Place at HackRush (ByteOasis), and Top 3 at MLH FrostHacks (Geek'O'Wars)."
+    ],
+    tags: ["CodeDay 2.0 (1st)", "HackRush (2nd)", "MLH FrostHacks (Top 3)", "Fast Scoping"],
+    metrics: [
+      { label: "Podium Finishes", value: "3x Victories" },
+      { label: "Sprint Duration", value: "24–48 Hours" },
+    ]
+  },
+  {
+    id: "act-4",
+    actNumber: "ACT IV",
+    year: "2024 — 2025",
+    title: "INTO THE ARENA: IGDC & ELYSIUM",
+    subtitle: "TOP 45 INDIE FINALIST • GAMING CLUB PRESIDENT • ESPORTS",
+    summary: "Validating combat feel on the national indie stage and leading collegiate gaming culture.",
+    paragraphs: [
+      "Building 14 playable prototypes culminated in City of Aethel—a top-down action prototype engineered with 5-hit attack combo buffering, 180ms i-frame dodge rolls, and posture parries—earning a Top 45 Indie Game Finalist selection at the India Game Developer Conference (IGDC 2024).",
+      "Simultaneously, as President of the Elysium Gaming Club at IARE, I stepped up to cultivate competitive collegiate gaming on campus, organizing esports tournaments and gaming events for students."
+    ],
+    tags: ["IGDC 2024 Finalist", "City of Aethel", "Elysium Gaming Club", "Esports Organizer"],
+    metrics: [
+      { label: "IGDC Honor", value: "Top 45 Indie Finalist" },
+      { label: "Campus Role", value: "Gaming Club President" },
+    ]
+  },
+  {
+    id: "act-5",
+    actNumber: "ACT V",
+    year: "2026 — PRESENT",
+    title: "THE ENGINE ROOM: UNREAL 5.7 C++",
+    subtitle: "HEADLESS AUTOMATION • DETERMINISM • PRODUCTION PIPELINES",
+    summary: "Engineering production engine systems, isolated sandboxes, and verification tools in Unreal Engine 5.7.",
+    paragraphs: [
+      "Today, my focus is locked on production Unreal Engine C++ architecture. Working at Cyrus 365, I architected a project-agnostic End-to-End Automation & Verification harness in UE 5.7 C++.",
+      "The harness instantiates isolated Win32 desktops to prevent OS mouse theft, recursively discovers runtime Slate and UMG widget trees via reflection, and pipes raw viewport backbuffer frames directly to bundled FFmpeg via stdin for automated pass/fail verification."
+    ],
+    tags: ["Unreal Engine 5.7", "C++", "Win32 Sandboxing", "FFmpeg Pipelines", "Slate Reflection"],
+    metrics: [
+      { label: "Engine Focus", value: "UE 5.7 C++ Core" },
+      { label: "Focus Theft", value: "0% (Zero OS Theft)" },
+    ]
+  }
+];
+
 function BackstoryPage() {
-  const milestones = [
-    ["2026 — PRESENT", "Unreal Engine Developer / Cyrus 365", "Architected an End-to-End Automation & Verification harness in UE 5.7 C++, with Win32 isolated desktops, recursive Slate/UMG discovery, and direct backbuffer FFmpeg streaming."],
-    ["2025", "Mentor & Technical Judge / CodeDay 3.0", "Mentored collegiate teams in game design, gameplay programming, and Unreal Engine debugging; guided participants through mechanics prototyping, shader optimization, and game jam submissions."],
-    ["2024 — 2025", "Game Developer & Prototyper / Aicade", "Engineered 14 playable 2D prototypes testing combat feel, rigid-body ragdolls, and boss encounter choreography, including the IGDC finalist City of Aethel."],
-    ["2024 — 2025", "President & Game Jam Organizer / Elysium Gaming Club — IARE", "Directing campus game development workshops, student hackathons, and collegiate esports tournaments for 200+ active student developers."],
-    ["2022 — 2024", "Lead Game Developer / MLH & CodeDay", "Won 1st Place Overall at CodeDay 2.0 with The Interlude, 2nd at HackRush with ByteOasis, and Top 3 at FrostHacks with Geek'O'Wars."],
-  ];
+  const [activeActId, setActiveActId] = useState("act-1");
+
+  const scrollToAct = (actId: string) => {
+    setActiveActId(actId);
+    playArcadeTone("click");
+    const el = document.getElementById(actId);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <main className="inner-page backstory-page">
-      <PageHeader number="02" kicker="Backstory" />
-      <section className="backstory-story page-pad">
-        <div className="backstory-story__copy">
-          <p className="lead">My engineering philosophy centers on ruthless execution under constraints. Over the past three years I have spearheaded teams in 24–48 hour competitive hackathons—winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks—alongside earning a Top 45 Indie Finalist selection at IGDC 2024 for City of Aethel.</p>
-          <p>As President of the Elysium Gaming Club at IARE, I oversee campus game development initiatives, Unreal and Unity workshops, and collegiate esports tournaments for a community of more than 200 active students.</p>
-          <div className="backstory-section__facts">
-            <div><strong>3</strong><span>Hackathon victories</span></div>
-            <div><strong>TOP 45</strong><span>IGDC indie finalist</span></div>
-            <div><strong>14+</strong><span>Playable prototypes</span></div>
-            <div><strong>200+</strong><span>Gaming Club developers</span></div>
+      <PageHeader
+        number="02"
+        kicker="Backstory"
+        title={<span>FROM OCEAN OF GAMES<br /><span style={{ color: "var(--teal)" }}>TO UNREAL ENGINE 5.7 C++</span></span>}
+        copy="A cinematic chronicle of childhood curiosity, self-taught code, hackathon failures, and production systems."
+      />
+
+      {/* QUICK JUMPER DOCK */}
+      <nav className="chapter-jumper page-pad" aria-label="Chapter quick navigation">
+        <div className="chapter-jumper__inner">
+          <span className="chapter-jumper__label">CINEMA ACTS // QUICK JUMP:</span>
+          <div className="chapter-jumper__links">
+            {BACKSTORY_ACTS.map((act) => (
+              <button
+                key={act.id}
+                type="button"
+                className={`chapter-jumper__btn ${activeActId === act.id ? "is-active" : ""}`}
+                onClick={() => scrollToAct(act.id)}
+              >
+                <strong>{act.actNumber}</strong>
+                <small>{act.title.split(":")[0]}</small>
+              </button>
+            ))}
           </div>
         </div>
-        <div className="backstory-story__aside">
+      </nav>
+
+      {/* CINEMATIC DOCUMENTARY SCROLL ACTS */}
+      <section className="documentary-acts page-pad">
+        {BACKSTORY_ACTS.map((act, index) => (
+          <article key={act.id} id={act.id} className="doc-act">
+            {/* 1. Title Slate (Appears first like a film chapter title) */}
+            <div className="doc-act__title-slate">
+              <div className="doc-act__slate-badge">
+                <span>{act.actNumber}</span>
+                <em>{act.year}</em>
+              </div>
+              <h2>{act.title}</h2>
+              <p className="doc-act__subtitle">{act.subtitle}</p>
+              <div className="doc-act__scroll-prompt">
+                <ChevronDown size={14} className="animate-bounce" />
+                <span>SCROLL INTO STORY</span>
+              </div>
+            </div>
+
+            {/* 2. Narrative Content Block */}
+            <div className="doc-act__narrative">
+              <div className="doc-act__summary-card">
+                <Eyebrow>Chapter Overview</Eyebrow>
+                <p className="doc-act__lead">{act.summary}</p>
+                <div className="doc-act__metrics">
+                  {act.metrics.map((m) => (
+                    <div key={m.label} className="doc-metric">
+                      <strong>{m.value}</strong>
+                      <small>{m.label}</small>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="doc-act__prose">
+                {act.paragraphs.map((p, pIdx) => (
+                  <p key={pIdx}>{p}</p>
+                ))}
+                <div className="tag-row doc-act__tags">
+                  {act.tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      {/* PILOT DOSSIER STATS STRIP */}
+      <section className="backstory-portrait-strip page-pad">
+        <div className="backstory-portrait-strip__content">
           <div className="backstory-portrait-frame">
             <div className="portrait-wrap">
               <img
@@ -1596,32 +1765,21 @@ function BackstoryPage() {
               <div className="portrait-corners" aria-hidden="true"><i /><i /><i /><i /></div>
               <div className="portrait-scanline" aria-hidden="true" />
             </div>
-            <div className="portrait-meta">
-              <span>PILOT DOSSIER // HYDERABAD, IN</span>
-              <strong>KARTHIK VEERANALA</strong>
-              <small>B.Tech CSE / Game Development & Design</small>
+          </div>
+          <div className="backstory-dossier-meta">
+            <Eyebrow>Pilot Dossier</Eyebrow>
+            <h2>KARTHIK VEERANALA</h2>
+            <p>Game Developer &amp; Designer pursuing B.Tech in CSE at IARE Hyderabad (2023–2027). Specializing in Unreal Engine 5.7 C++, combat feel, physics simulation, and rapid prototyping.</p>
+            <div className="bio-stats" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", marginTop: "24px" }}>
+              <div><strong>3</strong><span>Hackathon<br />victories</span></div>
+              <div><strong>TOP 45</strong><span>IGDC indie<br />finalist</span></div>
+              <div><strong>14+</strong><span>Playable<br />prototypes</span></div>
+              <div><strong>UE</strong><span>5.7 gameplay<br />systems</span></div>
             </div>
           </div>
         </div>
       </section>
-      <section className="timeline page-pad">
-        <div className="section-topline"><Eyebrow>Career trajectory</Eyebrow><span className="muted-label">EXPERIENCE & MILESTONE PATH</span></div>
-        {milestones.map(([date, title, copy]) => (
-          <article className="timeline-row" key={title}>
-            <span>{date}</span>
-            <div><h2>{title}</h2><p>{copy}</p></div>
-          </article>
-        ))}
-      </section>
-      <section className="skills-strip page-pad">
-        <Eyebrow>Proficiency & tools</Eyebrow>
-        <h2>Experience with engines<br /><span>& gameplay.</span></h2>
-        <div className="skills-strip__grid">
-          <div><strong>95%</strong><h3>Unreal Engine 5.7 / 4</h3><p>Engine source builds, C++ core architecture, Slate/UMG UI auto-discovery, Win32 subsystems, Niagara particles, and dedicated servers.</p></div>
-          <div><strong>95%</strong><h3>C++ Gameplay & Mechanics</h3><p>Real-time combat architectures, state machines, animation notifies, responsive camera feel, and gameplay debugging.</p></div>
-          <div><strong>85%</strong><h3>Phaser 2D Web Engine</h3><p>WebGL Canvas rendering, projectile trajectory prediction, ragdoll impulse integration, and web deployment pipelines.</p></div>
-        </div>
-      </section>
+
       <Footer />
     </main>
   );
@@ -2960,7 +3118,7 @@ function BioPage() {
         <div className="bio-copy">
           <Eyebrow>About the player</Eyebrow>
           <p className="bio-copy__lead">I am a game developer and designer currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on Unreal Engine C++, real-time combat feel, gameplay mechanics, and player experience.</p>
-          <p>My engineering philosophy centers on ruthless execution under constraints. I have spearheaded teams in 24–48 hour competitive hackathons, winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks, alongside earning a Top 45 Indie Finalist selection at IGDC 2024 for City of Aethel. As President of Elysium Gaming Club at IARE, I oversee game development workshops and collegiate esports tournaments for 200+ active students.</p>
+          <p>My journey started on my dad's PC playing downloaded classics, building logic prototypes in Scratch, and self-learning C++ game architecture. I honed my skills under high-pressure constraints in 24–48 hour competitive hackathons—winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks—alongside earning a Top 45 Indie Finalist selection at IGDC 2024 for City of Aethel. As President of the Elysium Gaming Club at IARE, I organize campus gaming culture and collegiate esports tournaments.</p>
           <div className="bio-stats">
             <div><strong>3</strong><span>hackathon<br />victories</span></div>
             <div><strong>TOP 45</strong><span>IGDC indie<br />finalist</span></div>

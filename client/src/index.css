@@ -3716,4 +3716,274 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   display: none;
 }
 
+/* =========================================================================
+   CINEMATIC DOCUMENTARY BACKSTORY (OPTION 1 + CHAPTER QUICK JUMPER)
+   ========================================================================= */
+
+/* 1. Chapter Quick Jumper Sticky Bar */
+.chapter-jumper {
+  position: sticky;
+  top: 60px;
+  z-index: 20;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: rgba(9, 13, 13, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-strong);
+}
+.site-shell:not(.theme-neon) .chapter-jumper {
+  background: rgba(238, 227, 210, 0.94);
+}
+.chapter-jumper__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chapter-jumper__inner::-webkit-scrollbar {
+  display: none;
+}
+.chapter-jumper__label {
+  font: 10px var(--mono);
+  color: var(--teal);
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.chapter-jumper__links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chapter-jumper__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  color: var(--bone);
+  font: 11px var(--mono);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.chapter-jumper__btn strong {
+  color: var(--teal);
+}
+.chapter-jumper__btn small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.chapter-jumper__btn:hover,
+.chapter-jumper__btn.is-active {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: var(--bg);
+}
+.chapter-jumper__btn:hover strong,
+.chapter-jumper__btn.is-active strong,
+.chapter-jumper__btn:hover small,
+.chapter-jumper__btn.is-active small {
+  color: var(--bg);
+}
+
+/* 2. Documentary Acts Flow */
+.documentary-acts {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(60px, 10vw, 110px);
+  padding-top: clamp(30px, 5vw, 60px);
+  padding-bottom: clamp(60px, 8vw, 100px);
+}
+.doc-act {
+  scroll-margin-top: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* 3. Title Slate (Theatrical Intertitle) */
+.doc-act__title-slate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(36px, 6vw, 70px) clamp(24px, 5vw, 55px);
+  background: radial-gradient(ellipse at 80% 20%, rgba(22, 214, 189, 0.06), transparent 60%), var(--bg-elevated);
+  border: 2px solid var(--line-strong);
+  border-left: 6px solid var(--teal);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.35);
+}
+.site-shell:not(.theme-neon) .doc-act__title-slate {
+  background: #eee3d2;
+  border-color: rgba(183, 91, 69, 0.4);
+  border-left-color: #2f7063;
+  box-shadow: 6px 6px 0 rgba(61, 47, 37, 0.18);
+}
+.doc-act__slate-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font: 11px var(--mono);
+}
+.doc-act__slate-badge span {
+  padding: 4px 8px;
+  background: var(--teal);
+  color: var(--bg);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.doc-act__slate-badge em {
+  color: var(--rust);
+  font-style: normal;
+  letter-spacing: 0.06em;
+}
+.doc-act__title-slate h2 {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 4.5vw, 54px);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1.02;
+  color: var(--bone);
+}
+.site-shell:not(.theme-neon) .doc-act__title-slate h2 {
+  color: #382d26;
+}
+.doc-act__subtitle {
+  font: 11px var(--mono);
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  margin: 0 0 24px;
+}
+.doc-act__scroll-prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(22, 214, 189, 0.08);
+  border: 1px solid var(--line);
+  color: var(--teal);
+  font: 9px var(--mono);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+/* 4. Narrative Content & Overview Card */
+.doc-act__narrative {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: clamp(24px, 4vw, 55px);
+  align-items: start;
+}
+.doc-act__summary-card {
+  padding: 24px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.site-shell:not(.theme-neon) .doc-act__summary-card {
+  background: #f7f0e3;
+  border-color: rgba(183, 91, 69, 0.3);
+}
+.doc-act__lead {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--bone);
+  font-weight: 500;
+  margin: 0;
+}
+.site-shell:not(.theme-neon) .doc-act__lead {
+  color: #382d26;
+}
+.doc-act__metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.doc-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.doc-metric strong {
+  font: 13px var(--mono);
+  color: var(--teal);
+}
+.doc-metric small {
+  font: 9px var(--mono);
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.doc-act__prose {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.doc-act__prose p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--muted);
+}
+.site-shell:not(.theme-neon) .doc-act__prose p {
+  color: #55483f;
+}
+.doc-act__tags {
+  margin-top: 8px;
+}
+
+/* 5. Pilot Dossier Strip */
+.backstory-portrait-strip {
+  padding-top: 50px;
+  padding-bottom: 90px;
+  border-top: 1px solid var(--line);
+}
+.backstory-portrait-strip__content {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr;
+  gap: clamp(30px, 6vw, 75px);
+  align-items: center;
+}
+.backstory-dossier-meta h2 {
+  margin: 12px 0 16px;
+  font-size: clamp(30px, 4vw, 52px);
+  letter-spacing: -0.06em;
+  color: var(--bone);
+}
+.site-shell:not(.theme-neon) .backstory-dossier-meta h2 {
+  color: #382d26;
+}
+.backstory-dossier-meta p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 640px;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 860px) {
+  .doc-act__narrative {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .backstory-portrait-strip__content {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .chapter-jumper {
+    top: 50px;
+  }
+  .chapter-jumper__btn small {
+    display: none;
+  }
+}
+
+
 
