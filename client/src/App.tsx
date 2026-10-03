@@ -81,7 +81,7 @@ function playArcadeTone(kind: "hover" | "click" | "transition" | "hit" | "win" |
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "Gameplay Reel", href: "/demo-reel/" },
+  { label: "Demo Reel", href: "/demo-reel/" },
   { label: "Backstory", href: "/backstory/" },
   { label: "Tech Tree", href: "/skills/" },
   { label: "Hobbies", href: "/hobbies/" },
@@ -1527,9 +1527,9 @@ function BackstoryPage() {
   ];
   return (
     <main className="inner-page backstory-page">
+      <PageHeader number="02" kicker="Backstory" />
       <section className="backstory-story page-pad">
         <div className="backstory-story__copy">
-          <Eyebrow>My story</Eyebrow>
           <p className="lead">My engineering philosophy centers on ruthless execution under constraints. Over the past three years I have spearheaded teams in 24–48 hour competitive hackathons—winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks—alongside earning a Top 45 Indie Finalist selection at IGDC 2024 for City of Aethel.</p>
           <p>As President of the Elysium Gaming Club at IARE, I oversee campus game development initiatives, Unreal and Unity workshops, and collegiate esports tournaments for a community of more than 200 active students.</p>
           <div className="backstory-section__facts">
@@ -1618,7 +1618,7 @@ function Home() {
       </section>
 
       <section className="reel-band page-pad">
-        <div className="reel-band__copy"><Eyebrow number="03">Gameplay reel</Eyebrow><h2>Gameplay Systems<br /><span>in motion.</span></h2><p>A 2-minute comprehensive demonstration of Unreal Engine 5.7 C++ gameplay mechanics, combat feel, and playable prototypes.</p><Link href="/demo-reel/" className="button button--outline">Watch gameplay reel <Play size={13} fill="currentColor" /></Link></div>
+        <div className="reel-band__copy"><Eyebrow number="03">Demo Reel</Eyebrow><h2>Demo Reel<br /><span>in motion.</span></h2><p>A 2-minute comprehensive demonstration of Unreal Engine 5.7 C++ gameplay mechanics, combat feel, and playable prototypes.</p><Link href="/demo-reel/" className="button button--outline">Watch Demo Reel <Play size={13} fill="currentColor" /></Link></div>
         <HeroVideo />
       </section>
 
@@ -1898,16 +1898,14 @@ function ArcadePage() {
     return aicadeGames.filter((g) => g.category === vaultCategory);
   }, [vaultCategory]);
 
-
   return (
     <main className="inner-page arcade-page">
-      <section className="arcade-hero page-pad">
-        <Eyebrow number="04">Playable Prototypes</Eyebrow>
-        <h1>Take a break.<br /><span>Play the prototypes.</span></h1>
-        <p className="lead">
-          Done exploring the systems and demo reel? Jump into these retro-inspired arcade builds and production Phaser prototypes engineered with custom state machines, timing reflexes, and physics simulations.
-        </p>
-      </section>
+      <PageHeader
+        number="06"
+        kicker="Arcade"
+        title={<>Take a break.<br /><span>Play the prototypes.</span></>}
+        copy="Done exploring the systems and demo reel? Jump into these retro-inspired arcade builds and production Phaser prototypes engineered with custom state machines, timing reflexes, and physics simulations."
+      />
 
       {/* Featured Phaser 2D Prototypes Showcase */}
       <section className="aicade-section page-pad">
@@ -2489,12 +2487,12 @@ function BossFight() {
   );
 }
 
-function PageHeader({ number, kicker, title, copy }: { number: string; kicker: string; title: React.ReactNode; copy?: string }) {
+function PageHeader({ number, kicker, title, copy }: { number: string; kicker: string; title?: React.ReactNode; copy?: string }) {
   return (
     <section className="page-header page-pad">
       <div className="page-header__main">
         <Eyebrow number={number}>{kicker}</Eyebrow>
-        <h1>{title}</h1>
+        {title && <h1>{title}</h1>}
         {copy && <p>{copy}</p>}
       </div>
     </section>
@@ -2580,7 +2578,7 @@ function DemoReelPage() {
 
   return (
     <main className="inner-page">
-      <PageHeader number="01" kicker="Showreel" title={<>Gameplay &amp; Systems<br /><span>Showreel.</span></>} />
+      <PageHeader number="01" kicker="Demo Reel" />
       <section className="reel-page__player page-pad">
         <div ref={playerRef} className="reel-player reel-player--enhanced">
           <div className="hero-video hero-video--compact">
@@ -2844,6 +2842,7 @@ function HobbiesPage() {
 
   return (
     <main className="inner-page hobbies-page">
+      <PageHeader number="04" kicker="Hobbies" />
       <section className="hobby-field page-pad">
         <div className="hobby-field__topline">
           <Eyebrow>4 signals found</Eyebrow>
@@ -2903,7 +2902,7 @@ function BioPage() {
   const [sent, setSent] = useState(false);
   return (
     <main className="inner-page">
-      <PageHeader number="05" kicker="Bio & Contact" title={<>Let’s make<br /><span>something playable.</span></>} />
+      <PageHeader number="05" kicker="Bio & Contact" />
       <section className="bio-layout page-pad">
         <div className="bio-copy">
           <Eyebrow>About the player</Eyebrow>
@@ -2966,6 +2965,7 @@ function TechTreePage() {
 
   return (
     <main className="inner-page tech-page">
+      <PageHeader number="03" kicker="Tech Tree" />
       <section className="tech-tree page-pad">
         <div className="tech-tree__map">
           <svg className="tech-tree__svg-lines" aria-hidden="true" viewBox="0 0 500 400">
@@ -3099,6 +3099,7 @@ function PortfolioPage() {
   const [contribution, setContribution] = useState<typeof projects[number] | null>(null);
   return (
     <main className="inner-page portfolio-page-new">
+      <PageHeader number="07" kicker="Portfolio" />
       <section className="portfolio-page page-pad">
         <PortfolioCarousel items={projects} onContributions={setContribution} />
       </section>

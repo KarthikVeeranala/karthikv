@@ -3358,3 +3358,24 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   text-shadow: none !important;
 }
 
+/* 7. Standardized Page Header Rhythm */
+.page-header {
+  padding-top: clamp(80px, 12vw, 130px) !important;
+  padding-bottom: clamp(24px, 4vw, 40px) !important;
+  border-bottom: 1px solid var(--line);
+}
+.page-header .eyebrow {
+  font-size: clamp(10px, 1.2vw, 12px) !important;
+  letter-spacing: 0.08em;
+}
+.page-header h1 {
+  margin: 18px 0 14px !important;
+  font-size: clamp(32px, 5vw, 64px) !important;
+  line-height: 1.05 !important;
+}
+.page-header p {
+  max-width: 680px !important;
+  font-size: clamp(14px, 1.4vw, 16px) !important;
+  line-height: 1.6 !important;
+}
+
