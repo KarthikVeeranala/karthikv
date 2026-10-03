@@ -810,7 +810,7 @@ function StatusPill({ children = "AVAILABLE FOR COLLABORATION" }: { children?: R
 function HeroVideo({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`hero-video ${compact ? "hero-video--compact" : ""}`}>
-      <video autoPlay muted loop playsInline preload="metadata" aria-label="Karthik Veeranala Systems & Gameplay Master Reel">
+      <video autoPlay muted loop playsInline preload="metadata" aria-label="Karthik Veeranala Gameplay Master Reel">
         <source src={DEMO_REEL_URL} type="video/mp4" />
       </video>
     </div>
@@ -910,8 +910,7 @@ function FeaturedWorkCarousel({ onContributions }: { onContributions: (project: 
             }}
             aria-label={`Jump to project ${idx + 1}`}
           >
-            <span className="carousel-dot__num">{String(idx + 1).padStart(2, "0")}</span>
-            <span className="carousel-dot__line" />
+            <span>{String(idx + 1).padStart(2, "0")}</span>
           </button>
         ))}
       </div>
@@ -920,16 +919,16 @@ function FeaturedWorkCarousel({ onContributions }: { onContributions: (project: 
 }
 
 const contributionDetails: Record<string, { role: string; systems: string[]; snippet: string; metrics: string[] }> = {
-  "e2e-automation-suite": { role: "Unreal Engine Systems & Automation Engineer at Cyrus 365 (2026 — Present)", systems: ["Win32 Desktop Sandboxing: Instantiates winsta0\\E2E_IsolatedDesktop, injecting hardware mouse/keyboard events without stealing OS cursor focus or user interruption.", "Slate & UMG Auto-Discovery: Recursively navigates runtime Slate widget trees via reflection, synthesizing click/drag events and validating UI state changes dynamically.", "GPU Backbuffer Video Streaming: Pipes raw frames directly from FViewport::ReadPixels to bundled FFmpeg via standard input (stdin), encoding 1080p H.264 recordings with automated pass/fail incident markers.", "Headless Multi-Instance CI Commandlet: Orchestrates dedicated server runs with 90-second deterministic state guards, validating networked replication and physics determinism in CI/CD pipelines."], snippet: `// Hardware Sandboxing & Backbuffer Stream\nvoid FE2ESandbox::InitializeIsolatedDesktop() {\n  HDESK hDesk = CreateDesktopA("E2E_Desk", ...);\n  SetThreadDesktop(hDesk);\n\n  // Stream backbuffer pixels directly to FFmpeg stdin\n  FViewport* Viewport = GEngine->GameViewport->Viewport;\n  PipeBackbufferToFFmpeg(Viewport, "H264_Artifact.mp4");\n}\n\n// Status: 100% Authoritative Sync Passed\nUE_LOG(LogE2E, Display, TEXT("All Test Suites Validated!"));`, metrics: ["0% (Zero Theft) / Focus Theft", "1080p H.264 Stream / Resolution", "Unreal Engine 5.7 / Engine Version", "100% Authoritative / Sync Determinism"] },
-  "the-interlude": { role: "Solo Lead Gameplay & Systems Developer (24-Hour Competitive Sprint)", systems: ["6-DOF Zero-Gravity Physics: Responsive thruster inertia, pitch/yaw/roll torque dampening, and velocity vector alignment in zero gravity.", "Predictive Lead-Target AI: State-machine enemy AI calculating velocity vectors, lead-intercept angles, and evasive rolls.", "Visceral Combat Feedback: Procedural camera shake, laser collision particle trails via Niagara, and spatial 3D audio.", "Escalating Wave Director: Dynamic difficulty balancing managing enemy squad spawns and capital cruiser encounters."], snippet: `// Predictive Lead-Target Intercept Math\nFVector USpaceCombatComponent::CalculateLeadTarget(\n    const AActor* Target, float ProjectileSpeed, float DeltaTime) {\n  if (!Target) return FVector::ZeroVector;\n\n  FVector TargetVelocity = Target->GetVelocity();\n  float Distance = FVector::Dist(GetOwner()->GetActorLocation(), Target->GetActorLocation());\n  float TimeToImpact = Distance / FMath::Max(ProjectileSpeed, 100.0f);\n\n  // Lead compensation position vector\n  return Target->GetActorLocation() + (TargetVelocity * TimeToImpact);\n}`, metrics: ["🥇 1st Place Overall / Honor", "24-Hour Hackathon / Dev Cycle", "Unreal Engine 4 / Engine", "6-DOF Newtonian / Physics Model"] },
-  byteoasis: { role: "Lead Systems Developer & Mechanics Designer (48-Hour Hackathon)", systems: ["In-Game Terminal Simulator: Custom syntax parser supporting commandline input, flag validation, and state triggers.", "Environmental Logic Mechanics: Water reflection shaders, day/night lighting cycles, and puzzle-triggered island drawbridges.", "Diegetic HUD & Interaction: Integrated tablet UI displaying logic logs, signal frequency decoders, and circuit status.", "Procedural Island Clues: Dynamic clue generation requiring algorithmic thinking and logic gates to bypass security barriers."], snippet: `// In-Game Terminal Command Dispatcher\nbool UTerminalParser::ExecuteCommand(const FString& InputCmd) {\n  TArray<FString> Tokens;\n  InputCmd.TrimStartAndEnd().ParseIntoArray(Tokens, TEXT(" "), true);\n  if (Tokens.Num() == 0) return false;\n\n  if (Tokens[0].Equals(TEXT("bypass_grid"), ESearchCase::IgnoreCase)) {\n    if (Tokens.Contains(TEXT("--force"))) {\n      UnlockSecurityGate();\n      return true;\n    }\n  }\n  return false;\n}`, metrics: ["🥈 2nd Place Overall / Honor", "48-Hour Hackathon / Dev Cycle", "Unreal Engine 4 / Engine", "Logic & Code Terminals / Puzzles"] },
+  "e2e-automation-suite": { role: "Unreal Engine Developer & Tools Programmer at Cyrus 365 (2026 — Present)", systems: ["Win32 Desktop Sandboxing: Instantiates winsta0\\E2E_IsolatedDesktop, injecting hardware mouse/keyboard events without stealing OS cursor focus or user interruption.", "Slate & UMG Auto-Discovery: Recursively navigates runtime Slate widget trees via reflection, synthesizing click/drag events and validating UI state changes dynamically.", "GPU Backbuffer Video Streaming: Pipes raw frames directly from FViewport::ReadPixels to bundled FFmpeg via standard input (stdin), encoding 1080p H.264 recordings with automated pass/fail incident markers.", "Headless Multi-Instance CI Commandlet: Orchestrates dedicated server runs with 90-second deterministic state guards, validating networked replication and physics determinism in CI/CD pipelines."], snippet: `// Hardware Sandboxing & Backbuffer Stream\nvoid FE2ESandbox::InitializeIsolatedDesktop() {\n  HDESK hDesk = CreateDesktopA("E2E_Desk", ...);\n  SetThreadDesktop(hDesk);\n\n  // Stream backbuffer pixels directly to FFmpeg stdin\n  FViewport* Viewport = GEngine->GameViewport->Viewport;\n  PipeBackbufferToFFmpeg(Viewport, "H264_Artifact.mp4");\n}\n\n// Status: 100% Authoritative Sync Passed\nUE_LOG(LogE2E, Display, TEXT("All Test Suites Validated!"));`, metrics: ["0% (Zero Theft) / Focus Theft", "1080p H.264 Stream / Resolution", "Unreal Engine 5.7 / Engine Version", "100% Authoritative / Sync Determinism"] },
+  "the-interlude": { role: "Solo Lead Gameplay & Combat Developer (24-Hour Competitive Sprint)", systems: ["6-DOF Zero-Gravity Physics: Responsive thruster inertia, pitch/yaw/roll torque dampening, and velocity vector alignment in zero gravity.", "Predictive Lead-Target AI: State-machine enemy AI calculating velocity vectors, lead-intercept angles, and evasive rolls.", "Visceral Combat Feedback: Procedural camera shake, laser collision particle trails via Niagara, and spatial 3D audio.", "Escalating Wave Director: Dynamic difficulty balancing managing enemy squad spawns and capital cruiser encounters."], snippet: `// Predictive Lead-Target Intercept Math\nFVector USpaceCombatComponent::CalculateLeadTarget(\n    const AActor* Target, float ProjectileSpeed, float DeltaTime) {\n  if (!Target) return FVector::ZeroVector;\n\n  FVector TargetVelocity = Target->GetVelocity();\n  float Distance = FVector::Dist(GetOwner()->GetActorLocation(), Target->GetActorLocation());\n  float TimeToImpact = Distance / FMath::Max(ProjectileSpeed, 100.0f);\n\n  // Lead compensation position vector\n  return Target->GetActorLocation() + (TargetVelocity * TimeToImpact);\n}`, metrics: ["🥇 1st Place Overall / Honor", "24-Hour Hackathon / Dev Cycle", "Unreal Engine 4 / Engine", "6-DOF Newtonian / Physics Model"] },
+  byteoasis: { role: "Lead Gameplay Developer & Puzzle Mechanics Designer (48-Hour Hackathon)", systems: ["In-Game Terminal Simulator: Custom syntax parser supporting commandline input, flag validation, and state triggers.", "Environmental Logic Mechanics: Water reflection shaders, day/night lighting cycles, and puzzle-triggered island drawbridges.", "Diegetic HUD & Interaction: Integrated tablet UI displaying logic logs, signal frequency decoders, and circuit status.", "Procedural Island Clues: Dynamic clue generation requiring algorithmic thinking and logic gates to bypass security barriers."], snippet: `// In-Game Terminal Command Dispatcher\nbool UTerminalParser::ExecuteCommand(const FString& InputCmd) {\n  TArray<FString> Tokens;\n  InputCmd.TrimStartAndEnd().ParseIntoArray(Tokens, TEXT(" "), true);\n  if (Tokens.Num() == 0) return false;\n\n  if (Tokens[0].Equals(TEXT("bypass_grid"), ESearchCase::IgnoreCase)) {\n    if (Tokens.Contains(TEXT("--force"))) {\n      UnlockSecurityGate();\n      return true;\n    }\n  }\n  return false;\n}`, metrics: ["🥈 2nd Place Overall / Honor", "48-Hour Hackathon / Dev Cycle", "Unreal Engine 4 / Engine", "Logic & Code Terminals / Puzzles"] },
   "geek-o-wars": { role: "Lead Gameplay Engineer & Shaders Developer (36-Hour Hackathon)", systems: ["TPS Character Controller: Responsive sprint, aim-down-sights, weapon overheating math, and projectile recoil dissipation.", "Cyber Motherboard Environment: Custom neon cyber shaders, reactive trace circuits, and emissive pulse heat sinks.", "Multi-Class Malware Spawner: Fast melee rushers, ranged trojan spreaders, and heavy boss anomalies with coordinated flanking.", "Wave Survival Resource Tension: Ammo scarcity drops, overheating cooldown balancing, and dynamic score multipliers."], snippet: `// Weapon Heat Dissipation & Firing Logic\nvoid AGeekWeapon::FireProjectile() {\n  if (CurrentHeat >= MaxHeatLimit) {\n    TriggerOverheatCooldown();\n    return;\n  }\n\n  SpawnLaserTrace(MuzzleSocket->GetComponentLocation(), AimRotation);\n  CurrentHeat = FMath::Clamp(CurrentHeat + HeatPerShot, 0.0f, MaxHeatLimit);\n  LastFireTimestamp = GetWorld()->GetTimeSeconds();\n}`, metrics: ["🥉 Top 3 Overall (MLH) / Honor", "36-Hour Hackathon / Dev Cycle", "Unreal Engine 4.21 / Engine", "Third-Person Survival / Genre"] },
   "city-of-aethel": { role: "Lead Combat Designer & Gameplay Engineer at Aicade", systems: ["Responsive Melee Combat: 5-hit combo attack buffering, animation cancel windows, and precision parry timings.", "Dodge-Roll Invulnerability Frames: Precision i-frame calculation mitigating damage vectors within 180ms reaction windows.", "Multi-Phase Boss Fight Choreography: Telegraphed ground hazard indicators, multi-stage attack phase transitions, and posture breaks.", "2D Web Arcade Engine: 14 interactive prototypes testing rigid body ragdolls, ballistic parabolic curves, and wave tension."], snippet: `// Melee Attack Combo Buffer & i-Frame Window\nfunction handleAttackInput(player) {\n  if (player.canCancel && player.comboCount < 5) {\n    player.comboCount++;\n    player.playAnimation('attack_chain_' + player.comboCount);\n    player.grantInvulnerability(180); // 180ms i-frame\n    player.resetComboTimer(600);\n  }\n}`, metrics: ["🎖️ Top 45 IGDC Finalist / Honor", "14 Web Prototypes / Prototypes", "Phaser 3 / WebGL / Engine", "5-Hit Combos + i-Frames / Combat Feel"] },
 };
 
 function ContributionDrawer({ project, onClose }: { project: typeof projects[number]; onClose: () => void }) {
   const detail = contributionDetails[project.slug] ?? contributionDetails["e2e-automation-suite"];
-  return <div className="contribution-drawer__backdrop" role="dialog" aria-modal="true" aria-label={`${project.title} contributions`} onClick={onClose}><aside className="contribution-drawer" onClick={(event) => event.stopPropagation()}><button className="contribution-drawer__close" onClick={onClose} aria-label="Close contributions">×</button><Eyebrow>My contributions / {project.stat}</Eyebrow><h2>{project.title}</h2><div className="contribution-drawer__block"><Eyebrow>Role & scope</Eyebrow><strong>{detail.role}</strong></div><div className="contribution-drawer__block"><Eyebrow>Core systems architected</Eyebrow><ul className="contribution-list">{detail.systems.map((item) => <li key={item}>{item}</li>)}</ul></div><div className="contribution-drawer__block"><Eyebrow>Implementation snippet (C++)</Eyebrow><pre className="contribution-code"><code>{detail.snippet}</code></pre></div><div className="contribution-drawer__block"><Eyebrow>Verification & performance highlights</Eyebrow><div className="contribution-metrics">{detail.metrics.map((metric) => <span key={metric}>{metric}</span>)}</div></div><div className="contribution-drawer__code"><span>CONTRIBUTION_LOG // OPEN</span><code>systems.register("{project.slug}");</code><code>playability.signal = "clear";</code></div></aside></div>;
+  return <div className="contribution-drawer__backdrop" role="dialog" aria-modal="true" aria-label={`${project.title} contributions`} onClick={onClose}><aside className="contribution-drawer" onClick={(event) => event.stopPropagation()}><button className="contribution-drawer__close" onClick={onClose} aria-label="Close contributions">×</button><Eyebrow>My contributions / {project.stat}</Eyebrow><h2>{project.title}</h2><div className="contribution-drawer__block"><Eyebrow>Role & scope</Eyebrow><strong>{detail.role}</strong></div><div className="contribution-drawer__block"><Eyebrow>Core gameplay mechanics & features</Eyebrow><ul className="contribution-list">{detail.systems.map((item) => <li key={item}>{item}</li>)}</ul></div><div className="contribution-drawer__block"><Eyebrow>Implementation snippet (C++)</Eyebrow><pre className="contribution-code"><code>{detail.snippet}</code></pre></div><div className="contribution-drawer__block"><Eyebrow>Verification & performance highlights</Eyebrow><div className="contribution-metrics">{detail.metrics.map((metric) => <span key={metric}>{metric}</span>)}</div></div><div className="contribution-drawer__code"><span>CONTRIBUTION_LOG // OPEN</span><code>mechanics.register("{project.slug}");</code><code>playability.signal = "clear";</code></div></aside></div>;
 }
 
 function ProjectWindow({ project, onClose, onContributions }: { project: typeof projects[number]; onClose: () => void; onContributions: () => void }) {
@@ -1108,7 +1107,6 @@ function BackstoryPage() {
   ];
   return (
     <main className="inner-page backstory-page">
-      <PageHeader number="01" kicker="Biography / the backstory" title={<>Ruthless execution.<br /><span>Playable results.</span></>} />
       <section className="backstory-story page-pad">
         <div className="backstory-story__copy">
           <Eyebrow>My story</Eyebrow>
@@ -1161,10 +1159,10 @@ function BackstoryPage() {
       </section>
       <section className="skills-strip page-pad">
         <Eyebrow>Proficiency & tools</Eyebrow>
-        <h2>Experience with engines<br /><span>& systems.</span></h2>
+        <h2>Experience with engines<br /><span>& gameplay.</span></h2>
         <div className="skills-strip__grid">
           <div><strong>95%</strong><h3>Unreal Engine 5.7 / 4</h3><p>Engine source builds, C++ core architecture, Slate/UMG UI auto-discovery, Win32 subsystems, Niagara particles, and dedicated servers.</p></div>
-          <div><strong>95%</strong><h3>C++ Systems & Low-Level</h3><p>Memory management, multi-threading, desktop sandboxing, backbuffer pixel streaming to FFmpeg, and state machines.</p></div>
+          <div><strong>95%</strong><h3>C++ Gameplay & Mechanics</h3><p>Real-time combat architectures, state machines, animation notifies, responsive camera feel, and gameplay debugging.</p></div>
           <div><strong>85%</strong><h3>Phaser 2D Web Engine</h3><p>WebGL Canvas rendering, projectile trajectory prediction, ragdoll impulse integration, and web deployment pipelines.</p></div>
         </div>
       </section>
@@ -1198,9 +1196,9 @@ function Home() {
         <div className="chapter-index">01</div>
         <div className="intro-chapter__content">
           <Eyebrow>THE PLAYGROUND</Eyebrow>
-          <h2>Systems are<br /><span>feelings</span> waiting<br />to be played.</h2>
-          <p>Game developer and engine programmer with a strong focus on Unreal Engine C++ architecture, headless automation frameworks, and high-velocity gameplay prototyping.</p>
-          <Link href="/portfolio/" className="text-link">Explore the systems portfolio <ArrowUpRight size={14} /></Link>
+          <h2>Games are<br /><span>feelings</span> waiting<br />to be played.</h2>
+          <p>Game developer and designer focused on Unreal Engine C++ gameplay architecture, fluid combat mechanics, responsive controls, and high-velocity playable prototypes.</p>
+          <Link href="/portfolio/" className="text-link">Explore the game portfolio <ArrowUpRight size={14} /></Link>
         </div>
         <div className="intro-chapter__sigil" aria-hidden="true"><span>▦</span><small>KV / 001</small></div>
       </section>
@@ -1211,13 +1209,13 @@ function Home() {
       </section>
 
       <section className="reel-band page-pad">
-        <div className="reel-band__copy"><Eyebrow number="03">Demo reel</Eyebrow><h2>A door,<br /><span>left open.</span></h2><p>A 2-minute comprehensive demonstration of low-level Unreal Engine 5.7 C++ systems, gameplay feel, and interactive prototypes.</p><Link href="/demo-reel/" className="button button--outline">Watch the reel <Play size={13} fill="currentColor" /></Link></div>
+        <div className="reel-band__copy"><Eyebrow number="03">Demo reel</Eyebrow><h2>A door,<br /><span>left open.</span></h2><p>A 2-minute comprehensive demonstration of Unreal Engine 5.7 C++ gameplay mechanics, combat feel, and playable prototypes.</p><Link href="/demo-reel/" className="button button--outline">Watch the reel <Play size={13} fill="currentColor" /></Link></div>
         <HeroVideo />
       </section>
 
       <section className="manifesto page-pad">
         <div className="manifesto__rail"><span>MORE THAN A PORTFOLIO</span><span>SCROLL / 04</span></div>
-        <div className="manifesto__content"><p>Every system hides a story. Every prototype is a question made playable.</p><div className="manifesto__mark"><BrandMark /><span>KV / 2026</span></div></div>
+        <div className="manifesto__content"><p>Every mechanic hides a story. Every prototype is a question made playable.</p><div className="manifesto__mark"><BrandMark /><span>KV / 2026</span></div></div>
       </section>
 
       <CoinCatcher />
@@ -1253,7 +1251,18 @@ function ArcadePage() {
     return () => window.clearTimeout(timeout);
   }, [flipped, cards]);
   const reset = () => { setFlipped([]); setMatched([]); setMoves(0); };
-  return <main className="inner-page arcade-page"><PageHeader number="08" kicker="Arcade / secret room" title={<>Press start.<br /><span>Play a round.</span></>} copy="A tiny memory match hidden inside the portfolio. Find every pair, beat the clock, and unlock the cabinet glow." /><section className="arcade-cabinet page-pad"><div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div><div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div><div className="arcade-cabinet__bottom"><span>{matched.length === cards.length ? "PERFECT RUN! CABINET CLEARED." : "FIND THE PAIRS / NO CHEATING"}</span><button className="button button--tiny" onClick={reset}><RefreshCw size={12} /> Reset</button></div></section><BossFight /><div className="arcade-tips page-pad"><div><Zap size={17} /><p>Click the Karthik V companion mascot to change its mood. Drag it anywhere and it remembers the spot.</p></div><div><MousePointer2 size={17} /><p>Every card, project visual, and video panel has a little hover state waiting for you.</p></div></div><Footer /></main>;
+  return (
+    <main className="inner-page arcade-page">
+      <section className="arcade-cabinet page-pad">
+        <div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div>
+        <div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div>
+        <div className="arcade-cabinet__bottom"><span>{matched.length === cards.length ? "PERFECT RUN! CABINET CLEARED." : "FIND THE PAIRS / NO CHEATING"}</span><button className="button button--tiny" onClick={reset}><RefreshCw size={12} /> Reset</button></div>
+      </section>
+      <BossFight />
+      <div className="arcade-tips page-pad"><div><Zap size={17} /><p>Click the Karthik V companion mascot to change its mood. Drag it anywhere and it remembers the spot.</p></div><div><MousePointer2 size={17} /><p>Every card, project visual, and video panel has a little hover state waiting for you.</p></div></div>
+      <Footer />
+    </main>
+  );
 }
 
 function BossFight() {
@@ -1557,7 +1566,7 @@ function PageHeader({ number, kicker, title, copy }: { number: string; kicker: s
         {copy && <p>{copy}</p>}
       </div>
       <div className="page-header__index" aria-hidden="true">
-        <span>{number}</span><i /><i /><i /><small>SCROLL / PLAY</small>
+        <span>{number}</span><i /><i /><i />
       </div>
     </section>
   );
@@ -1642,7 +1651,7 @@ function DemoReelPage() {
 
   return (
     <main className="inner-page">
-      <PageHeader number="01" kicker="Demo reel" title={<>Gameplay & systems<br /><span>in motion.</span></>} />
+      <PageHeader number="01" kicker="Demo reel" title={<>Gameplay mechanics<br /><span>in motion.</span></>} />
       <section className="reel-page__player page-pad">
         <div ref={playerRef} className="reel-player reel-player--enhanced">
           <div className="hero-video hero-video--compact">
@@ -1887,7 +1896,6 @@ function HobbiesPage() {
 
   return (
     <main className="inner-page hobbies-page">
-      <PageHeader number="04" kicker="Creative pursuits / source notes" title={<>The things that<br /><span>keep me sharp.</span></>} />
       <section className="hobby-field page-pad">
         <div className="hobby-field__topline">
           <Eyebrow>4 signals found</Eyebrow>
@@ -1951,15 +1959,15 @@ function BioPage() {
       <section className="bio-layout page-pad">
         <div className="bio-copy">
           <Eyebrow>About the player</Eyebrow>
-          <p className="bio-copy__lead">I am a game developer and engine systems programmer currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on computer graphics, systems programming, and algorithms.</p>
+          <p className="bio-copy__lead">I am a game developer and designer currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on Unreal Engine C++, real-time combat feel, gameplay mechanics, and player experience.</p>
           <p>My engineering philosophy centers on ruthless execution under constraints. I have spearheaded teams in 24–48 hour competitive hackathons, winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks, alongside earning a Top 45 Indie Finalist selection at IGDC 2024 for City of Aethel. As President of Elysium Gaming Club at IARE, I oversee game development workshops and collegiate esports tournaments for 200+ active students.</p>
           <div className="bio-stats">
             <div><strong>3</strong><span>hackathon<br />victories</span></div>
             <div><strong>TOP 45</strong><span>IGDC indie<br />finalist</span></div>
             <div><strong>14+</strong><span>playable<br />prototypes</span></div>
-            <div><strong>UE</strong><span>5.7 systems<br />core</span></div>
+            <div><strong>UE</strong><span>5.7 gameplay<br />core</span></div>
           </div>
-          <StatusPill>OPEN TO SYSTEMS & GAMEPLAY ROLES</StatusPill>
+          <StatusPill>OPEN TO GAME DEVELOPER & GAMEPLAY ROLES</StatusPill>
         </div>
         <form className="contact-form" onSubmit={(event) => { event.preventDefault(); setSent(true); }}>
           <Eyebrow>Send a signal</Eyebrow>
@@ -1974,7 +1982,7 @@ function BioPage() {
             <>
               <label>Name<input required placeholder="Your name" /></label>
               <label>Signal path<input required type="email" placeholder="you@example.com" /></label>
-              <label>Message<textarea required placeholder="Tell me about the system or game you want to build..." rows={5} /></label>
+              <label>Message<textarea required placeholder="Tell me about the game or prototype you want to build..." rows={5} /></label>
               <button className="button" type="submit">Send transmission <Send size={14} /></button>
             </>
           )}
@@ -2010,12 +2018,6 @@ function TechTreePage() {
 
   return (
     <main className="inner-page tech-page">
-      <PageHeader
-        number="10"
-        kicker="Tech-stack inventory / interactive skill tree"
-        title={<>Map the<br /><span>loadout.</span></>}
-        copy="Don’t just read a list of tools. Hover and select a node to inspect the low-level systems, engine architecture, and project implementations behind the work."
-      />
       <section className="tech-tree page-pad">
         <div className="tech-tree__map">
           <svg className="tech-tree__svg-lines" aria-hidden="true" viewBox="0 0 500 400">
@@ -2146,11 +2148,16 @@ function PortfolioCarousel({ items, onContributions }: { items: typeof projects;
 }
 
 function PortfolioPage() {
-  const [filter, setFilter] = useState("ALL");
   const [contribution, setContribution] = useState<typeof projects[number] | null>(null);
-  const tags = ["ALL", "SYSTEMS", "WORLDS", "PROTOTYPES"];
-  const filtered = filter === "ALL" ? projects : projects.filter((project) => project.tags.some((tag) => tag.toUpperCase().includes(filter.slice(0, -1))));
-  return <main className="inner-page portfolio-page-new"><PageHeader number="07" kicker="Games & systems portfolio" title={<>Engine plugins,<br /><span>3D titles & prototypes.</span></>} copy="Scroll through the project carousel. Hover to wake the reel, click a card to open the dossier, and inspect the contribution log when you want the engineering details." /><section className="portfolio-page page-pad"><div className="portfolio-loadout"><Eyebrow>Carousel inventory</Eyebrow><Link href="/skills/" className="text-link">Open interactive tech tree <ArrowUpRight size={14} /></Link></div><div className="filter-row">{tags.map((tag) => <button key={tag} className={filter === tag ? "is-selected" : ""} onClick={() => setFilter(tag)}>{tag}</button>)}</div><PortfolioCarousel items={filtered} onContributions={setContribution} /></section>{contribution && <ContributionDrawer project={contribution} onClose={() => setContribution(null)} />}<Footer /></main>;
+  return (
+    <main className="inner-page portfolio-page-new">
+      <section className="portfolio-page page-pad">
+        <PortfolioCarousel items={projects} onContributions={setContribution} />
+      </section>
+      {contribution && <ContributionDrawer project={contribution} onClose={() => setContribution(null)} />}
+      <Footer />
+    </main>
+  );
 }
 
 
@@ -2409,7 +2416,7 @@ function ProjectPage({ slug }: { slug: string }) {
 
         <div className="project-detail__copy">
           <div className="project-detail__section">
-            <Eyebrow>Core Systems Architected</Eyebrow>
+            <Eyebrow>Core Gameplay Mechanics & Features</Eyebrow>
             <ul className="project-systems-list">
               {detail.systems.map((item, idx) => {
                 const parts = item.split(": ");
@@ -2469,7 +2476,7 @@ function ProjectPage({ slug }: { slug: string }) {
 function Footer() {
   const [soundOn, setSoundOn] = useState(() => { try { return localStorage.getItem("pixelguild-sound") !== "off"; } catch { return true; } });
   const [cabinetOn, setCabinetOn] = useState(() => { try { return localStorage.getItem("pixelguild-cabinet") === "on"; } catch { return false; } });
-  return <footer className="site-footer page-pad"><div className="site-footer__mark"><BrandMark /><span>KV / KARTHIK VEERANALA</span></div><div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:karthik.veeranala@gmail.com">karthik.veeranala@gmail.com</a></div><div className="site-footer__controls"><span>ARCADE CONTROLS</span><button className="footer-control" onClick={() => { footerControls?.toggleCabinet(); setCabinetOn((value) => !value); }} aria-label={cabinetOn ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"}><Monitor size={13} /> {cabinetOn ? "CRT ON" : "CRT"}</button><button className="footer-control" onClick={() => { footerControls?.toggleSound(); setSoundOn((value) => !value); }} aria-label={soundOn ? "Mute arcade sounds" : "Unmute arcade sounds"}>{soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />} {soundOn ? "SFX ON" : "SFX OFF"}</button></div><div className="site-footer__bottom"><span>© 2026 KARTHIK VEERANALA / GAME SYSTEMS & PROTOTYPING</span><span>Built under constraints <Sparkles size={12} /></span></div></footer>;
+  return <footer className="site-footer page-pad"><div className="site-footer__mark"><BrandMark /><span>KV / KARTHIK VEERANALA</span></div><div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:karthik.veeranala@gmail.com">karthik.veeranala@gmail.com</a></div><div className="site-footer__controls"><span>ARCADE CONTROLS</span><button className="footer-control" onClick={() => { footerControls?.toggleCabinet(); setCabinetOn((value) => !value); }} aria-label={cabinetOn ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"}><Monitor size={13} /> {cabinetOn ? "CRT ON" : "CRT"}</button><button className="footer-control" onClick={() => { footerControls?.toggleSound(); setSoundOn((value) => !value); }} aria-label={soundOn ? "Mute arcade sounds" : "Unmute arcade sounds"}>{soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />} {soundOn ? "SFX ON" : "SFX OFF"}</button></div><div className="site-footer__bottom"><span>© 2026 KARTHIK VEERANALA / GAME DEVELOPMENT & DESIGN</span><span>Built under constraints <Sparkles size={12} /></span></div></footer>;
 }
 
 function Router() {
@@ -2492,7 +2499,7 @@ function NotFoundPage() {
 }
 
 function BootSequence() {
-  return <div className="boot-sequence" aria-label="Loading Karthik Veeranala portfolio"><div className="boot-sequence__logo">KV<span>_</span></div><div className="boot-sequence__bar"><i /></div><div className="boot-sequence__copy"><span>INITIALIZING PLAYER PROFILE</span><strong>LOADING WORLDS / 05</strong><small>UNREAL SYSTEMS // PLAYABLE RESULTS</small></div></div>;
+  return <div className="boot-sequence" aria-label="Loading Karthik Veeranala portfolio"><div className="boot-sequence__logo">KV<span>_</span></div><div className="boot-sequence__bar"><i /></div><div className="boot-sequence__copy"><span>INITIALIZING PLAYER PROFILE</span><strong>LOADING WORLDS / 05</strong><small>UNREAL ENGINE // PLAYABLE WORLDS</small></div></div>;
 }
 
 function App() {
