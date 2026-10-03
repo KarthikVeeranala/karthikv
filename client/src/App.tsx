@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, Router as WouterRouter } from "wouter";
 import {
   ArrowDownRight,
   ArrowLeft,
@@ -3493,7 +3493,17 @@ function BootSequence() {
 function App() {
   const [booting, setBooting] = useState(() => { try { return !sessionStorage.getItem("pixelguild-booted"); } catch { return true; } });
   useEffect(() => { if (!booting) return; const timer = window.setTimeout(() => { try { sessionStorage.setItem("pixelguild-booted", "1"); } catch { /* no-op */ } setBooting(false); }, 1450); return () => window.clearTimeout(timer); }, [booting]);
-  return <ErrorBoundary>{booting && <BootSequence />}<SiteShell><Router /></SiteShell></ErrorBoundary>;
+  const baseUrl = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  return (
+    <ErrorBoundary>
+      <WouterRouter base={baseUrl}>
+        {booting && <BootSequence />}
+        <SiteShell>
+          <Router />
+        </SiteShell>
+      </WouterRouter>
+    </ErrorBoundary>
+  );
 }
 
 export default App;
