@@ -81,7 +81,7 @@ function playArcadeTone(kind: "hover" | "click" | "transition" | "hit" | "win" |
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "Demo Reel", href: "/demo-reel/" },
+  { label: "Gameplay Reel", href: "/demo-reel/" },
   { label: "Backstory", href: "/backstory/" },
   { label: "Tech Tree", href: "/skills/" },
   { label: "Hobbies", href: "/hobbies/" },
@@ -426,7 +426,7 @@ function SocialRail() {
       >
         <DiscordIcon size={14} />
       </a>
-      <a href="mailto:karthik.veeranala@gmail.com" aria-label="Email"><Mail size={14} /></a>
+      <a href="mailto:veeranalakarthik@gmail.com" aria-label="Email"><Mail size={14} /></a>
     </aside>
   );
 }
@@ -1073,8 +1073,14 @@ function CheatTerminal({
 
 function SiteShell({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
-  const [theme, setTheme] = useState<"beige" | "neon">(() => {
-    try { return localStorage.getItem("pixelguild-theme") === "neon" ? "neon" : "beige"; } catch { return "beige"; }
+    const [theme, setTheme] = useState<"beige" | "neon">(() => {
+    try {
+      const saved = localStorage.getItem("pixelguild-theme");
+      if (saved === "beige") return "beige";
+      return "neon";
+    } catch {
+      return "neon";
+    }
   });
   const [soundOn, setSoundOn] = useState(() => {
     try { return localStorage.getItem("pixelguild-sound") !== "off"; } catch { return true; }
@@ -1178,7 +1184,7 @@ function SiteShell({ children }: { children: React.ReactNode }) {
     return () => { window.removeEventListener("pointerover", over); window.removeEventListener("click", click); };
   }, [soundOn]);
 
-  const paletteClass = palette ? `palette-${palette}` : "";
+  const paletteClass = theme === "neon" && palette ? `palette-${palette}` : "";
 
   return (
     <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""} ${paletteClass} ${cabinet ? "cabinet-mode" : ""} ${developerMode ? "developer-mode" : ""} ${partyMode ? "party-mode" : ""} ${matrixMode ? "matrix-mode" : ""} ${bigheadMode ? "bighead-mode" : ""}`}> 
@@ -1634,7 +1640,7 @@ function Home() {
       </section>
 
       <section className="reel-band page-pad">
-        <div className="reel-band__copy"><Eyebrow number="03">Demo reel</Eyebrow><h2>A door,<br /><span>left open.</span></h2><p>A 2-minute comprehensive demonstration of Unreal Engine 5.7 C++ gameplay mechanics, combat feel, and playable prototypes.</p><Link href="/demo-reel/" className="button button--outline">Watch the reel <Play size={13} fill="currentColor" /></Link></div>
+        <div className="reel-band__copy"><Eyebrow number="03">Gameplay reel</Eyebrow><h2>Gameplay Systems<br /><span>in motion.</span></h2><p>A 2-minute comprehensive demonstration of Unreal Engine 5.7 C++ gameplay mechanics, combat feel, and playable prototypes.</p><Link href="/demo-reel/" className="button button--outline">Watch gameplay reel <Play size={13} fill="currentColor" /></Link></div>
         <HeroVideo />
       </section>
 
@@ -1888,8 +1894,9 @@ function ArcadePage() {
   const [matched, setMatched] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
 
-  const [activeCategory, setActiveCategory] = useState<string>("All");
   const [activeGame, setActiveGame] = useState<AicadeGame | null>(null);
+  const [vaultModalOpen, setVaultModalOpen] = useState(false);
+  const [vaultCategory, setVaultCategory] = useState<string>("All");
 
   // Read URL query parameter "?game=city_of_aethel"
   useEffect(() => {
@@ -1905,12 +1912,18 @@ function ArcadePage() {
     }
   }, []);
 
-  const categories = ["All", "Action & Combat", "Physics & Ragdoll", "Platformer & Exploration"];
+  // 4 Featured Phaser Prototypes requested by the user
+  const showcaseIds = ["city_of_aethel", "kickthebuddy", "harrypotter", "vertical_maze"];
+  const featuredGames = useMemo(() => {
+    return showcaseIds.map((id) => aicadeGames.find((g) => g.id === id)).filter(Boolean) as AicadeGame[];
+  }, []);
 
-  const filteredGames = useMemo(() => {
-    if (activeCategory === "All") return aicadeGames;
-    return aicadeGames.filter((g) => g.category === activeCategory);
-  }, [activeCategory]);
+  const vaultCategories = ["All", "Action & Combat", "Physics & Ragdoll", "Platformer & Exploration"];
+
+  const filteredVaultGames = useMemo(() => {
+    if (vaultCategory === "All") return aicadeGames;
+    return aicadeGames.filter((g) => g.category === vaultCategory);
+  }, [vaultCategory]);
 
   useEffect(() => {
     if (flipped.length !== 2) return;
@@ -1934,37 +1947,30 @@ function ArcadePage() {
         </p>
       </section>
 
-      {/* 8 Playable Phaser 2D Prototypes Showcase */}
+      {/* Featured Phaser 2D Prototypes Showcase */}
       <section className="aicade-section page-pad">
         <div className="aicade-header">
-          <Eyebrow number="01 / 02">Phaser 3 Game Engine Portfolio</Eyebrow>
-          <h2>Rapid Prototypes &amp; <span>Combat Mechanics</span></h2>
+          <div className="section-topline">
+            <Eyebrow number="01 / 02">Phaser 3 Game Engine Showcase</Eyebrow>
+            <button
+              type="button"
+              className="button button--tiny button--outline"
+              onClick={() => {
+                playArcadeTone("click");
+                setVaultModalOpen(true);
+              }}
+            >
+              <span>View All 8 Games Vault</span> <ArrowUpRight size={13} />
+            </button>
+          </div>
+          <h2>Featured Prototypes &amp; <span>Combat Mechanics</span></h2>
           <p>
-            During my gameplay engineering and combat design tenure at Aicade, I architected 8 production-grade 2D web prototypes to test feel, combat buffering, rigid-body physics, and AI navigation. All 8 games run live in your browser below.
+            During my gameplay engineering and combat design tenure at Aicade, I architected 8 production-grade 2D web prototypes to test combat buffering, rigid-body physics, and AI navigation. Below are the 4 featured flagship games, with the remaining 4 playable in the full archive.
           </p>
         </div>
 
-        <div className="aicade-filters">
-          {categories.map((cat) => {
-            const count = cat === "All" ? aicadeGames.length : aicadeGames.filter((g) => g.category === cat).length;
-            return (
-              <button
-                key={cat}
-                type="button"
-                className={`aicade-filter-btn ${activeCategory === cat ? "is-active" : ""}`}
-                onClick={() => {
-                  playArcadeTone("click");
-                  setActiveCategory(cat);
-                }}
-              >
-                {cat} ({count})
-              </button>
-            );
-          })}
-        </div>
-
         <div className="aicade-grid">
-          {filteredGames.map((game) => (
+          {featuredGames.map((game) => (
             <article key={game.id} className="aicade-card">
               <div
                 className="aicade-card__media"
@@ -2016,39 +2022,234 @@ function ArcadePage() {
                       setActiveGame(game);
                     }}
                   >
-                    <Play size={12} /> Play Prototype
+                    <Play size={12} fill="currentColor" /> Play Game
                   </button>
                   <span className="aicade-card__aspect">{game.aspect}</span>
                 </div>
               </div>
             </article>
           ))}
+
+          {/* 5th Card: More Games Vault Trigger */}
+          <article
+            className="aicade-card aicade-card--vault-trigger"
+            onClick={() => {
+              playArcadeTone("transition");
+              setVaultModalOpen(true);
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Open Full Playable Games Vault"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                playArcadeTone("transition");
+                setVaultModalOpen(true);
+              }
+            }}
+          >
+            <div className="aicade-card__vault-art">
+              <div className="aicade-card__vault-icon">
+                <Gamepad2 size={36} />
+              </div>
+              <span className="aicade-card__scanline" />
+              <div className="aicade-card__badge-overlay">
+                <span className="aicade-card__pill aicade-card__pill--accolade">ARCHIVE VAULT</span>
+                <span className="aicade-card__pill">8 PROTOTYPES</span>
+              </div>
+            </div>
+
+            <div className="aicade-card__content">
+              <div className="aicade-card__meta">
+                <span>MATTER.JS + PHASER</span>
+                <span>MORE HERE</span>
+              </div>
+              <h3>+4 More Playable Prototypes</h3>
+              <p className="aicade-card__tagline">Total Crush, Cannon Rampart, Skyward Cannon &amp; Maze Runner</p>
+              <p className="aicade-card__desc">
+                Access the complete archive of experimental ballistics simulations, turret defense pacing, mobile portrait layouts, and tilemap stealth pathfinding.
+              </p>
+              <div className="aicade-card__tags">
+                <span>Matter.js</span>
+                <span>Ballistics Arc</span>
+                <span>Portrait Viewport</span>
+                <span>Stealth AI</span>
+              </div>
+              <div className="aicade-card__actions">
+                <button
+                  type="button"
+                  className="aicade-card__play-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playArcadeTone("transition");
+                    setVaultModalOpen(true);
+                  }}
+                >
+                  <Gamepad2 size={12} /> Explore All 8 Games
+                </button>
+                <span className="aicade-card__aspect">ALL 8 LIVE</span>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
-      {/* Mini-Games Retention Lab */}
+      {/* Retro Memory Match Mini-Game */}
       <section className="arcade-cabinet page-pad">
-        <Eyebrow number="02 / 02">Memory Matrix Mini-Game</Eyebrow>
-        <div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div>
-        <div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div>
-        <div className="arcade-cabinet__bottom"><span>{matched.length === cards.length ? "PERFECT RUN! CABINET CLEARED." : "FIND THE PAIRS / NO CHEATING"}</span><button className="button button--tiny" onClick={reset}><RefreshCw size={12} /> Reset</button></div>
+        <div className="arcade-cabinet__top">
+          <span>MINI-GAME // MEMORY MATRIX</span>
+          <span>MOVES // {String(moves).padStart(2, "0")}</span>
+          <span>MATCHED // {matched.length / 2} / 6</span>
+        </div>
+
+        <div className="memory-grid">
+          {cards.map((sym, index) => {
+            const isFlipped = flipped.includes(index) || matched.includes(index);
+            const isMatched = matched.includes(index);
+            return (
+              <button
+                key={index}
+                type="button"
+                className={`memory-card ${isFlipped ? "is-face-up" : ""} ${isMatched ? "is-matched" : ""}`}
+                onClick={() => {
+                  if (flipped.length === 2 || isFlipped) return;
+                  playArcadeTone("click");
+                  setFlipped((current) => [...current, index]);
+                }}
+                disabled={isMatched}
+                aria-label={`Card ${index + 1}`}
+              >
+                {isFlipped ? sym : "?"}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="arcade-cabinet__bottom">
+          <span>PAIR ALL MATCHES TO REVEAL SECRETS</span>
+          <button type="button" className="text-link" onClick={reset}>
+            Reset Matrix
+          </button>
+        </div>
       </section>
 
-      <BossFight />
+      {/* Mini Games Tips Footer */}
+      <section className="arcade-tips page-pad">
+        <div>
+          <Terminal size={18} />
+          <p>PRESS TILDE (~) OR ESCAPE ANYWHERE ON THE SITE TO ACTIVATE DEVELOPER CONSOLE</p>
+        </div>
+        <div>
+          <Gamepad2 size={18} />
+          <p>TRY OUT SPEEDRUNNING ENCOUNTERS IN THE BOSS REFLEX ARENA ON THE HOMEPAGE</p>
+        </div>
+      </section>
 
-      <div className="arcade-tips page-pad">
-        <div><Zap size={17} /><p>Click the Karthik V companion mascot to pause/resume its movement. Drag it anywhere on screen!</p></div>
-        <div><MousePointer2 size={17} /><p>Each playable prototype features custom physics, state machines, and responsive control binds.</p></div>
-      </div>
-
+      {/* Cabinet Play Modal */}
       {activeGame && (
-        <AicadeCabinetModal
-          game={activeGame}
-          onClose={() => setActiveGame(null)}
-        />
+        <AicadeModal game={activeGame} onClose={() => setActiveGame(null)} />
       )}
 
-      <Footer />
+      {/* All 8 Games Vault Modal Window */}
+      {vaultModalOpen && (
+        <div className="aicade-vault-backdrop" onClick={() => setVaultModalOpen(false)}>
+          <div className="aicade-vault-window" onClick={(e) => e.stopPropagation()}>
+            <div className="aicade-vault-header">
+              <div className="aicade-vault-header__left">
+                <Gamepad2 size={18} />
+                <strong>PLAYABLE PHASER 3 VAULT // ALL 8 GAMES</strong>
+                <span>[ PRODUCTION ARCHIVE ]</span>
+              </div>
+              <button
+                type="button"
+                className="aicade-vault-close-btn"
+                onClick={() => setVaultModalOpen(false)}
+                title="Close archive (Esc)"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="aicade-vault-body">
+              <div className="aicade-vault-intro">
+                <p>Complete archive of 8 interactive 2D prototypes developed during my gameplay engineering tenure at Aicade testing mechanics feel, combat buffering, rigid-body ragdoll physics, and AI navigation. Click any game to launch directly in the arcade cabinet.</p>
+                <div className="aicade-filters" style={{ margin: "14px 0 24px" }}>
+                  {vaultCategories.map((cat) => {
+                    const count = cat === "All" ? aicadeGames.length : aicadeGames.filter((g) => g.category === cat).length;
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        className={`aicade-filter-btn ${vaultCategory === cat ? "is-active" : ""}`}
+                        onClick={() => {
+                          playArcadeTone("click");
+                          setVaultCategory(cat);
+                        }}
+                      >
+                        {cat} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="aicade-grid aicade-grid--vault">
+                {filteredVaultGames.map((game) => (
+                  <article key={game.id} className="aicade-card">
+                    <div
+                      className="aicade-card__media"
+                      onClick={() => {
+                        playArcadeTone("transition");
+                        setActiveGame(game);
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Play ${game.title}`}
+                    >
+                      <img src={game.thumbnail} alt={game.title} loading="lazy" />
+                      <span className="aicade-card__scanline" />
+                      <div className="aicade-card__badge-overlay">
+                        <span className="aicade-card__pill">{game.category}</span>
+                        {game.badge && (
+                          <span className="aicade-card__pill aicade-card__pill--accolade">
+                            ★ {game.badge}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="aicade-card__content">
+                      <div className="aicade-card__meta">
+                        <span>{game.aspect}</span>
+                        <span>PHASER 3</span>
+                      </div>
+                      <h3>{game.title}</h3>
+                      <p className="aicade-card__tagline">{game.tagline}</p>
+                      <p className="aicade-card__desc">{game.description}</p>
+                      <div className="aicade-card__tags">
+                        {game.tech.map((t) => (
+                          <span key={t}>{t}</span>
+                        ))}
+                      </div>
+                      <div className="aicade-card__actions">
+                        <button
+                          type="button"
+                          className="aicade-card__play-btn"
+                          onClick={() => {
+                            playArcadeTone("transition");
+                            setActiveGame(game);
+                          }}
+                        >
+                          <Play size={12} fill="currentColor" /> Play Game
+                        </button>
+                        <span className="aicade-card__aspect">{game.aspect}</span>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
@@ -2468,7 +2669,7 @@ function DemoReelPage() {
 
   return (
     <main className="inner-page">
-      <PageHeader number="01" kicker="Demo reel" title={<>Gameplay mechanics<br /><span>in motion.</span></>} />
+      <PageHeader number="01" kicker="Showreel" title={<>Gameplay &amp; Systems<br /><span>Showreel.</span></>} />
       <section className="reel-page__player page-pad">
         <div ref={playerRef} className="reel-player reel-player--enhanced">
           <div className="hero-video hero-video--compact">
@@ -2568,30 +2769,26 @@ function DemoReelPage() {
             <Eyebrow>Credits</Eyebrow>
             <p>Direction & Game Design / Karthik Veeranala<br />Engine Architecture / Unreal Engine 5.7 & 4.21 C++<br />2D Web Arcade / Phaser 3 WebGL</p>
           </div>
-          <div>
-            <Eyebrow>Chapters</Eyebrow>
-            <p>00:04 — The Interlude (6-DOF Flight Sim)<br />00:30 — Cyrus 365 E2E Automation Suite (UE 5.7 C++)<br />00:57 — ByteOasis: Code to Escape<br />01:23 — Geek'O'Wars TPS Survival<br />01:49 — City of Aethel & IGDC Arcade</p>
+          <div className="reel-meta-chapters-block">
+            <Eyebrow>Chapters // Click to Jump</Eyebrow>
+            <div className="reel-meta-chapters">
+              {chapters.map((ch) => (
+                <button
+                  key={ch.title}
+                  type="button"
+                  className="reel-meta-chapter-btn"
+                  onClick={() => seekTo(ch.seconds)}
+                  title={`Jump to ${ch.time} — ${ch.title}`}
+                >
+                  <span className="reel-meta-chapter-time">{ch.time}</span>
+                  <span className="reel-meta-chapter-sep">—</span>
+                  <span className="reel-meta-chapter-title">{ch.title}</span>
+                  <ArrowRight size={12} className="reel-meta-chapter-arrow" />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </section>
-
-      <section className="chapter-list page-pad">
-        <div className="section-topline"><Eyebrow number="02">Selected chapters</Eyebrow><span className="muted-label">CLICK ANY CHAPTER TO JUMP</span></div>
-        {chapters.map((ch, index) => (
-          <div
-            key={ch.title}
-            className="chapter-row"
-            onClick={() => seekTo(ch.seconds)}
-            role="button"
-            tabIndex={0}
-            aria-label={`Jump to ${ch.title}`}
-          >
-            <span>0{index + 1}</span>
-            <strong>{ch.title}</strong>
-            <small>{ch.time}</small>
-            <ArrowRight size={15} />
-          </div>
-        ))}
       </section>
       <Footer />
     </main>
@@ -2730,7 +2927,7 @@ function HobbiesPage() {
       <section className="hobby-field page-pad">
         <div className="hobby-field__topline">
           <Eyebrow>4 signals found</Eyebrow>
-          <span>DRAG CARDS ANYWHERE INSIDE THE BOX // CLICK TO EXPAND</span>
+          <span>DRAG CARDS ANYWHERE INSIDE THE BOX // HOVER TO REVEAL</span>
         </div>
         <div ref={canvasRef} className="hobby-field__canvas">
           {hobbies.map((hobby, index) => {
@@ -3325,7 +3522,7 @@ function Footer() {
   return (
     <footer className="site-footer page-pad">
       <div className="site-footer__mark"><BrandMark /><span>KV / KARTHIK VEERANALA</span></div>
-      <div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:karthik.veeranala@gmail.com">karthik.veeranala@gmail.com</a></div>
+      <div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:veeranalakarthik@gmail.com">veeranalakarthik@gmail.com</a></div>
       <div className="site-footer__controls">
         <span>ARCADE CONTROLS</span>
         <button className="footer-control" onClick={() => { footerControls?.toggleCabinet(); setCabinetOn((value) => !value); }} aria-label={cabinetOn ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"}><Monitor size={13} /> {cabinetOn ? "CRT ON" : "CRT"}</button>

@@ -16,7 +16,7 @@ An interactive, retro-arcade-inspired portfolio built to showcase production Unr
 - **Live Site**: [https://karthikveeranala.github.io/karthikv/](https://karthikveeranala.github.io/karthikv/)
 - **LinkedIn**: [linkedin.com/in/karthikveeranala/](https://www.linkedin.com/in/karthikveeranala/)
 - **Discord**: `karthikkkkv`
-- **Email**: [karthik.veeranala@gmail.com](mailto:karthik.veeranala@gmail.com)
+- **Email**: [veeranalakarthik@gmail.com](mailto:veeranalakarthik@gmail.com)
 
 ---
 
