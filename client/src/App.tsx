@@ -1879,8 +1879,8 @@ function ArcadePage() {
   return (
     <main className="inner-page arcade-page">
       <section className="arcade-hero page-pad">
-        <Eyebrow number="06">Playable Prototypes & Mini-Games</Eyebrow>
-        <h2>Take a break.<br /><span>Play the prototypes.</span></h2>
+        <Eyebrow number="04">Playable Prototypes</Eyebrow>
+        <h1>Take a break.<br /><span>Play the prototypes.</span></h1>
         <p className="lead">
           Done exploring the systems and demo reel? Jump into these retro-inspired arcade builds and production Phaser prototypes engineered with custom state machines, timing reflexes, and physics simulations.
         </p>
@@ -1890,7 +1890,7 @@ function ArcadePage() {
       <section className="aicade-section page-pad">
         <div className="aicade-header">
           <div className="section-topline">
-            <Eyebrow number="01 / 02">Phaser 3 Game Engine Showcase</Eyebrow>
+            <Eyebrow>Phaser 3 Game Showcase</Eyebrow>
             <button
               type="button"
               className="button button--tiny button--outline"
@@ -2351,7 +2351,7 @@ function BossFight() {
   return (
     <section className="boss-arena page-pad">
       <div className="boss-arena__copy">
-        <Eyebrow number="02">Reflex combat / boss arena</Eyebrow>
+        <Eyebrow>Boss Fight Mini Game</Eyebrow>
         <h2>Break the<br /><span>{isEnraged ? "ENRAGED BEAST" : "LOGIC BEAST"}</span></h2>
         <p>A timing-based reflex combat encounter. Watch the charging meter: when it enters the <strong>GOLD PARRY ZONE</strong>, hit <strong>PARRY</strong> to stun the boss and land critical hits!</p>
         <div className="boss-arena__stats">
@@ -2473,9 +2473,6 @@ function PageHeader({ number, kicker, title, copy }: { number: string; kicker: s
         <Eyebrow number={number}>{kicker}</Eyebrow>
         <h1>{title}</h1>
         {copy && <p>{copy}</p>}
-      </div>
-      <div className="page-header__index" aria-hidden="true">
-        <span>{number}</span><i /><i /><i />
       </div>
     </section>
   );

@@ -1774,11 +1774,13 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   padding-top: 32px;
   padding-bottom: 20px;
 }
+.arcade-hero h1,
 .arcade-hero h2 {
   font: 700 clamp(28px, 4.2vw, 42px) / 1.08 var(--heading);
   letter-spacing: -0.03em;
   margin: 12px 0 14px;
 }
+.arcade-hero h1 span,
 .arcade-hero h2 span {
   color: var(--teal);
 }
