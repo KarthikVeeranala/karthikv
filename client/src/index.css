@@ -3721,6 +3721,12 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
    CINEMATIC DOCUMENTARY BACKSTORY (OPTION 1 + CHAPTER QUICK JUMPER)
    ========================================================================= */
 
+/* Container zone for the entire documentary feature */
+.cinema-documentary-zone {
+  position: relative;
+  width: 100%;
+}
+
 /* 1. Chapter Quick Jumper Sticky Bar */
 .chapter-jumper {
   position: sticky;
@@ -3731,6 +3737,13 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   background: rgba(9, 13, 13, 0.94);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line-strong);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.chapter-jumper.is-hidden {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 .site-shell:not(.theme-neon) .chapter-jumper {
   background: rgba(238, 227, 210, 0.94);

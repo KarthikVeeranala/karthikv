@@ -1760,8 +1760,10 @@ function BackstoryPage() {
         copy="A scroll-driven cinematic documentary. Scroll down to watch each chapter title dissolve directly into the story."
       />
 
-      {/* STICKY CHAPTER QUICK JUMPER DOCK */}
-      <nav className="chapter-jumper page-pad" aria-label="Chapter quick navigation">
+      {/* CINEMA DOCUMENTARY FEATURE ZONE */}
+      <div className="cinema-documentary-zone">
+        {/* STICKY CHAPTER QUICK JUMPER DOCK */}
+        <nav className={`chapter-jumper page-pad ${progress >= 0.96 ? "is-hidden" : ""}`} aria-label="Chapter quick navigation">
         <div className="chapter-jumper__inner">
           <div className="chapter-jumper__header">
             <span className="chapter-jumper__label">DOCUMENTARY ACTS // QUICK JUMP:</span>
@@ -1797,7 +1799,14 @@ function BackstoryPage() {
 
       {/* MASTER CINEMATIC SCROLL TRACK */}
       <section ref={trackRef} className="cinema-documentary-track">
-        <div ref={stageRef} className="cinema-viewport-stage page-pad">
+        <div
+          ref={stageRef}
+          className="cinema-viewport-stage page-pad"
+          style={{
+            opacity: progress >= 0.98 ? Math.max(0, 1 - (progress - 0.98) * 50) : 1,
+            pointerEvents: progress >= 0.98 ? "none" : "auto",
+          }}
+        >
           {/* Ambient Background & Grid */}
           <div className="cinema-stage-glow" aria-hidden="true" />
           <div className="cinema-stage-grid" aria-hidden="true" />
@@ -1923,6 +1932,7 @@ function BackstoryPage() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* PILOT DOSSIER STATS STRIP */}
       <section className="backstory-portrait-strip page-pad">
