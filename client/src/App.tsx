@@ -1064,10 +1064,10 @@ function SiteShell({ children }: { children: React.ReactNode }) {
     const [theme, setTheme] = useState<"beige" | "neon">(() => {
     try {
       const saved = localStorage.getItem("pixelguild-theme");
-      if (saved === "neon") return "neon";
-      return "beige";
+      if (saved === "beige") return "beige";
+      return "neon";
     } catch {
-      return "beige";
+      return "neon";
     }
   });
   const [soundOn, setSoundOn] = useState(() => {

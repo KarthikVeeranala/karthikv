@@ -3400,7 +3400,11 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
 .portfolio-page-new,
 .portfolio-page-new .portfolio-page,
 .portfolio-page {
-  padding-top: clamp(20px, 3vw, 36px) !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+.portfolio-carousel {
+  margin-top: 14px !important;
 }
 
 /* Home Demo Reel Video Container & Play/Pause Controls */
