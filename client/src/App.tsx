@@ -415,8 +415,9 @@ function PixelMascot() {
   });
   const [dragging, setDragging] = useState(false);
   const [state, setState] = useState<"idle" | "wandering" | "dragging" | "excited">("idle");
-  const [rotation, setRotation] = useState(0);
-  const [message, setMessage] = useState("DRAG ME / CHOMP PELLETS");
+  const [facing, setFacing] = useState<1 | -1>(1);
+  const [isPaused, setIsPaused] = useState(false);
+  const [message, setMessage] = useState("CLICK TO PAUSE // DRAG TO CHOMP");
   const [pelletScore, setPelletScore] = useState(0);
   const [popups, setPopups] = useState<Array<{ id: number; x: number; y: number; text: string }>>([]);
 
@@ -424,13 +425,16 @@ function PixelMascot() {
     if (typeof window === "undefined") return [];
     const w = window.innerWidth;
     const h = window.innerHeight;
+    const now = Date.now();
     return [
-      { id: 1, x: Math.floor(w * 0.15), y: Math.floor(h * 0.25) },
-      { id: 2, x: Math.floor(w * 0.82), y: Math.floor(h * 0.35) },
-      { id: 3, x: Math.floor(w * 0.45), y: Math.floor(h * 0.65) },
-      { id: 4, x: Math.floor(w * 0.22), y: Math.floor(h * 0.78) },
-      { id: 5, x: Math.floor(w * 0.75), y: Math.floor(h * 0.82) },
-      { id: 6, x: Math.floor(w * 0.55), y: Math.floor(h * 0.20) },
+      { id: now + 1, x: Math.floor(w * 0.12), y: Math.floor(h * 0.22) },
+      { id: now + 2, x: Math.floor(w * 0.45), y: Math.floor(h * 0.28) },
+      { id: now + 3, x: Math.floor(w * 0.82), y: Math.floor(h * 0.20) },
+      { id: now + 4, x: Math.floor(w * 0.88), y: Math.floor(h * 0.60) },
+      { id: now + 5, x: Math.floor(w * 0.65), y: Math.floor(h * 0.78) },
+      { id: now + 6, x: Math.floor(w * 0.35), y: Math.floor(h * 0.82) },
+      { id: now + 7, x: Math.floor(w * 0.15), y: Math.floor(h * 0.62) },
+      { id: now + 8, x: Math.floor(w * 0.50), y: Math.floor(h * 0.50) },
     ];
   }, []);
 
@@ -477,7 +481,7 @@ function PixelMascot() {
           setMessage("POWER RUN! ALL PELLETS CLEARED! +50");
           setTimeout(() => {
             setPellets(generatePellets());
-          }, 1200);
+          }, 800);
         }
       }
       return ate ? remaining : current;
@@ -495,11 +499,10 @@ function PixelMascot() {
       const nextY = Math.max(64, Math.min(window.innerHeight - 76, event.clientY - dragOffset.current.y));
 
       const dx = nextX - prevX;
-      const dy = nextY - prevY;
-      if (Math.abs(dx) > Math.abs(dy)) {
-        setRotation(dx > 0 ? 0 : 180);
-      } else if (Math.abs(dy) > 1) {
-        setRotation(dy > 0 ? 90 : 270);
+      if (dx > 2) {
+        setFacing(1);
+      } else if (dx < -2) {
+        setFacing(-1);
       }
 
       const next = { x: nextX, y: nextY };
@@ -533,54 +536,107 @@ function PixelMascot() {
     playArcadeTone("hover");
   }, [dragging]);
 
+  // Continuous autonomous pellet-hunting loop
   useEffect(() => {
-    const checkWander = () => {
-      if (dragging) return;
-      const idleTime = Date.now() - lastActiveRef.current;
-      if (idleTime > 4500) {
-        setState("wandering");
-        const cur = positionRef.current;
-        const stepX = (Math.random() > 0.5 ? 1 : -1) * (50 + Math.random() * 90);
-        const nextX = Math.max(16, Math.min(window.innerWidth - 80, cur.x + stepX));
-        const stepY = (Math.random() - 0.5) * 50;
-        const nextY = Math.max(80, Math.min(window.innerHeight - 90, cur.y + stepY));
+    let animId: number;
+    let lastTime = performance.now();
+    let phraseTime = performance.now();
 
-        setRotation(nextX > cur.x ? 0 : 180);
-        const next = { x: nextX, y: nextY };
-        positionRef.current = next;
-        setPosition(next);
-        checkChomp(next.x, next.y);
+    const huntPhrases = [
+      "HUNTING PELLETS...",
+      "WAKAWAKA...",
+      "CHOMP CHOMP!",
+      "SCANNING GRID",
+      "TARGET LOCKED",
+      "PAC-KV CRUISING",
+    ];
 
-        const wanderBubbles = ["CHOMPING AROUND...", "WAKAWAKA...", "SCANNING FOR DOTS", "PAC-KV ONLINE"];
-        setMessage(wanderBubbles[Math.floor(Math.random() * wanderBubbles.length)]);
+    const step = (now: number) => {
+      const dt = Math.min(0.1, (now - lastTime) / 1000);
+      lastTime = now;
+
+      if (!dragging && !isPaused) {
+        // Change speech phrase periodically
+        if (now - phraseTime > 4500) {
+          phraseTime = now;
+          setMessage(huntPhrases[Math.floor(Math.random() * huntPhrases.length)]);
+        }
+
+        const curX = positionRef.current.x + 22; // Pacman center
+        const curY = positionRef.current.y + 22;
+
+        // Find closest pellet
+        let closest: Pellet | null = null;
+        let minDist = Infinity;
+        for (const p of pellets) {
+          const d = Math.hypot(p.x - curX, p.y - curY);
+          if (d < minDist) {
+            minDist = d;
+          }
+        }
+
+        for (const p of pellets) {
+          const d = Math.hypot(p.x - curX, p.y - curY);
+          if (d === minDist) {
+            closest = p;
+            break;
+          }
+        }
+
+        if (closest) {
+          setState("wandering");
+          const dx = closest.x - curX;
+          const dy = closest.y - curY;
+          const angle = Math.atan2(dy, dx);
+          const speed = 125; // 125px per second smooth travel
+
+          const nextX = Math.max(8, Math.min(window.innerWidth - 74, positionRef.current.x + Math.cos(angle) * speed * dt));
+          const nextY = Math.max(64, Math.min(window.innerHeight - 76, positionRef.current.y + Math.sin(angle) * speed * dt));
+
+          positionRef.current = { x: nextX, y: nextY };
+          if (mascotRef.current) {
+            mascotRef.current.style.transform = `translate3d(${nextX}px, ${nextY}px, 0)`;
+          }
+
+          // Pure horizontal flip: face right (1) or face left (-1). Never rotated upside down!
+          if (dx > 2) {
+            setFacing(1);
+          } else if (dx < -2) {
+            setFacing(-1);
+          }
+
+          if (minDist <= 32) {
+            checkChomp(nextX, nextY);
+          }
+        } else if (pellets.length === 0) {
+          setPellets(generatePellets());
+        }
       }
+
+      animId = requestAnimationFrame(step);
     };
-    const interval = window.setInterval(checkWander, 5000);
-    return () => window.clearInterval(interval);
-  }, [dragging, checkChomp]);
+
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [dragging, isPaused, pellets, checkChomp, generatePellets]);
 
   const handleClick = () => {
     lastActiveRef.current = Date.now();
     if (moved.current) return;
-    setState("excited");
-    playArcadeTone("win");
-    const quotes = [
-      "WAKAWAKA!",
-      "READY FOR ACTION!",
-      "3X HACKATHON WINNER!",
-      "IGDC TOP 45 FINALIST!",
-      "UNREAL 5.7 C++!",
-      "PRESS START!",
-      "CHOMP ALL PELLETS!",
-      "LET'S BUILD A GAME!",
-    ];
-    setMessage((cur) => {
-      const nextQuotes = quotes.filter((q) => q !== cur);
-      return nextQuotes[Math.floor(Math.random() * nextQuotes.length)];
+    setIsPaused((p) => {
+      const nextPaused = !p;
+      if (nextPaused) {
+        setState("idle");
+        playArcadeTone("hover");
+        setMessage("⏸ PAUSED // CLICK TO RESUME!");
+      } else {
+        setState("excited");
+        playArcadeTone("win");
+        setMessage("▶ RESUMED // CHOMPING PELLETS!");
+        setTimeout(() => setState("idle"), 1800);
+      }
+      return nextPaused;
     });
-    setTimeout(() => {
-      setState("idle");
-    }, 1800);
   };
 
   return (
@@ -633,14 +689,16 @@ function PixelMascot() {
         <span className="pixel-mascot__bubble">{message}</span>
         <div
           className="pacman-sprite"
-          style={{ transform: `rotate(${rotation}deg)` }}
+          style={{ transform: `scaleX(${facing})` }}
           aria-hidden="true"
         >
           <div className="pacman-wedge pacman-wedge--top" />
           <div className="pacman-wedge pacman-wedge--bottom" />
           <div className="pacman-eye" />
         </div>
-        <span className="pixel-mascot__tag">PAC-KV • {pelletScore} PTS</span>
+        <span className="pixel-mascot__tag">
+          PAC-KV • {pelletScore} PTS {isPaused ? "• PAUSED" : ""}
+        </span>
       </div>
     </>
   );
@@ -910,10 +968,10 @@ function ProjectWindow({ project, onClose, onContributions }: { project: typeof 
 function BackstorySection() {
   const [activeBtn, setActiveBtn] = useState<"X" | "A" | "Y" | "B">("X");
   const controllerFocus = {
-    X: { title: "C++ SYSTEMS & WIN32", copy: "Low-level desktop isolation, hardware input hooks, Slate/UMG UI automation, and GPU backbuffer FFmpeg streaming." },
-    A: { title: "GAMEPLAY & COMBAT", copy: "Deterministic simulation, 5-hit melee combos, 180ms i-frame dodge rolls, and predictive lead-target AI." },
-    Y: { title: "3X HACKATHON WINNER", copy: "1st at CodeDay 2.0 (The Interlude), 2nd at HackRush (ByteOasis), and Top 3 at MLH FrostHacks (Geek'O'Wars)." },
-    B: { title: "COMMUNITY & LEADERSHIP", copy: "President of Elysium Gaming Club directing collegiate esports and mentoring 200+ student developers." },
+    X: { title: "GAMEPLAY & COMBAT", copy: "Deterministic simulation, 5-hit melee combos, 180ms i-frame dodge rolls, and predictive lead-target AI." },
+    A: { title: "UNREAL ENGINE & C++", copy: "Production UE 5.7 C++ engine architecture, isolated desktop sandboxing, Slate/UMG automation, and streaming." },
+    Y: { title: "3X HACKATHON VICTORIES", copy: "1st at CodeDay 2.0 (The Interlude), 2nd at HackRush (ByteOasis), and Top 3 at MLH FrostHacks (Geek'O'Wars)." },
+    B: { title: "COMMUNITY & LEADERSHIP", copy: "President of Elysium Gaming Club directing collegiate esports and mentoring 200+ student game developers." },
   };
 
   const handleBtnClick = (btn: "X" | "A" | "Y" | "B") => {
@@ -925,11 +983,11 @@ function BackstorySection() {
     <section className="backstory-section backstory-section--highlight page-pad" id="backstory">
       <div className="backstory-editorial">
         <div className="backstory-editorial__left">
-          <div className="backstory-section__stamp">01 / SAVE FILE<br /><strong>ENGINE & SYSTEMS PROFILE</strong></div>
+          <div className="backstory-section__stamp">01 / SAVE FILE<br /><strong>GAME DEVELOPER PROFILE</strong></div>
           <Eyebrow number="01">The backstory</Eyebrow>
           <h2>Engineered under pressure.<br /><span>Built for production.</span></h2>
           <p className="lead">
-            I am a game developer and engine systems programmer focused on low-level graphics, deterministic simulation, and real-time interaction. Pursuing a B.Tech in CSE at IARE Hyderabad (2023–2027), with production internship experience in Unreal Engine 5.7 C++.
+            I am a game developer focused on gameplay mechanics, real-time combat systems, physics simulation, and player feel. Pursuing a B.Tech in CSE at IARE Hyderabad (2023–2027), with production internship experience in Unreal Engine 5.7 C++.
           </p>
 
           {/* Interactive Retro Arcade Gamepad Button Cluster */}
@@ -940,39 +998,51 @@ function BackstorySection() {
                 className={`ctrl-btn ctrl-btn--y ${activeBtn === "Y" ? "is-active" : ""}`}
                 onClick={() => handleBtnClick("Y")}
                 title="Y: 3x Hackathon Victories"
+                aria-pressed={activeBtn === "Y"}
               >
                 <span>Y</span>
+                <small>HACK</small>
               </button>
               <div className="controller-diamond__middle">
                 <button
                   type="button"
                   className={`ctrl-btn ctrl-btn--x ${activeBtn === "X" ? "is-active" : ""}`}
                   onClick={() => handleBtnClick("X")}
-                  title="X: C++ Systems & Win32"
+                  title="X: Gameplay & Combat"
+                  aria-pressed={activeBtn === "X"}
                 >
                   <span>X</span>
+                  <small>PLAY</small>
                 </button>
                 <button
                   type="button"
                   className={`ctrl-btn ctrl-btn--b ${activeBtn === "B" ? "is-active" : ""}`}
                   onClick={() => handleBtnClick("B")}
                   title="B: Community & Leadership"
+                  aria-pressed={activeBtn === "B"}
                 >
                   <span>B</span>
+                  <small>LEAD</small>
                 </button>
               </div>
               <button
                 type="button"
                 className={`ctrl-btn ctrl-btn--a ${activeBtn === "A" ? "is-active" : ""}`}
                 onClick={() => handleBtnClick("A")}
-                title="A: Gameplay & Combat"
+                title="A: Unreal Engine & C++"
+                aria-pressed={activeBtn === "A"}
               >
                 <span>A</span>
+                <small>UE/C++</small>
               </button>
             </div>
             <div className="controller-readout">
-              <span className="controller-readout__tag">PAD INPUT // [{activeBtn}] ACTIVE</span>
-              <strong>{controllerFocus[activeBtn].title}</strong>
+              <span className={`controller-readout__tag controller-readout__tag--${activeBtn.toLowerCase()}`}>
+                PAD INPUT // [{activeBtn}] ACTIVE
+              </span>
+              <strong className={`controller-readout__title controller-readout__title--${activeBtn.toLowerCase()}`}>
+                {controllerFocus[activeBtn].title}
+              </strong>
               <p>{controllerFocus[activeBtn].copy}</p>
             </div>
           </div>
@@ -1003,7 +1073,7 @@ function BackstorySection() {
               />
               <div className="portrait-fallback">
                 <span className="portrait-monogram">KV</span>
-                <small>SYSTEMS ENGINEER</small>
+                <small>GAME DEVELOPER</small>
                 <span className="portrait-beacon" />
               </div>
               <div className="portrait-corners" aria-hidden="true"><i /><i /><i /><i /></div>
@@ -1012,7 +1082,7 @@ function BackstorySection() {
             <div className="portrait-meta">
               <span>PILOT DOSSIER // HYDERABAD, IN</span>
               <strong>KARTHIK VEERANALA</strong>
-              <small>B.Tech CSE / Systems & Prototyping</small>
+              <small>B.Tech CSE / Game Development & Design</small>
             </div>
           </div>
 
@@ -1030,22 +1100,55 @@ function BackstorySection() {
 
 function BackstoryPage() {
   const milestones = [
-    ["2026 — PRESENT", "Unreal Engine Systems Intern / Cyrus 365", "Architected an End-to-End Automation & Headless Verification harness in UE 5.7 C++, with Win32 isolated desktops, recursive Slate/UMG discovery, and direct backbuffer FFmpeg streaming."],
+    ["2026 — PRESENT", "Unreal Engine Developer / Cyrus 365", "Architected an End-to-End Automation & Verification harness in UE 5.7 C++, with Win32 isolated desktops, recursive Slate/UMG discovery, and direct backbuffer FFmpeg streaming."],
     ["2025", "Mentor & Technical Judge / CodeDay 3.0", "Mentored collegiate teams in game design, gameplay programming, and Unreal Engine debugging; guided participants through mechanics prototyping, shader optimization, and game jam submissions."],
-    ["2024 — 2025", "Game Developer & Systems Prototyper / Aicade", "Engineered 14 playable 2D prototypes testing combat feel, rigid-body ragdolls, and boss encounter choreography, including the IGDC finalist City of Aethel."],
+    ["2024 — 2025", "Game Developer & Prototyper / Aicade", "Engineered 14 playable 2D prototypes testing combat feel, rigid-body ragdolls, and boss encounter choreography, including the IGDC finalist City of Aethel."],
     ["2024 — 2025", "President & Game Jam Organizer / Elysium Gaming Club — IARE", "Directing campus game development workshops, student hackathons, and collegiate esports tournaments for 200+ active student developers."],
-    ["2022 — 2024", "Lead Systems & Gameplay Engineer / MLH & CodeDay", "Won 1st Place Overall at CodeDay 2.0 with The Interlude, 2nd at HackRush with ByteOasis, and Top 3 at FrostHacks with Geek'O'Wars."],
+    ["2022 — 2024", "Lead Game Developer / MLH & CodeDay", "Won 1st Place Overall at CodeDay 2.0 with The Interlude, 2nd at HackRush with ByteOasis, and Top 3 at FrostHacks with Geek'O'Wars."],
   ];
   return (
     <main className="inner-page backstory-page">
       <PageHeader number="01" kicker="Biography / the backstory" title={<>Ruthless execution.<br /><span>Playable results.</span></>} />
       <section className="backstory-story page-pad">
-        <div>
+        <div className="backstory-story__copy">
           <Eyebrow>My story</Eyebrow>
           <p className="lead">My engineering philosophy centers on ruthless execution under constraints. Over the past three years I have spearheaded teams in 24–48 hour competitive hackathons—winning 1st Place at CodeDay 2.0, 2nd Place at HackRush, and Top 3 at MLH FrostHacks—alongside earning a Top 45 Indie Finalist selection at IGDC 2024 for City of Aethel.</p>
           <p>As President of the Elysium Gaming Club at IARE, I oversee campus game development initiatives, Unreal and Unity workshops, and collegiate esports tournaments for a community of more than 200 active students.</p>
+          <div className="backstory-section__facts">
+            <div><strong>3</strong><span>Hackathon victories</span></div>
+            <div><strong>TOP 45</strong><span>IGDC indie finalist</span></div>
+            <div><strong>14+</strong><span>Playable prototypes</span></div>
+            <div><strong>200+</strong><span>Gaming Club developers</span></div>
+          </div>
         </div>
-        <div className="backstory-identity"><span>KV</span><strong>Karthik Veeranala</strong><small>Hyderabad, India / B.Tech CSE</small></div>
+        <div className="backstory-story__aside">
+          <div className="backstory-portrait-frame">
+            <div className="portrait-wrap">
+              <img
+                src={assetUrl("karthik_portrait.png")}
+                alt="Karthik Veeranala portrait"
+                className="portrait-img"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  const fallback = e.currentTarget.parentElement?.querySelector(".portrait-fallback");
+                  if (fallback) (fallback as HTMLElement).style.display = "flex";
+                }}
+              />
+              <div className="portrait-fallback">
+                <span className="portrait-monogram">KV</span>
+                <small>GAME DEVELOPER</small>
+                <span className="portrait-beacon" />
+              </div>
+              <div className="portrait-corners" aria-hidden="true"><i /><i /><i /><i /></div>
+              <div className="portrait-scanline" aria-hidden="true" />
+            </div>
+            <div className="portrait-meta">
+              <span>PILOT DOSSIER // HYDERABAD, IN</span>
+              <strong>KARTHIK VEERANALA</strong>
+              <small>B.Tech CSE / Game Development & Design</small>
+            </div>
+          </div>
+        </div>
       </section>
       <section className="timeline page-pad">
         <div className="section-topline"><Eyebrow>Career trajectory</Eyebrow><span className="muted-label">EXPERIENCE & MILESTONE PATH</span></div>
@@ -1071,7 +1174,7 @@ function BackstoryPage() {
 }
 
 function Home() {
-  const roles = ["Game Design", "Combat Design", "Systems Design", "World Building"];
+  const roles = ["Game Developer", "Game Designer", "Gameplay Programmer", "Unreal Engine Developer"];
   const [roleIndex, setRoleIndex] = useState(0);
   const [contribModal, setContribModal] = useState<typeof projects[number] | null>(null);
   useEffect(() => { const timer = window.setInterval(() => setRoleIndex((index) => (index + 1) % roles.length), 2200); return () => window.clearInterval(timer); }, []);
@@ -1081,12 +1184,12 @@ function Home() {
         <video className="home-hero__video" autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source src={assetUrl("landing-worlds-reel.mp4")} type="video/mp4" /></video>
         <div className="home-hero__veil" aria-hidden="true" />
         <div className="hero-identity">
-          <Eyebrow number="00">Unreal Engine systems & gameplay architecture</Eyebrow>
+          <Eyebrow number="00">Unreal Engine & gameplay developer</Eyebrow>
           <h1>KARTHIK<br /><span>VEERANALA</span></h1>
-          <div className="hero-identity__sub"><span key={roles[roleIndex]} className="hero-role">{roles[roleIndex]}</span><b>Developer</b><em>—</em><small>systems / prototyping / play</small></div>
+          <div className="hero-identity__sub"><span key={roles[roleIndex]} className="hero-role">{roles[roleIndex]}</span><em>—</em><small>Unreal Engine • C++ • Gameplay • Prototypes</small></div>
         </div>
         <div className="hero-side-note"><span>SCROLL TO EXPLORE</span><ArrowDownRight size={16} /></div>
-        <div className="hero-bottomline"><StatusPill>OPEN TO SYSTEMS & GAMEPLAY ROLES</StatusPill><span>HYDERABAD, INDIA / UTC+05:30</span></div>
+        <div className="hero-bottomline"><StatusPill>OPEN TO GAME DEVELOPER & GAMEPLAY ROLES</StatusPill><span>HYDERABAD, INDIA / UTC+05:30</span></div>
       </section>
 
       <BackstorySection />
@@ -1161,7 +1264,7 @@ function BossFight() {
   const [maxCombo, setMaxCombo] = useState(0);
   const [message, setMessage] = useState("BOSS LOCK-ON // TIMED REFLEX COMBAT");
   const [highScores, setHighScores] = useState([4500, 3200, 2450]);
-  const [bossState, setBossState] = useState<"idle" | "telegraph" | "recovering">("idle");
+  const [bossState, setBossState] = useState<"idle" | "telegraph" | "lunging" | "stunned" | "hurt" | "dead">("idle");
   const [telegraphProgress, setTelegraphProgress] = useState(0);
   const [isParryWindow, setIsParryWindow] = useState(false);
 
@@ -1170,24 +1273,31 @@ function BossFight() {
   const isParryWindowRef = useRef(isParryWindow);
   isParryWindowRef.current = isParryWindow;
   const isAlive = bossHp > 0 && playerHp > 0;
-  const isEnraged = bossHp < 50;
+  const isEnraged = bossHp < 50 && bossHp > 0;
 
   // Boss attack cycle
   useEffect(() => {
     if (!isAlive) return;
 
     let progressInterval: number | null = null;
-    const attackTimer = setInterval(() => {
+    let lungeTimeout: number | null = null;
+    let stunTimeout: number | null = null;
+
+    const attackTimer = window.setInterval(() => {
+      // Only initiate attack if completely idle and alive
       if (bossStateRef.current !== "idle") return;
 
       setBossState("telegraph");
       let p = 0;
-      const attackSpeed = isEnraged ? 18 : 26;
+      // 2.2s windup: 40 increments of 55ms
+      const tickMs = isEnraged ? 45 : 55;
 
       progressInterval = window.setInterval(() => {
-        p += 5;
+        p += 2.5;
         setTelegraphProgress(p);
-        if (p >= 70 && p <= 95) {
+
+        // 600ms golden parry window between 68% and 92%
+        if (p >= 68 && p <= 92) {
           setIsParryWindow(true);
         } else {
           setIsParryWindow(false);
@@ -1196,34 +1306,46 @@ function BossFight() {
         if (p >= 100) {
           clearInterval(progressInterval!);
           setIsParryWindow(false);
-          setBossState("idle");
           setTelegraphProgress(0);
 
-          const retaliation = isEnraged ? 20 : 13;
-          setPlayerHp((hp) => {
-            const nextHp = Math.max(0, hp - retaliation);
-            if (nextHp === 0) {
-              setMessage("SYSTEM CORE OVERLOAD // PRESS RESET");
-              playArcadeTone("hit");
-            }
-            return nextHp;
-          });
-          setCombo(0);
-          setMessage(`UNGUARDED HIT! -${retaliation} HP`);
+          // Phase 2: Lunging claw strike
+          setBossState("lunging");
           playArcadeTone("hit");
+          setMessage("⚠️ BOSS LUNGES FORWARD!");
+
+          lungeTimeout = window.setTimeout(() => {
+            // Apply damage if boss wasn't stunned/dodged
+            if (bossStateRef.current === "lunging") {
+              const retaliation = isEnraged ? 22 : 14;
+              setPlayerHp((hp) => {
+                const nextHp = Math.max(0, hp - retaliation);
+                if (nextHp === 0) {
+                  setMessage("SYSTEM OVERLOAD // CLICK RESET TO RETRY");
+                  playArcadeTone("hit");
+                }
+                return nextHp;
+              });
+              setCombo(0);
+              setMessage(`UNGUARDED HIT! -${retaliation} HP (Time your parry in the gold zone!)`);
+              setBossState("idle");
+            }
+          }, 420);
         }
-      }, attackSpeed);
-    }, isEnraged ? 2500 : 3600);
+      }, tickMs);
+    }, isEnraged ? 2600 : 3800);
 
     return () => {
       clearInterval(attackTimer);
       if (progressInterval) clearInterval(progressInterval);
+      if (lungeTimeout) clearTimeout(lungeTimeout);
+      if (stunTimeout) clearTimeout(stunTimeout);
     };
   }, [isAlive, isEnraged]);
 
   const strike = () => {
     if (!isAlive) return;
-    const baseDamage = 9 + Math.floor(Math.random() * 8);
+    const isStunned = bossState === "stunned";
+    const baseDamage = isStunned ? 18 : 10 + Math.floor(Math.random() * 8);
     const multiplier = 1 + combo * 0.25;
     const damage = Math.round(baseDamage * multiplier);
     const nextBoss = Math.max(0, bossHp - damage);
@@ -1235,48 +1357,71 @@ function BossFight() {
       if (nextC > maxCombo) setMaxCombo(nextC);
       return nextC;
     });
+
     playArcadeTone("hit");
 
     if (nextBoss === 0) {
-      setMessage("VICTORY! OVERCLOCK OVERLORD DEFEATED!");
+      setBossState("dead");
+      setIsParryWindow(false);
+      setTelegraphProgress(0);
+      setMessage("★ BOSS DEFEATED! CLICK RESET TO PLAY AGAIN ★");
       playArcadeTone("win");
       setHighScores((scores) => [...scores, score + damage * 20].sort((a, b) => b - a).slice(0, 3));
     } else {
-      setMessage(`DIRECT STRIKE -${damage} (${Math.round(multiplier * 100)}% MULTIPLIER)`);
+      if (bossState !== "stunned") {
+        setBossState("hurt");
+        setTimeout(() => {
+          setBossState((curr) => (curr === "hurt" ? "idle" : curr));
+        }, 240);
+      }
+      setMessage(isStunned ? `CRITICAL STRIKE ON STUNNED BOSS! -${damage} HP` : `DIRECT STRIKE -${damage} (${Math.round(multiplier * 100)}% MULTIPLIER)`);
     }
   };
 
   const parry = () => {
     if (!isAlive) return;
-    if (isParryWindowRef.current) {
+    if (isParryWindowRef.current || (bossState === "telegraph" && telegraphProgress >= 65)) {
       playArcadeTone("parry");
       setIsParryWindow(false);
-      setBossState("idle");
       setTelegraphProgress(0);
-      const bonusScore = 250;
+      const bonusScore = 300;
       setScore((s) => s + bonusScore);
       setCombo((c) => c + 2);
-      const counterDamage = 18;
-      setBossHp((hp) => Math.max(0, hp - counterDamage));
-      setMessage(`PERFECT PARRY! BOSS STUNNED! +${bonusScore} PTS`);
+      const counterDamage = 22;
+      const nextBoss = Math.max(0, bossHp - counterDamage);
+      setBossHp(nextBoss);
+
+      if (nextBoss === 0) {
+        setBossState("dead");
+        setMessage("★ CRITICAL PARRY FINISHER! BOSS DEFEATED! CLICK RESET TO PLAY AGAIN ★");
+        playArcadeTone("win");
+      } else {
+        setBossState("stunned");
+        setMessage(`⚡ PERFECT PARRY! BOSS STUNNED FOR 2.5s! +${bonusScore} PTS ⚡`);
+        // Stun for 2.5 seconds
+        window.setTimeout(() => {
+          setBossState((curr) => (curr === "stunned" ? "idle" : curr));
+          setMessage("BOSS RECOVERS FROM STUN // READY");
+        }, 2500);
+      }
     } else {
       playArcadeTone("hit");
       const penalty = 12;
       setPlayerHp((hp) => Math.max(0, hp - penalty));
       setCombo(0);
-      setMessage(`MISTIMED PARRY! -${penalty} HP (Watch the yellow zone!)`);
+      setMessage(`MISTIMED PARRY! -${penalty} HP (Watch for the glowing yellow zone!)`);
     }
   };
 
   const dodge = () => {
     if (!isAlive) return;
-    if (bossStateRef.current === "telegraph") {
+    if (bossStateRef.current === "telegraph" || bossStateRef.current === "lunging") {
       playArcadeTone("transition");
       setBossState("idle");
       setTelegraphProgress(0);
       setIsParryWindow(false);
-      setScore((s) => s + 50);
-      setMessage("DODGE ROLL SUCCESS! 0 DAMAGE");
+      setScore((s) => s + 75);
+      setMessage("DODGE ROLL SUCCESS! 0 DAMAGE // BOSS WHIFFED!");
     } else {
       playArcadeTone("hover");
       setMessage("EVASIVE ROLL // CLEAR");
@@ -1292,6 +1437,7 @@ function BossFight() {
     setTelegraphProgress(0);
     setIsParryWindow(false);
     setMessage("BOSS SIGNAL DETECTED // READY");
+    playArcadeTone("click");
   };
 
   return (
@@ -1299,7 +1445,7 @@ function BossFight() {
       <div className="boss-arena__copy">
         <Eyebrow number="09">Reflex combat / boss arena</Eyebrow>
         <h2>Break the<br /><span>{isEnraged ? "ENRAGED BEAST" : "LOGIC BEAST"}</span></h2>
-        <p>A fast-paced reflex combat system modeled on <em>City of Aethel</em>. Watch the boss attack meter and parry inside the golden window to stun the boss and build combos!</p>
+        <p>A timing-based reflex combat encounter. Watch the charging meter: when it enters the <strong>GOLD PARRY ZONE</strong>, hit <strong>PARRY</strong> to stun the boss and land critical hits!</p>
         <div className="boss-arena__stats">
           <span>PLAYER <b>{playerHp}%</b></span>
           <span>BOSS <b>{bossHp}%</b></span>
@@ -1309,22 +1455,52 @@ function BossFight() {
       </div>
 
       <div className="boss-arena__cabinet">
-        <div className={`boss-arena__screen ${isEnraged ? "is-enraged" : ""}`}>
-          <div className={`boss-sprite ${bossState === "telegraph" ? "is-charging" : ""}`} aria-hidden="true">
+        <div className={`boss-arena__screen ${isEnraged ? "is-enraged" : ""} state-${bossState}`}>
+          {/* Boss character entity with dynamic combat states */}
+          <div
+            className={`boss-sprite is-${bossState} ${isEnraged ? "is-enraged" : ""}`}
+            aria-hidden="true"
+          >
             <i /><i /><i /><b /><b /><em />
+            {bossState === "stunned" && <div className="boss-stun-stars">★ ★ ★</div>}
+            {bossState === "lunging" && <div className="boss-claw-slash" />}
+            {bossState === "dead" && <div className="boss-death-effect">💥 K.O. 💥</div>}
           </div>
+
+          {/* Victory Defeat Overlay */}
+          {bossHp === 0 && (
+            <div className="boss-defeat-overlay">
+              <strong>VICTORY ACHIEVED!</strong>
+              <span>LOGIC BEAST DEFEATED</span>
+              <button type="button" className="button button--parry is-alert" onClick={reset}>
+                <RefreshCw size={13} /> CLICK RESET TO PLAY AGAIN
+              </button>
+            </div>
+          )}
 
           {/* Telegraph charging meter */}
           <div className="attack-meter-wrap">
             <span className="attack-meter-label">
-              {bossState === "telegraph" ? (isParryWindow ? "⚡ PARRY NOW! ⚡" : "CHARGING ATTACK...") : "READY"}
+              {bossHp === 0
+                ? "🏆 BOSS DEFEATED! CLICK RESET TO PLAY AGAIN 🏆"
+                : playerHp === 0
+                ? "💀 SYSTEM OVERLOAD! CLICK RESET TO RETRY 💀"
+                : bossState === "telegraph"
+                ? isParryWindow
+                  ? "⚡ PARRY NOW! (PRESS PARRY) ⚡"
+                  : "CHARGING ATTACK..."
+                : bossState === "stunned"
+                ? "★★★ BOSS STUNNED! ATTACK NOW! ★★★"
+                : bossState === "lunging"
+                ? "⚠️ LUNGING CLAW STRIKE!"
+                : "READY"}
             </span>
             <div className="attack-meter-bar">
               <div
                 className={`attack-meter-fill ${isParryWindow ? "is-parry-active" : ""}`}
                 style={{ width: `${telegraphProgress}%` }}
               />
-              <span className="parry-zone-marker" title="Parry Window" />
+              <span className="parry-zone-marker" title="Parry Window (68% - 92%)" />
             </div>
           </div>
 
@@ -1349,8 +1525,11 @@ function BossFight() {
           <button className="button button--outline" onClick={dodge} disabled={!isAlive}>
             Dodge
           </button>
-          <button className="button button--tiny" onClick={reset}>
-            <RefreshCw size={12} /> Reset
+          <button
+            className={`button ${!isAlive ? "button--parry is-alert" : "button--tiny"}`}
+            onClick={reset}
+          >
+            <RefreshCw size={12} /> {!isAlive ? "Click Reset to Play Again" : "Reset"}
           </button>
         </div>
       </div>
@@ -1454,16 +1633,16 @@ function DemoReelPage() {
   };
 
   const chapters = [
-    { title: "Headless E2E Automation Suite (UE 5.7 C++)", time: "00:00", seconds: 0 },
-    { title: "The Interlude (1st Place CodeDay)", time: "00:32", seconds: 32 },
-    { title: "ByteOasis: Code to Escape (2nd Place HackRush)", time: "01:05", seconds: 65 },
-    { title: "Geek'O'Wars (Top 3 MLH FrostHacks)", time: "01:25", seconds: 85 },
-    { title: "City of Aethel (Top 45 IGDC Finalist)", time: "01:40", seconds: 100 },
+    { title: "The Interlude (1st Place CodeDay 2.0)", time: "00:04", seconds: 4 },
+    { title: "Cyrus 365 E2E Automation Suite (UE 5.7 C++)", time: "00:30", seconds: 30 },
+    { title: "ByteOasis: Code to Escape (2nd Place HackRush)", time: "00:57", seconds: 57 },
+    { title: "Geek'O'Wars (Top 3 MLH FrostHacks)", time: "01:23", seconds: 83 },
+    { title: "City of Aethel & Playable Arcade (Top 45 IGDC Finalist)", time: "01:49", seconds: 109 },
   ];
 
   return (
     <main className="inner-page">
-      <PageHeader number="01" kicker="Demo reel" title={<>Systems in<br /><span>motion.</span></>} />
+      <PageHeader number="01" kicker="Demo reel" title={<>Gameplay & systems<br /><span>in motion.</span></>} />
       <section className="reel-page__player page-pad">
         <div ref={playerRef} className="reel-player reel-player--enhanced">
           <div className="hero-video hero-video--compact">
@@ -1474,7 +1653,7 @@ function DemoReelPage() {
               loop
               playsInline
               preload="metadata"
-              aria-label="Karthik Veeranala Systems & Gameplay Reel"
+              aria-label="Karthik Veeranala Gameplay & Systems Demo Reel"
               onTimeUpdate={() => {
                 if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
               }}
@@ -1561,11 +1740,11 @@ function DemoReelPage() {
         <div className="reel-page__meta">
           <div>
             <Eyebrow>Credits</Eyebrow>
-            <p>Direction & Systems / Karthik Veeranala<br />Engine Architecture / Unreal Engine 5.7 & 4.21 C++<br />2D Web / Phaser 3 WebGL</p>
+            <p>Direction & Game Design / Karthik Veeranala<br />Engine Architecture / Unreal Engine 5.7 & 4.21 C++<br />2D Web Arcade / Phaser 3 WebGL</p>
           </div>
           <div>
             <Eyebrow>Chapters</Eyebrow>
-            <p>00:00 — Headless E2E Automation Suite (UE 5.7)<br />00:32 — The Interlude (6-DOF Flight Sim)<br />01:05 — ByteOasis & Geek'O'Wars<br />01:40 — City of Aethel & IGDC Arcade</p>
+            <p>00:04 — The Interlude (6-DOF Flight Sim)<br />00:30 — Cyrus 365 E2E Automation Suite (UE 5.7 C++)<br />00:57 — ByteOasis: Code to Escape<br />01:23 — Geek'O'Wars TPS Survival<br />01:49 — City of Aethel & IGDC Arcade</p>
           </div>
         </div>
       </section>
@@ -1604,8 +1783,8 @@ function HobbiesPage() {
       copy: "Playing everything from retro icons to modern titles to dissect mechanics & feel: AC3, Tomb Raider, FIFA 16, Fortnite, Minecraft, Road Rash, Prince of Persia, OG Wolfenstein 3D, Doom, Tekken, and Mortal Kombat.",
       art: "games",
       note: "DISSECT / PLAY / ADAPT",
-      initX: 40,
-      initY: 45,
+      initX: 30,
+      initY: 30,
     },
     {
       id: "reading",
@@ -1614,8 +1793,8 @@ function HobbiesPage() {
       copy: "Avid reader and collector with complete physical manga collections of Jujutsu Kaisen, Demon Slayer, and Attack on Titan, alongside following seasonal and classic anime.",
       art: "reading",
       note: "STORY / ART / LORE",
-      initX: 380,
-      initY: 35,
+      initX: 320,
+      initY: 30,
     },
     {
       id: "athletics",
@@ -1624,8 +1803,8 @@ function HobbiesPage() {
       copy: "Playing football on the pitch and watching European matchdays with the same adrenaline as following Formula 1 Grand Prix weekends—tracking race strategy, reaction windows, and pacing.",
       art: "athletics",
       note: "PACE / RESET / COMMIT",
-      initX: 80,
-      initY: 350,
+      initX: 30,
+      initY: 320,
     },
     {
       id: "creative",
@@ -1634,8 +1813,8 @@ function HobbiesPage() {
       copy: "Acoustic fingerstyle guitar, kitchen cooking experiments, and curating an ongoing collection of scale figures, rare Pokémon cards, and game posters.",
       art: "creative",
       note: "MAKE / TUNE / COLLECT",
-      initX: 440,
-      initY: 330,
+      initX: 320,
+      initY: 320,
     },
   ];
 
@@ -1646,17 +1825,30 @@ function HobbiesPage() {
   const [draggingCard, setDraggingCard] = useState<string | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const dragMovedRef = useRef(false);
 
   const handlePointerDown = (id: string, e: React.PointerEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    e.stopPropagation();
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {}
     const rect = e.currentTarget.getBoundingClientRect();
     dragOffsetRef.current = {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
+    dragMovedRef.current = false;
     setDraggingCard(id);
     setActive(id);
     playArcadeTone("hover");
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {}
+    setDraggingCard(null);
   };
 
   useEffect(() => {
@@ -1665,14 +1857,15 @@ function HobbiesPage() {
     const onPointerMove = (e: PointerEvent) => {
       if (!canvasRef.current) return;
       const canvasRect = canvasRef.current.getBoundingClientRect();
-      const cardWidth = 270;
-      const cardHeight = 220;
+      const cardWidth = 260;
+      const cardHeight = 240;
+      dragMovedRef.current = true;
 
       // Strictly clamp inside canvas bounds!
       const rawX = e.clientX - canvasRect.left - dragOffsetRef.current.x;
       const rawY = e.clientY - canvasRect.top - dragOffsetRef.current.y;
-      const clampedX = Math.max(12, Math.min(canvasRect.width - cardWidth - 12, rawX));
-      const clampedY = Math.max(12, Math.min(canvasRect.height - cardHeight - 12, rawY));
+      const clampedX = Math.max(8, Math.min(canvasRect.width - cardWidth - 8, rawX));
+      const clampedY = Math.max(8, Math.min(canvasRect.height - cardHeight - 8, rawY));
 
       setPositions((prev) => ({
         ...prev,
@@ -1715,11 +1908,14 @@ function HobbiesPage() {
                   left: 0,
                   top: 0,
                   cursor: isDragging ? "grabbing" : "grab",
-                  zIndex: isDragging ? 15 : isSelected ? 10 : 2,
+                  zIndex: isDragging ? 25 : isSelected ? 15 : 2,
                   transition: isDragging ? "none" : "box-shadow 0.2s, border-color 0.2s",
                 }}
                 onPointerDown={(e) => handlePointerDown(hobby.id, e)}
-                onClick={() => setActive(active === hobby.id ? null : hobby.id)}
+                onPointerUp={handlePointerUp}
+                onClick={() => {
+                  if (!dragMovedRef.current) setActive(active === hobby.id ? null : hobby.id);
+                }}
                 aria-label={hobby.title}
               >
                 <span className="hobby-card__index">0{index + 1}</span>
@@ -1830,21 +2026,30 @@ function TechTreePage() {
             <line x1="250" y1="100" x2="250" y2="280" className="circuit-line circuit-line--active" />
           </svg>
           <div className="tech-tree__nodes-grid">
-            {techNodes.map((node) => (
-              <button
-                key={node.id}
-                className={`tech-node tech-node--${node.color} ${selected.id === node.id ? "is-selected" : ""}`}
-                onClick={() => selectNode(node)}
-                onMouseEnter={() => playArcadeTone("hover")}
-              >
-                <span>{node.rank}</span>
-                <strong>{node.label}</strong>
-                <div className="tech-node__meta">
-                  <em>{nodeProficiency[node.id]}% MASTERY</em>
-                  <small>SELECT NODE</small>
-                </div>
-              </button>
-            ))}
+            {techNodes.map((node) => {
+              const isSelected = selected.id === node.id;
+              return (
+                <button
+                  type="button"
+                  key={node.id}
+                  className={`tech-node tech-node--${node.color} ${isSelected ? "is-selected" : ""}`}
+                  onClick={() => selectNode(node)}
+                  onMouseEnter={() => playArcadeTone("hover")}
+                  aria-pressed={isSelected}
+                  aria-label={`Skill node: ${node.label}`}
+                >
+                  <div className="tech-node__top">
+                    <span>{node.rank}</span>
+                    <span className="tech-node__status">{isSelected ? "● ACTIVE" : "○ INSPECT"}</span>
+                  </div>
+                  <strong>{node.label}</strong>
+                  <div className="tech-node__meta">
+                    <em>{nodeProficiency[node.id]}% MASTERY</em>
+                    <small>{isSelected ? "VIEWING SPECS" : "SELECT NODE"}</small>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
