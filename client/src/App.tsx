@@ -49,9 +49,19 @@ function assetUrl(path: string) {
 
 const ACCENT = "#16d6bd";
 let arcadeAudio: AudioContext | null = null;
+let isSoundEnabled = true;
+try {
+  if (typeof window !== "undefined" && localStorage.getItem("pixelguild-sound") === "off") {
+    isSoundEnabled = false;
+  }
+} catch { /* storage may be disabled */ }
+
 let footerControls: { toggleSound: () => void; toggleCabinet: () => void } | null = null;
+
 function playArcadeTone(kind: "hover" | "click" | "transition" | "hit" | "win" | "chomp" | "parry") {
   try {
+    if (!isSoundEnabled) return;
+    if (typeof window !== "undefined" && localStorage.getItem("pixelguild-sound") === "off") return;
     arcadeAudio ??= new AudioContext();
     const ctx = arcadeAudio;
     if (ctx.state === "suspended") void ctx.resume();
@@ -748,7 +758,20 @@ function SiteShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try { localStorage.setItem("pixelguild-theme", theme); } catch { /* optional persistence */ }
   }, [theme]);
-  useEffect(() => { footerControls = { toggleSound: () => setSoundOn((current) => !current), toggleCabinet: () => setCabinet((current) => !current) }; return () => { footerControls = null; }; }, []);
+  useEffect(() => {
+    footerControls = {
+      toggleSound: () => {
+        setSoundOn((current) => {
+          const next = !current;
+          isSoundEnabled = next;
+          try { localStorage.setItem("pixelguild-sound", next ? "on" : "off"); } catch {}
+          return next;
+        });
+      },
+      toggleCabinet: () => setCabinet((current) => !current),
+    };
+    return () => { footerControls = null; };
+  }, []);
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     if (soundOn) playArcadeTone("transition");
@@ -982,7 +1005,7 @@ function BackstorySection() {
     <section className="backstory-section backstory-section--highlight page-pad" id="backstory">
       <div className="backstory-editorial">
         <div className="backstory-editorial__left">
-          <div className="backstory-section__stamp">01 / SAVE FILE<br /><strong>GAME DEVELOPER PROFILE</strong></div>
+          <div className="backstory-section__stamp">SAVE FILE<br /><strong>GAME DEVELOPER PROFILE</strong></div>
           <Eyebrow number="01">The backstory</Eyebrow>
           <h2>Engineered under pressure.<br /><span>Built for production.</span></h2>
           <p className="lead">
@@ -1046,6 +1069,17 @@ function BackstorySection() {
             </div>
           </div>
 
+          {/* Inline facts summary strip directly below controller dock */}
+          <div className="backstory-inline-facts">
+            <span className="backstory-inline-facts__item"><strong>3</strong> Hackathon Victories</span>
+            <span className="backstory-inline-facts__sep">•</span>
+            <span className="backstory-inline-facts__item"><strong>TOP 45</strong> IGDC Indie Finalist</span>
+            <span className="backstory-inline-facts__sep">•</span>
+            <span className="backstory-inline-facts__item"><strong>14+</strong> Playable Prototypes</span>
+            <span className="backstory-inline-facts__sep">•</span>
+            <span className="backstory-inline-facts__item"><strong>200+</strong> Gaming Club Devs</span>
+          </div>
+
           <div className="backstory-actions">
             <Link href="/backstory/" className="button button--outline">
               Read complete backstory <ArrowUpRight size={14} />
@@ -1083,13 +1117,6 @@ function BackstorySection() {
               <strong>KARTHIK VEERANALA</strong>
               <small>B.Tech CSE / Game Development & Design</small>
             </div>
-          </div>
-
-          <div className="backstory-section__facts">
-            <div><strong>3</strong><span>Hackathon victories</span></div>
-            <div><strong>TOP 45</strong><span>IGDC indie finalist</span></div>
-            <div><strong>14+</strong><span>Playable prototypes</span></div>
-            <div><strong>200+</strong><span>Gaming Club developers</span></div>
           </div>
         </div>
       </div>
@@ -1182,18 +1209,17 @@ function Home() {
         <video className="home-hero__video" autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source src={assetUrl("landing-worlds-reel.mp4")} type="video/mp4" /></video>
         <div className="home-hero__veil" aria-hidden="true" />
         <div className="hero-identity">
-          <Eyebrow number="00">Unreal Engine & gameplay developer</Eyebrow>
+          <Eyebrow>Unreal Engine & gameplay developer</Eyebrow>
           <h1>KARTHIK<br /><span>VEERANALA</span></h1>
           <div className="hero-identity__sub"><span key={roles[roleIndex]} className="hero-role">{roles[roleIndex]}</span><em>—</em><small>Unreal Engine • C++ • Gameplay • Prototypes</small></div>
         </div>
-        <div className="hero-side-note"><span>SCROLL TO EXPLORE</span><ArrowDownRight size={16} /></div>
+        <div className="hero-side-note"><span>EXPLORE</span><ArrowDownRight size={16} /></div>
         <div className="hero-bottomline"><StatusPill>OPEN TO GAME DEVELOPER & GAMEPLAY ROLES</StatusPill><span>HYDERABAD, INDIA / UTC+05:30</span></div>
       </section>
 
       <BackstorySection />
 
       <section className="intro-chapter page-pad page-pad--chapter">
-        <div className="chapter-index">01</div>
         <div className="intro-chapter__content">
           <Eyebrow>THE PLAYGROUND</Eyebrow>
           <h2>Games are<br /><span>feelings</span> waiting<br />to be played.</h2>
@@ -1214,7 +1240,7 @@ function Home() {
       </section>
 
       <section className="manifesto page-pad">
-        <div className="manifesto__rail"><span>MORE THAN A PORTFOLIO</span><span>SCROLL / 04</span></div>
+        <div className="manifesto__rail"><span>MORE THAN A PORTFOLIO</span><span>04</span></div>
         <div className="manifesto__content"><p>Every mechanic hides a story. Every prototype is a question made playable.</p><div className="manifesto__mark"><BrandMark /><span>KV / 2026</span></div></div>
       </section>
 
@@ -1233,7 +1259,7 @@ function CoinCatcher() {
     setScore((value) => value + 1);
     setCoin({ left: 16 + Math.random() * 68, top: 18 + Math.random() * 62 });
   };
-  return <section className="coin-catcher page-pad"><div className="coin-catcher__copy"><Eyebrow number="04">Easter egg / coin hunt</Eyebrow><h2>Catch the<br /><span>glitch coin.</span></h2><p>Tap the coin before it jumps. A tiny reward for exploring the page.</p><strong>SCORE {String(score).padStart(2, "0")}</strong></div><div className="coin-catcher__screen"><span className="coin-catcher__scanline" /><button className="glitch-coin" style={{ left: `${coin.left}%`, top: `${coin.top}%` }} onClick={collect} aria-label="Collect glitch coin">✦</button><span className="coin-catcher__hint">CLICK THE STAR / +10 XP</span></div></section>;
+  return <section className="coin-catcher page-pad"><div className="coin-catcher__copy"><Eyebrow number="05">Easter egg / coin hunt</Eyebrow><h2>Catch the<br /><span>glitch coin.</span></h2><p>Tap the coin before it jumps. A tiny reward for exploring the page.</p><strong>SCORE {String(score).padStart(2, "0")}</strong></div><div className="coin-catcher__screen"><span className="coin-catcher__scanline" /><button className="glitch-coin" style={{ left: `${coin.left}%`, top: `${coin.top}%` }} onClick={collect} aria-label="Collect glitch coin">✦</button><span className="coin-catcher__hint">CLICK THE STAR / +10 XP</span></div></section>;
 }
 
 function ArcadePage() {
@@ -2476,7 +2502,31 @@ function ProjectPage({ slug }: { slug: string }) {
 function Footer() {
   const [soundOn, setSoundOn] = useState(() => { try { return localStorage.getItem("pixelguild-sound") !== "off"; } catch { return true; } });
   const [cabinetOn, setCabinetOn] = useState(() => { try { return localStorage.getItem("pixelguild-cabinet") === "on"; } catch { return false; } });
-  return <footer className="site-footer page-pad"><div className="site-footer__mark"><BrandMark /><span>KV / KARTHIK VEERANALA</span></div><div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:karthik.veeranala@gmail.com">karthik.veeranala@gmail.com</a></div><div className="site-footer__controls"><span>ARCADE CONTROLS</span><button className="footer-control" onClick={() => { footerControls?.toggleCabinet(); setCabinetOn((value) => !value); }} aria-label={cabinetOn ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"}><Monitor size={13} /> {cabinetOn ? "CRT ON" : "CRT"}</button><button className="footer-control" onClick={() => { footerControls?.toggleSound(); setSoundOn((value) => !value); }} aria-label={soundOn ? "Mute arcade sounds" : "Unmute arcade sounds"}>{soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />} {soundOn ? "SFX ON" : "SFX OFF"}</button></div><div className="site-footer__bottom"><span>© 2026 KARTHIK VEERANALA / GAME DEVELOPMENT & DESIGN</span><span>Built under constraints <Sparkles size={12} /></span></div></footer>;
+  return (
+    <footer className="site-footer page-pad">
+      <div className="site-footer__mark"><BrandMark /><span>KV / KARTHIK VEERANALA</span></div>
+      <div className="site-footer__middle"><Eyebrow>Keep in touch</Eyebrow><a href="mailto:karthik.veeranala@gmail.com">karthik.veeranala@gmail.com</a></div>
+      <div className="site-footer__controls">
+        <span>ARCADE CONTROLS</span>
+        <button className="footer-control" onClick={() => { footerControls?.toggleCabinet(); setCabinetOn((value) => !value); }} aria-label={cabinetOn ? "Exit CRT cabinet mode" : "Enter CRT cabinet mode"}><Monitor size={13} /> {cabinetOn ? "CRT ON" : "CRT"}</button>
+        <button className="footer-control" onClick={() => {
+          footerControls?.toggleSound();
+          setSoundOn((value) => {
+            const next = !value;
+            isSoundEnabled = next;
+            try { localStorage.setItem("pixelguild-sound", next ? "on" : "off"); } catch {}
+            return next;
+          });
+        }} aria-label={soundOn ? "Mute arcade sounds" : "Unmute arcade sounds"}>
+          {soundOn ? <Volume2 size={13} /> : <VolumeX size={13} />} {soundOn ? "SFX ON" : "SFX OFF"}
+        </button>
+      </div>
+      <div className="site-footer__bottom">
+        <span>© 2026 KARTHIK VEERANALA / GAME DEVELOPMENT & DESIGN</span>
+        <span>Built under constraints <Sparkles size={12} /></span>
+      </div>
+    </footer>
+  );
 }
 
 function Router() {
