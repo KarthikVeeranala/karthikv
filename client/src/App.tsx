@@ -85,8 +85,8 @@ const navItems = [
   { label: "Backstory", href: "/backstory/" },
   { label: "Tech Tree", href: "/skills/" },
   { label: "Hobbies", href: "/hobbies/" },
-  { label: "Arcade", href: "/arcade/" },
   { label: "Bio & Contact", href: "/bio/" },
+  { label: "Arcade", href: "/arcade/" },
 ];
 
 const DEMO_REEL_URL = assetUrl("karthik_veeranala_demo_reel.mp4");
@@ -393,12 +393,39 @@ function TopNav({ theme, onToggleTheme }: { theme: "beige" | "neon"; onToggleThe
   );
 }
 
+function DiscordIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+    </svg>
+  );
+}
+
 function SocialRail() {
+  const [copied, setCopied] = useState(false);
+  const handleDiscordClick = () => {
+    try {
+      navigator.clipboard.writeText("karthikkkkv");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    } catch {}
+  };
   return (
     <aside className="social-rail" aria-label="Social links">
       <a href="https://github.com/karthikveeranala" target="_blank" rel="noreferrer" aria-label="GitHub"><Github size={14} /></a>
       <a href="https://www.youtube.com/@karthikkkk.v" target="_blank" rel="noreferrer" aria-label="YouTube"><Youtube size={14} /></a>
       <a href="https://www.linkedin.com/in/karthikveeranala/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={14} /></a>
+      <a
+        href="https://discord.com/users/karthikkkkv"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Discord: karthikkkkv"
+        title={copied ? "Copied @karthikkkkv to clipboard!" : "Discord: karthikkkkv (Click to open / copy)"}
+        onClick={handleDiscordClick}
+        className="social-rail__discord"
+      >
+        <DiscordIcon size={14} />
+      </a>
       <a href="mailto:karthik.veeranala@gmail.com" aria-label="Email"><Mail size={14} /></a>
     </aside>
   );
@@ -430,25 +457,53 @@ function PixelMascot() {
   const [message, setMessage] = useState("CLICK TO PAUSE // DRAG TO CHOMP");
   const [pelletScore, setPelletScore] = useState(0);
   const [popups, setPopups] = useState<Array<{ id: number; x: number; y: number; text: string }>>([]);
+  const speedMultiplierRef = useRef(1);
 
-  const generatePellets = useCallback((): Pellet[] => {
+  const generatePellets = useCallback((count = 4): Pellet[] => {
     if (typeof window === "undefined") return [];
     const w = window.innerWidth;
     const h = window.innerHeight;
     const now = Date.now();
-    return [
-      { id: now + 1, x: Math.floor(w * 0.12), y: Math.floor(h * 0.22) },
-      { id: now + 2, x: Math.floor(w * 0.45), y: Math.floor(h * 0.28) },
-      { id: now + 3, x: Math.floor(w * 0.82), y: Math.floor(h * 0.20) },
-      { id: now + 4, x: Math.floor(w * 0.88), y: Math.floor(h * 0.60) },
-      { id: now + 5, x: Math.floor(w * 0.65), y: Math.floor(h * 0.78) },
-      { id: now + 6, x: Math.floor(w * 0.35), y: Math.floor(h * 0.82) },
-      { id: now + 7, x: Math.floor(w * 0.15), y: Math.floor(h * 0.62) },
-      { id: now + 8, x: Math.floor(w * 0.50), y: Math.floor(h * 0.50) },
+    const spots = [
+      { x: Math.floor(w * 0.16), y: Math.floor(h * 0.28) },
+      { x: Math.floor(w * 0.82), y: Math.floor(h * 0.25) },
+      { x: Math.floor(w * 0.74), y: Math.floor(h * 0.72) },
+      { x: Math.floor(w * 0.24), y: Math.floor(h * 0.74) },
     ];
+    return spots.slice(0, count).map((s, idx) => ({ id: now + idx + 1, x: s.x, y: s.y }));
   }, []);
 
-  const [pellets, setPellets] = useState<Pellet[]>(() => generatePellets());
+  const [pellets, setPellets] = useState<Pellet[]>(() => generatePellets(4));
+
+  useEffect(() => {
+    const onSpawnExtra = () => {
+      if (typeof window === "undefined") return;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const now = Date.now();
+      const extra: Pellet[] = Array.from({ length: 20 }, (_, idx) => ({
+        id: now + idx + 100,
+        x: Math.floor(35 + Math.random() * (w - 110)),
+        y: Math.floor(80 + Math.random() * (h - 160)),
+      }));
+      setPellets((prev) => [...prev, ...extra]);
+      setMessage("★ PELLET SHOWER! +200 PTS ★");
+      playArcadeTone("win");
+    };
+
+    const onTurbo = () => {
+      speedMultiplierRef.current = speedMultiplierRef.current > 1 ? 1 : 2.5;
+      setMessage(speedMultiplierRef.current > 1 ? "⚡ TURBO NOM SPEED ENGAGED! ⚡" : "CRUISING SPEED RESTORED");
+      playArcadeTone("win");
+    };
+
+    window.addEventListener("karthik-spawn-pellets", onSpawnExtra);
+    window.addEventListener("karthik-turbo-mascot", onTurbo);
+    return () => {
+      window.removeEventListener("karthik-spawn-pellets", onSpawnExtra);
+      window.removeEventListener("karthik-turbo-mascot", onTurbo);
+    };
+  }, []);
 
   const mascotRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef(position);
@@ -598,7 +653,7 @@ function PixelMascot() {
           const dx = closest.x - curX;
           const dy = closest.y - curY;
           const angle = Math.atan2(dy, dx);
-          const speed = 125; // 125px per second smooth travel
+          const speed = 125 * speedMultiplierRef.current; // 125px per second smooth travel (boosted on turbo)
 
           const nextX = Math.max(8, Math.min(window.innerWidth - 74, positionRef.current.x + Math.cos(angle) * speed * dt));
           const nextY = Math.max(64, Math.min(window.innerHeight - 76, positionRef.current.y + Math.sin(angle) * speed * dt));
@@ -726,21 +781,259 @@ function CursorFX() {
   return <div className="cursor-fx" aria-hidden="true">{Array.from({ length: 6 }, (_, index) => <span key={index} ref={(node) => { trailRefs.current[index] = node; }} style={{ opacity: Math.max(0, .75 - index * .1) }} />)}</div>;
 }
 
-function CheatTerminal({ open, unlocked, onClose, onToggleCabinet, onDeveloper }: { open: boolean; unlocked: boolean; onClose: () => void; onToggleCabinet: () => void; onDeveloper: () => void }) {
+function CheatTerminal({
+  open,
+  unlocked,
+  onClose,
+  onToggleCabinet,
+  onDeveloper,
+  onToggleTheme,
+  onPartyMode,
+  onMatrixMode,
+  onBigheadMode,
+  onSetPalette,
+}: {
+  open: boolean;
+  unlocked: boolean;
+  onClose: () => void;
+  onToggleCabinet: () => void;
+  onDeveloper: () => void;
+  onToggleTheme: () => void;
+  onPartyMode: () => void;
+  onMatrixMode: () => void;
+  onBigheadMode: () => void;
+  onSetPalette: (pal: string) => void;
+}) {
+  const [, setLocation] = useLocation();
   const [input, setInput] = useState("");
-  const [lines, setLines] = useState<string[]>(["KARTHIK V DEV CONSOLE v1.0", "Type HELP for commands."]);
+  const [lines, setLines] = useState<string[]>([
+    "=== KARTHIK V DEV CONSOLE v2.0 ===",
+    "Type HELP for available commands.",
+  ]);
+
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
-    const command = input.trim().toLowerCase();
-    if (!command) return;
-    const responses: Record<string, string> = { help: "COMMANDS: DEV / CABINET / BOSS / PIXEL / CLEAR", dev: "DEVELOPER MODE ONLINE — hidden grid diagnostics enabled.", cabinet: "CRT CABINET TOGGLE SENT.", boss: "BOSS ARENA READY — open /arcade/.", pixel: "PIXEL TRAIL AMPLIFIED — cursor particles unlocked.", clear: "" };
-    if (command === "cabinet") onToggleCabinet();
-    if (command === "dev" || command === "pixel") onDeveloper();
-    setLines((current) => command === "clear" ? [] : [...current, `> ${command}`, responses[command] ?? "UNKNOWN COMMAND — TRY HELP"]);
+    const raw = input.trim();
+    const cmd = raw.toLowerCase();
+    if (!cmd) return;
+
+    // 1. Navigation Commands: cd <destination> or cd/<destination>
+    if (cmd.startsWith("cd") || cmd.startsWith("goto")) {
+      const target = cmd.replace(/^(cd\/?|goto\s*)/, "").trim().replace(/^\/+/, "");
+      if (!target || target === "~" || target === "home" || target === "root") {
+        setLocation("/");
+        playArcadeTone("transition");
+        onClose();
+        setInput("");
+        return;
+      }
+
+      const routeMap: Record<string, string> = {
+        arcade: "/arcade/",
+        backstory: "/backstory/",
+        story: "/backstory/",
+        "demo-reel": "/demo-reel/",
+        reel: "/demo-reel/",
+        demo: "/demo-reel/",
+        skills: "/skills/",
+        techtree: "/skills/",
+        tech: "/skills/",
+        tree: "/skills/",
+        hobbies: "/hobbies/",
+        hobby: "/hobbies/",
+        bio: "/bio/",
+        contact: "/bio/",
+        portfolio: "/portfolio/",
+        work: "/portfolio/",
+        projects: "/portfolio/",
+      };
+
+      if (routeMap[target]) {
+        setLocation(routeMap[target]);
+        playArcadeTone("transition");
+        onClose();
+        setInput("");
+        return;
+      } else {
+        setLines((prev) => [
+          ...prev,
+          `> ${raw}`,
+          `ERR: Target "${target}" not found.`,
+          `Available destinations: home, arcade, backstory, demo-reel, skills, hobbies, bio, portfolio`,
+        ]);
+        setInput("");
+        return;
+      }
+    }
+
+    // 2. Help Command
+    if (cmd === "help" || cmd === "?") {
+      setLines((prev) => [
+        ...prev,
+        `> ${raw}`,
+        "─── KARTHIK V DEV CONSOLE DIRECTORY ───",
+        "[NAVIGATION]",
+        "  cd <page> or cd/<page>  : Warp to page & auto-close console",
+        "  destinations            : home, arcade, backstory, demo-reel, skills, hobbies, bio, portfolio",
+        "[CHEATS & FX]",
+        "  pellets / feed          : Spawn golden pellet shower (+20)",
+        "  turbo / speed           : Boost Pac-Man wandering velocity",
+        "  bighead                 : Toggle giant Pac-Man mascot mode",
+        "  disco / party           : Cyber rainbow neon hue rotation",
+        "  matrix                  : Cascading phosphor digital code rain",
+        "  godmode                 : 9999 HP & +500 DMG buff in Boss Reflex Arena",
+        "  crt                     : Toggle arcade CRT cabinet mode",
+        "  theme                   : Toggle Day (Beige) / Night (Neon)",
+        "  theme <palette>         : cobalt | bloodmoon | matrix | tokyo | neon",
+        "[SYSTEM]",
+        "  whoami / stats          : Display pilot dossier & proficiencies",
+        "  clear / cls             : Clear console screen",
+        "  exit / quit             : Close console modal",
+      ]);
+      setInput("");
+      return;
+    }
+
+    // 3. Interactive Cheats
+    if (cmd === "pellets" || cmd === "feed") {
+      window.dispatchEvent(new CustomEvent("karthik-spawn-pellets"));
+      setLines((prev) => [...prev, `> ${raw}`, "PELLET SHOWER ACTIVATED (+20 GOLDEN PELLETS SPAWNED)"]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "turbo" || cmd === "speed") {
+      window.dispatchEvent(new CustomEvent("karthik-turbo-mascot"));
+      setLines((prev) => [...prev, `> ${raw}`, "TURBO NOM ENGAGED: PAC-MAN VELOCITY BOOSTED"]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "bighead") {
+      onBigheadMode();
+      playArcadeTone("win");
+      setLines((prev) => [...prev, `> ${raw}`, "BIG HEAD MODE TOGGLED"]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "disco" || cmd === "party") {
+      onPartyMode();
+      playArcadeTone("win");
+      setLines((prev) => [...prev, `> ${raw}`, "CYBER RAINBOW DISCO MODE TOGGLED"]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "matrix") {
+      onMatrixMode();
+      playArcadeTone("win");
+      setLines((prev) => [...prev, `> ${raw}`, "DIGITAL PHOSPHOR MATRIX RAIN TOGGLED"]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "godmode") {
+      try {
+        localStorage.setItem("karthik-godmode", "true");
+      } catch {}
+      playArcadeTone("win");
+      setLines((prev) => [...prev, `> ${raw}`, "★ GODMODE ACTIVE: 9999 HP & +500 DMG IN BOSS ARENA ★"]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "crt" || cmd === "cabinet") {
+      onToggleCabinet();
+      setLines((prev) => [...prev, `> ${raw}`, "CRT CABINET MODE TOGGLED"]);
+      setInput("");
+      return;
+    }
+
+    if (cmd.startsWith("theme")) {
+      const parts = cmd.split(/\s+/);
+      if (parts.length > 1) {
+        const pal = parts[1];
+        if (["cobalt", "bloodmoon", "matrix", "tokyo", "neon"].includes(pal)) {
+          onSetPalette(pal === "neon" ? "" : pal);
+          setLines((prev) => [...prev, `> ${raw}`, `COLOR PALETTE SWITCHED TO: ${pal.toUpperCase()}`]);
+          playArcadeTone("click");
+          setInput("");
+          return;
+        }
+      }
+      onToggleTheme();
+      setLines((prev) => [...prev, `> ${raw}`, "DAY / NIGHT THEME TOGGLED"]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "whoami" || cmd === "stats") {
+      setLines((prev) => [
+        ...prev,
+        `> ${raw}`,
+        "PILOT: KARTHIK VEERANALA",
+        "ROLE: Game Developer & Designer (B.Tech CSE, IARE Hyderabad)",
+        "ENGINES: Unreal Engine 5.7 / 4 (95%), C++ Gameplay (95%), Phaser 2D (85%)",
+        "ACCOLADES: 1st Place CodeDay 2.0 (The Interlude), 2nd HackRush, Top 3 FrostHacks, Top 45 IGDC Indie Finalist",
+        "COMMUNITY: President, Elysium Gaming Club (200+ Developers)",
+      ]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "dev") {
+      onDeveloper();
+      setLines((prev) => [...prev, `> ${raw}`, "DEVELOPER MODE ONLINE — hidden grid diagnostics enabled."]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "clear" || cmd === "cls") {
+      setLines([]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "exit" || cmd === "quit") {
+      onClose();
+      setInput("");
+      return;
+    }
+
+    setLines((prev) => [...prev, `> ${raw}`, `UNKNOWN COMMAND: "${raw}". Type HELP for directory.`]);
     setInput("");
   };
+
   if (!open) return null;
-  return <div className="cheat-terminal__backdrop" role="dialog" aria-modal="true" aria-label="Developer cheat terminal"><div className="cheat-terminal"><div className="cheat-terminal__bar"><span><Terminal size={13} /> KONAMI // DEV UNLOCK</span><button onClick={onClose} aria-label="Close terminal">×</button></div><div className="cheat-terminal__body"><div className="cheat-terminal__unlock">{unlocked ? "▲ ▲ ▼ ▼ ◀ ▶ ◀ ▶ B A / ACCEPTED" : "ENTER THE CODE"}</div>{lines.map((line, index) => <p key={`${line}-${index}`}>{line}</p>)}<form onSubmit={submit}><span>&gt;</span><input autoFocus value={input} onChange={(event) => setInput(event.target.value)} placeholder="type a command" aria-label="Developer terminal command" /></form></div></div></div>;
+  return (
+    <div className="cheat-terminal__backdrop" role="dialog" aria-modal="true" aria-label="Developer cheat terminal">
+      <div className="cheat-terminal">
+        <div className="cheat-terminal__bar">
+          <span><Terminal size={13} /> KONAMI // DEV CONSOLE v2.0</span>
+          <button onClick={onClose} aria-label="Close terminal">×</button>
+        </div>
+        <div className="cheat-terminal__body">
+          <div className="cheat-terminal__unlock">
+            {unlocked ? "▲ ▲ ▼ ▼ ◀ ▶ ◀ ▶ B A / ACCEPTED" : "ENTER THE CODE"}
+          </div>
+          {lines.map((line, index) => (
+            <p key={`${line}-${index}`}>{line}</p>
+          ))}
+          <form onSubmit={submit}>
+            <span>&gt;</span>
+            <input
+              autoFocus
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              placeholder="type 'help' or 'cd/arcade'..."
+              aria-label="Developer terminal command"
+            />
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function SiteShell({ children }: { children: React.ReactNode }) {
@@ -754,10 +1047,23 @@ function SiteShell({ children }: { children: React.ReactNode }) {
   const [cabinet, setCabinet] = useState(() => { try { return localStorage.getItem("pixelguild-cabinet") === "on"; } catch { return false; } });
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [developerMode, setDeveloperMode] = useState(false);
+  const [partyMode, setPartyMode] = useState(false);
+  const [matrixMode, setMatrixMode] = useState(false);
+  const [bigheadMode, setBigheadMode] = useState(false);
+  const [palette, setPalette] = useState<string>(() => {
+    try { return localStorage.getItem("pixelguild-palette") || ""; } catch { return ""; }
+  });
+
   const cheatIndex = useRef(0);
+
   useEffect(() => {
     try { localStorage.setItem("pixelguild-theme", theme); } catch { /* optional persistence */ }
   }, [theme]);
+
+  useEffect(() => {
+    try { localStorage.setItem("pixelguild-palette", palette); } catch { /* optional persistence */ }
+  }, [palette]);
+
   useEffect(() => {
     footerControls = {
       toggleSound: () => {
@@ -772,13 +1078,16 @@ function SiteShell({ children }: { children: React.ReactNode }) {
     };
     return () => { footerControls = null; };
   }, []);
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     if (soundOn) playArcadeTone("transition");
   }, [location]);
+
   useEffect(() => {
     try { localStorage.setItem("pixelguild-cabinet", cabinet ? "on" : "off"); } catch { /* optional persistence */ }
   }, [cabinet]);
+
   useEffect(() => {
     const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
     const keydown = (event: KeyboardEvent) => {
@@ -790,6 +1099,7 @@ function SiteShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("keydown", keydown);
     return () => window.removeEventListener("keydown", keydown);
   }, []);
+
   useEffect(() => {
     try { localStorage.setItem("pixelguild-sound", soundOn ? "on" : "off"); } catch { /* optional persistence */ }
     let lastHover = 0;
@@ -798,8 +1108,11 @@ function SiteShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("pointerover", over); window.addEventListener("click", click);
     return () => { window.removeEventListener("pointerover", over); window.removeEventListener("click", click); };
   }, [soundOn]);
+
+  const paletteClass = palette ? `palette-${palette}` : "";
+
   return (
-    <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""} ${cabinet ? "cabinet-mode" : ""} ${developerMode ? "developer-mode" : ""}`}> 
+    <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""} ${paletteClass} ${cabinet ? "cabinet-mode" : ""} ${developerMode ? "developer-mode" : ""} ${partyMode ? "party-mode" : ""} ${matrixMode ? "matrix-mode" : ""} ${bigheadMode ? "bighead-mode" : ""}`}> 
       <div className="noise" aria-hidden="true" />
       <ArcadeBackground />
       <TopNav theme={theme} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
@@ -807,7 +1120,18 @@ function SiteShell({ children }: { children: React.ReactNode }) {
       {children}
       <SocialRail />
       <CursorFX />
-      <CheatTerminal open={terminalOpen} unlocked={developerMode} onClose={() => setTerminalOpen(false)} onToggleCabinet={() => setCabinet((current) => !current)} onDeveloper={() => setDeveloperMode(true)} />
+      <CheatTerminal
+        open={terminalOpen}
+        unlocked={developerMode}
+        onClose={() => setTerminalOpen(false)}
+        onToggleCabinet={() => setCabinet((current) => !current)}
+        onDeveloper={() => setDeveloperMode(true)}
+        onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")}
+        onPartyMode={() => setPartyMode((v) => !v)}
+        onMatrixMode={() => setMatrixMode((v) => !v)}
+        onBigheadMode={() => setBigheadMode((v) => !v)}
+        onSetPalette={(pal) => setPalette(pal)}
+      />
     </div>
   );
 }
@@ -1005,7 +1329,7 @@ function BackstorySection() {
     <section className="backstory-section backstory-section--highlight page-pad" id="backstory">
       <div className="backstory-editorial">
         <div className="backstory-editorial__left">
-          <div className="backstory-section__stamp">SAVE FILE<br /><strong>GAME DEVELOPER PROFILE</strong></div>
+          <div className="backstory-section__stamp"><br /><strong>GAME DEVELOPER PROFILE</strong></div>
           <Eyebrow number="01">The backstory</Eyebrow>
           <h2>Engineered under pressure.<br /><span>Built for production.</span></h2>
           <p className="lead">
@@ -1279,6 +1603,13 @@ function ArcadePage() {
   const reset = () => { setFlipped([]); setMatched([]); setMoves(0); };
   return (
     <main className="inner-page arcade-page">
+      <section className="arcade-hero page-pad">
+        <Eyebrow number="06">Playable Prototypes & Mini-Games</Eyebrow>
+        <h2>Take a break.<br /><span>Play the prototypes.</span></h2>
+        <p className="lead">
+          Done reviewing the systems and demo reel? Jump into these retro-inspired arcade builds engineered with custom state machines, timing reflexes, and memory logic.
+        </p>
+      </section>
       <section className="arcade-cabinet page-pad">
         <div className="arcade-cabinet__top"><span><Gamepad2 size={15} /> PLAYER 01</span><span><Trophy size={14} /> MATCH {matched.length / 2} / 6</span><span>MOVES {moves}</span></div>
         <div className="memory-grid">{cards.map((symbol, index) => <button key={index} className={`memory-card ${flipped.includes(index) || matched.includes(index) ? "is-face-up" : ""} ${matched.includes(index) ? "is-matched" : ""}`} onClick={() => { if (flipped.length < 2 && !flipped.includes(index) && !matched.includes(index)) setFlipped((value) => [...value, index]); }} aria-label={`Memory card ${index + 1}`}>{flipped.includes(index) || matched.includes(index) ? symbol : "?"}</button>)}</div>
@@ -1293,7 +1624,13 @@ function ArcadePage() {
 
 function BossFight() {
   const [bossHp, setBossHp] = useState(100);
-  const [playerHp, setPlayerHp] = useState(100);
+  const [playerHp, setPlayerHp] = useState(() => {
+    try {
+      return localStorage.getItem("karthik-godmode") === "true" ? 9999 : 100;
+    } catch {
+      return 100;
+    }
+  });
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
@@ -1353,6 +1690,10 @@ function BossFight() {
             if (bossStateRef.current === "lunging") {
               const retaliation = isEnraged ? 22 : 14;
               setPlayerHp((hp) => {
+                const isGod = (() => {
+                  try { return localStorage.getItem("karthik-godmode") === "true"; } catch { return false; }
+                })();
+                if (isGod) return hp;
                 const nextHp = Math.max(0, hp - retaliation);
                 if (nextHp === 0) {
                   setMessage("SYSTEM OVERLOAD // CLICK RESET TO RETRY");
@@ -1442,7 +1783,13 @@ function BossFight() {
     } else {
       playArcadeTone("hit");
       const penalty = 12;
-      setPlayerHp((hp) => Math.max(0, hp - penalty));
+      setPlayerHp((hp) => {
+        const isGod = (() => {
+          try { return localStorage.getItem("karthik-godmode") === "true"; } catch { return false; }
+        })();
+        if (isGod) return hp;
+        return Math.max(0, hp - penalty);
+      });
       setCombo(0);
       setMessage(`MISTIMED PARRY! -${penalty} HP (Watch for the glowing yellow zone!)`);
     }
@@ -1465,7 +1812,10 @@ function BossFight() {
 
   const reset = () => {
     setBossHp(100);
-    setPlayerHp(100);
+    const isGod = (() => {
+      try { return localStorage.getItem("karthik-godmode") === "true"; } catch { return false; }
+    })();
+    setPlayerHp(isGod ? 9999 : 100);
     setScore(0);
     setCombo(0);
     setBossState("idle");
@@ -1502,13 +1852,23 @@ function BossFight() {
             {bossState === "dead" && <div className="boss-death-effect">💥 K.O. 💥</div>}
           </div>
 
-          {/* Victory Defeat Overlay */}
+          {/* Victory & Defeat Overlays */}
           {bossHp === 0 && (
-            <div className="boss-defeat-overlay">
+            <div className="boss-defeat-overlay boss-defeat-overlay--victory">
               <strong>VICTORY ACHIEVED!</strong>
               <span>LOGIC BEAST DEFEATED</span>
-              <button type="button" className="button button--parry is-alert" onClick={reset}>
+              <button type="button" className="button button--victory" onClick={reset}>
                 <RefreshCw size={13} /> CLICK RESET TO PLAY AGAIN
+              </button>
+            </div>
+          )}
+
+          {playerHp === 0 && (
+            <div className="boss-defeat-overlay boss-defeat-overlay--defeat">
+              <strong style={{ color: "var(--rust)" }}>CRITICAL DEFEAT!</strong>
+              <span>SYSTEM INTEGRITY COMPROMISED</span>
+              <button type="button" className="button button--defeat" onClick={reset}>
+                <RefreshCw size={13} /> CLICK RESET TO RETRY
               </button>
             </div>
           )}
@@ -1561,10 +1921,10 @@ function BossFight() {
             Dodge
           </button>
           <button
-            className={`button ${!isAlive ? "button--parry is-alert" : "button--tiny"}`}
+            className={`button ${!isAlive ? (bossHp === 0 ? "button--victory" : "button--defeat") : "button--tiny"}`}
             onClick={reset}
           >
-            <RefreshCw size={12} /> {!isAlive ? "Click Reset to Play Again" : "Reset"}
+            <RefreshCw size={12} /> {!isAlive ? (bossHp === 0 ? "Click Reset to Play Again" : "Click Reset to Retry") : "Reset"}
           </button>
         </div>
       </div>
@@ -1809,6 +2169,28 @@ function DemoReelPage() {
 
 
 
+function generateScatteredPositions() {
+  // 4 discrete spatial zones to guarantee non-overlapping scattered tabletop placement
+  const zones = [
+    { minX: 24, maxX: 85, minY: 20, maxY: 65 },
+    { minX: 330, maxX: 410, minY: 16, maxY: 60 },
+    { minX: 25, maxX: 85, minY: 310, maxY: 355 },
+    { minX: 335, maxX: 415, minY: 305, maxY: 350 },
+  ];
+  const shuffledZones = [...zones].sort(() => Math.random() - 0.5);
+  const ids = ["games", "reading", "athletics", "creative"];
+  const res: Record<string, { x: number; y: number; rot: number }> = {};
+
+  ids.forEach((id, idx) => {
+    const zone = shuffledZones[idx];
+    const x = Math.round(zone.minX + Math.random() * (zone.maxX - zone.minX));
+    const y = Math.round(zone.minY + Math.random() * (zone.maxY - zone.minY));
+    const rot = Number(((Math.random() - 0.5) * 5.5).toFixed(1)); // -2.7° to +2.7° organic tabletop tilt
+    res[id] = { x, y, rot };
+  });
+  return res;
+}
+
 function HobbiesPage() {
   const hobbies = [
     {
@@ -1818,8 +2200,6 @@ function HobbiesPage() {
       copy: "Playing everything from retro icons to modern titles to dissect mechanics & feel: AC3, Tomb Raider, FIFA 16, Fortnite, Minecraft, Road Rash, Prince of Persia, OG Wolfenstein 3D, Doom, Tekken, and Mortal Kombat.",
       art: "games",
       note: "DISSECT / PLAY / ADAPT",
-      initX: 30,
-      initY: 30,
     },
     {
       id: "reading",
@@ -1828,8 +2208,6 @@ function HobbiesPage() {
       copy: "Avid reader and collector with complete physical manga collections of Jujutsu Kaisen, Demon Slayer, and Attack on Titan, alongside following seasonal and classic anime.",
       art: "reading",
       note: "STORY / ART / LORE",
-      initX: 320,
-      initY: 30,
     },
     {
       id: "athletics",
@@ -1838,8 +2216,6 @@ function HobbiesPage() {
       copy: "Playing football on the pitch and watching European matchdays with the same adrenaline as following Formula 1 Grand Prix weekends—tracking race strategy, reaction windows, and pacing.",
       art: "athletics",
       note: "PACE / RESET / COMMIT",
-      initX: 30,
-      initY: 320,
     },
     {
       id: "creative",
@@ -1848,14 +2224,12 @@ function HobbiesPage() {
       copy: "Acoustic fingerstyle guitar, kitchen cooking experiments, and curating an ongoing collection of scale figures, rare Pokémon cards, and game posters.",
       art: "creative",
       note: "MAKE / TUNE / COLLECT",
-      initX: 320,
-      initY: 320,
     },
   ];
 
   const [active, setActive] = useState<string | null>(null);
-  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>(() => {
-    return hobbies.reduce((acc, h) => ({ ...acc, [h.id]: { x: h.initX, y: h.initY } }), {});
+  const [positions, setPositions] = useState<Record<string, { x: number; y: number; rot: number }>>(() => {
+    return generateScatteredPositions();
   });
   const [draggingCard, setDraggingCard] = useState<string | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -1904,7 +2278,7 @@ function HobbiesPage() {
 
       setPositions((prev) => ({
         ...prev,
-        [draggingCard]: { x: clampedX, y: clampedY },
+        [draggingCard]: { x: clampedX, y: clampedY, rot: 0 },
       }));
     };
 
@@ -1929,7 +2303,7 @@ function HobbiesPage() {
         </div>
         <div ref={canvasRef} className="hobby-field__canvas">
           {hobbies.map((hobby, index) => {
-            const pos = positions[hobby.id] ?? { x: hobby.initX, y: hobby.initY };
+            const pos = positions[hobby.id] ?? { x: 30, y: 30, rot: 0 };
             const isDragging = draggingCard === hobby.id;
             const isSelected = active === hobby.id;
             return (
@@ -1937,13 +2311,13 @@ function HobbiesPage() {
                 key={hobby.id}
                 className={`hobby-card hobby-card--${hobby.art} ${isSelected ? "is-active" : ""} ${isDragging ? "is-dragging" : ""}`}
                 style={{
-                  transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
+                  transform: `translate3d(${pos.x}px, ${pos.y}px, 0) rotate(${isDragging ? 0 : (pos.rot ?? 0)}deg)`,
                   position: "absolute",
                   left: 0,
                   top: 0,
                   cursor: isDragging ? "grabbing" : "grab",
                   zIndex: isDragging ? 25 : isSelected ? 15 : 2,
-                  transition: isDragging ? "none" : "box-shadow 0.2s, border-color 0.2s",
+                  transition: isDragging ? "none" : "box-shadow 0.2s, border-color 0.2s, transform 0.22s ease-out",
                 }}
                 onPointerDown={(e) => handlePointerDown(hobby.id, e)}
                 onPointerUp={handlePointerUp}

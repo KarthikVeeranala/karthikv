@@ -460,17 +460,18 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
 }
 .pacman-pellet {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #ffd64f;
-  box-shadow: 0 0 8px #ffd64f, 0 0 16px rgba(255, 214, 79, 0.6);
+  background: rgba(255, 214, 79, 0.58);
+  box-shadow: 0 0 6px rgba(255, 214, 79, 0.35);
   transform: translate(-50%, -50%);
-  animation: pellet-pulse 1.2s ease-in-out infinite alternate;
+  animation: pellet-pulse 1.8s ease-in-out infinite alternate;
+  opacity: 0.52;
 }
 @keyframes pellet-pulse {
-  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.8; }
-  100% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.38; }
+  100% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.62; }
 }
 .pellet-popup {
   position: absolute;
@@ -1671,5 +1672,168 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   color: #ffd64f !important;
   border-color: #ffd64f !important;
 }
+
+/* 12. SOCIAL RAIL DISCORD ITEM */
+.social-rail__discord:hover {
+  color: #5865f2 !important;
+  border-color: #5865f2 !important;
+  box-shadow: 0 0 10px rgba(88, 101, 242, 0.45) !important;
+}
+
+/* 13. ARCADE HERO BANNER */
+.arcade-hero {
+  padding-top: 32px;
+  padding-bottom: 20px;
+}
+.arcade-hero h2 {
+  font: 700 clamp(28px, 4.2vw, 42px) / 1.08 var(--heading);
+  letter-spacing: -0.03em;
+  margin: 12px 0 14px;
+}
+.arcade-hero h2 span {
+  color: var(--teal);
+}
+.arcade-hero .lead {
+  max-width: 680px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 14. BOSS ARENA CALM RESTART & OVERLAY STYLES */
+.boss-defeat-overlay--defeat strong {
+  color: #ff4757 !important;
+  text-shadow: 0 0 16px rgba(255, 71, 87, 0.7) !important;
+}
+.boss-defeat-overlay--defeat span {
+  color: #ffa502 !important;
+}
+.button--victory {
+  background: #56f7d2 !important;
+  color: #100820 !important;
+  border-color: #56f7d2 !important;
+  box-shadow: 0 0 12px rgba(86, 247, 210, 0.45) !important;
+  animation: calm-pulse-victory 2.2s ease-in-out infinite !important;
+  font: 11px var(--mono) !important;
+  letter-spacing: 0.05em;
+  padding: 8px 16px !important;
+  cursor: pointer;
+}
+.button--defeat {
+  background: var(--rust) !important;
+  color: #ffffff !important;
+  border-color: var(--rust) !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.45) !important;
+  animation: calm-pulse-defeat 2.2s ease-in-out infinite !important;
+  font: 11px var(--mono) !important;
+  letter-spacing: 0.05em;
+  padding: 8px 16px !important;
+  cursor: pointer;
+}
+@keyframes calm-pulse-victory {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(86, 247, 210, 0.35);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(86, 247, 210, 0.7);
+    transform: scale(1.02);
+  }
+}
+@keyframes calm-pulse-defeat {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.35);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.7);
+    transform: scale(1.02);
+  }
+}
+
+/* 15. CHEAT TERMINAL VISUAL MODES */
+.party-mode {
+  animation: party-hue 4s linear infinite;
+}
+@keyframes party-hue {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.matrix-mode {
+  filter: contrast(1.15) brightness(0.95) saturate(1.4) sepia(0.6) hue-rotate(85deg);
+}
+.matrix-mode::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: repeating-linear-gradient(0deg, rgba(0, 255, 70, 0.05) 0 2px, transparent 2px 4px);
+}
+
+.bighead-mode .pacman-sprite {
+  transform: scale(2.4) !important;
+  transform-origin: center center;
+}
+
+/* 16. NIGHT MODE COLOR PALETTES (Token Overrides Only - Layout Preserved 100%) */
+/* Option 1: Deep Cobalt (Slate Blue & Neon Cyan) */
+.palette-cobalt {
+  --bg: #070b14 !important;
+  --bg-elevated: #0d1527 !important;
+  --teal: #38bdf8 !important;
+  --rust: #f43f5e !important;
+  --pink: #818cf8 !important;
+  --gold: #38bdf8 !important;
+  --bone: #f0f6fc !important;
+  --muted: #94a3b8 !important;
+  --line: rgba(56, 189, 248, 0.18) !important;
+  --line-strong: rgba(56, 189, 248, 0.38) !important;
+}
+
+/* Option 2: Blood Moon (Crimson Gold & Ruby) */
+.palette-bloodmoon {
+  --bg: #14080a !important;
+  --bg-elevated: #220e12 !important;
+  --teal: #fbbf24 !important;
+  --rust: #f43f5e !important;
+  --pink: #fb7185 !important;
+  --gold: #f59e0b !important;
+  --bone: #fff1f2 !important;
+  --muted: #fda4af !important;
+  --line: rgba(244, 63, 94, 0.22) !important;
+  --line-strong: rgba(244, 63, 94, 0.45) !important;
+}
+
+/* Option 3: Emerald Matrix (Phosphor Green & Terminal Mint) */
+.palette-matrix {
+  --bg: #05100a !important;
+  --bg-elevated: #091b11 !important;
+  --teal: #10b981 !important;
+  --rust: #f59e0b !important;
+  --pink: #34d399 !important;
+  --gold: #10b981 !important;
+  --bone: #ecfdf5 !important;
+  --muted: #6ee7b7 !important;
+  --line: rgba(16, 185, 129, 0.2) !important;
+  --line-strong: rgba(16, 185, 129, 0.42) !important;
+}
+
+/* Option 4: Tokyo Midnight (Synthwave Violet & Electric Cyan) */
+.palette-tokyo {
+  --bg: #0b0716 !important;
+  --bg-elevated: #160f2a !important;
+  --teal: #22d3ee !important;
+  --rust: #f43f5e !important;
+  --pink: #d946ef !important;
+  --gold: #facc15 !important;
+  --bone: #faf5ff !important;
+  --muted: #c084fc !important;
+  --line: rgba(217, 70, 239, 0.2) !important;
+  --line-strong: rgba(217, 70, 239, 0.42) !important;
+}
+
 
 
