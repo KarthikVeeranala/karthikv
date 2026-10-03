@@ -3471,3 +3471,28 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   pointer-events: none;
 }
 
+/* Playful Konami Code Easter Egg Hints */
+.coin-catcher__secret-hint {
+  font-family: var(--mono);
+  font-size: 11px !important;
+  color: var(--teal) !important;
+  opacity: 0.85;
+  margin: 10px 0 16px !important;
+  line-height: 1.5;
+}
+.coin-catcher__secret-hint em {
+  color: #ffd64f;
+  font-style: normal;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.footer-secret-hint em {
+  font-style: normal;
+  color: var(--teal);
+  transition: color 0.2s;
+}
+.footer-secret-hint:hover em {
+  color: #ffd64f;
+  text-decoration: underline;
+}
+

@@ -1678,7 +1678,24 @@ function CoinCatcher() {
     setScore((value) => value + 1);
     setCoin({ left: 16 + Math.random() * 68, top: 18 + Math.random() * 62 });
   };
-  return <section className="coin-catcher page-pad"><div className="coin-catcher__copy"><Eyebrow number="05">Easter egg / coin hunt</Eyebrow><h2>Catch the<br /><span>glitch coin.</span></h2><p>Tap the coin before it jumps. A tiny reward for exploring the page.</p><strong>SCORE {String(score).padStart(2, "0")}</strong></div><div className="coin-catcher__screen"><span className="coin-catcher__scanline" /><button className="glitch-coin" style={{ left: `${coin.left}%`, top: `${coin.top}%` }} onClick={collect} aria-label="Collect glitch coin">✦</button><span className="coin-catcher__hint">CLICK THE STAR / +10 XP</span></div></section>;
+  return (
+    <section className="coin-catcher page-pad">
+      <div className="coin-catcher__copy">
+        <Eyebrow number="05">Easter egg / coin hunt</Eyebrow>
+        <h2>Catch the<br /><span>glitch coin.</span></h2>
+        <p>Tap the coin before it jumps. A tiny reward for exploring the page.</p>
+        <p className="coin-catcher__secret-hint">
+          <em>Whisper:</em> Do you know what the Konami Code is? Why don’t you try entering it anywhere on the site...
+        </p>
+        <strong>SCORE {String(score).padStart(2, "0")}</strong>
+      </div>
+      <div className="coin-catcher__screen">
+        <span className="coin-catcher__scanline" />
+        <button className="glitch-coin" style={{ left: `${coin.left}%`, top: `${coin.top}%` }} onClick={collect} aria-label="Collect glitch coin">✦</button>
+        <span className="coin-catcher__hint">CLICK THE STAR / +10 XP</span>
+      </div>
+    </section>
+  );
 }
 
 export interface AicadeGame {
@@ -3497,7 +3514,9 @@ function Footer() {
       </div>
       <div className="site-footer__bottom">
         <span>© 2026 KARTHIK VEERANALA / GAME DEVELOPMENT & DESIGN</span>
-        <span>Built under constraints <Sparkles size={12} /></span>
+        <span className="footer-secret-hint" title="Psst... Ever typed the Konami Code on a game developer's website?">
+          Built under constraints • <em>Do you know what the Konami Code is? Try entering it...</em> <Sparkles size={12} />
+        </span>
       </div>
     </footer>
   );
