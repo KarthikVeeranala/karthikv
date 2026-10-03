@@ -3056,7 +3056,8 @@ function TechTreePage() {
           </div>
         </div>
 
-        <aside className="tech-inspector">
+        {/* DESKTOP INTERACTIVE INSPECTOR */}
+        <aside className="tech-inspector tech-inspector--desktop">
           <Eyebrow>Selected node / {selected.rank}</Eyebrow>
           <h2>{selected.label}</h2>
           <div className="mastery-gauge">
@@ -3082,6 +3083,39 @@ function TechTreePage() {
             View project dossiers <ArrowUpRight size={13} />
           </Link>
         </aside>
+
+        {/* MOBILE LINEAR TECH TREE (All nodes expanded one after another, no node selecting required) */}
+        <div className="tech-tree__mobile-list">
+          {techNodes.map((node) => (
+            <article key={`mob-${node.id}`} className={`tech-mobile-card tech-mobile-card--${node.color}`}>
+              <div className="tech-mobile-card__header">
+                <div>
+                  <span className="tech-mobile-card__rank">{node.rank}</span>
+                  <h3>{node.label}</h3>
+                </div>
+                <span className="tech-mobile-card__pct">{nodeProficiency[node.id]}%</span>
+              </div>
+              <div className="mastery-gauge">
+                <div className="mastery-gauge__bar">
+                  <div className="mastery-gauge__fill" style={{ width: `${nodeProficiency[node.id]}%` }} />
+                </div>
+              </div>
+              <p>{node.copy}</p>
+              <div className="tech-inspector__tools">
+                {node.tools.map((tool) => (
+                  <span key={tool}>{tool}</span>
+                ))}
+              </div>
+              <div className="tech-mobile-card__used">
+                <small>DEPLOYED IN</small>
+                <strong>{node.usedIn}</strong>
+              </div>
+            </article>
+          ))}
+          <Link href="/portfolio/" className="button button--outline" style={{ justifyContent: "center", marginTop: "12px" }}>
+            View project dossiers <ArrowUpRight size={13} />
+          </Link>
+        </div>
       </section>
 
       <section className="inventory-strip page-pad">

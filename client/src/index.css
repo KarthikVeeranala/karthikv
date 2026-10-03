@@ -3613,51 +3613,107 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
     transform: none !important;
   }
 
-  /* 3. Tech Tree: clean linear vertical layout */
+  /* 3. Tech Tree: clean linear vertical layout (all expanded, no selecting required) */
   .tech-tree {
     display: flex !important;
     flex-direction: column !important;
-    gap: 32px !important;
-    padding-top: 16px !important;
+    gap: 20px !important;
+    padding-top: 14px !important;
+    border-top: none !important;
   }
-  .tech-tree__map {
-    display: flex !important;
-    flex-direction: column !important;
-    min-height: 0 !important;
-    height: auto !important;
-    padding: 16px !important;
-    gap: 14px !important;
-  }
-  .tech-tree__svg-lines {
+  .tech-tree__map,
+  .tech-inspector--desktop {
     display: none !important;
   }
-  .tech-tree__nodes-grid {
+  .tech-tree__mobile-list {
     display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
+    gap: 16px !important;
     width: 100% !important;
   }
-  .tech-node {
-    width: 100% !important;
-    min-height: 80px !important;
+  .tech-mobile-card {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 16px !important;
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--line-strong) !important;
+    border-left: 3px solid var(--teal) !important;
   }
-  .tech-inspector {
-    width: 100% !important;
-    border-left: none !important;
-    border-top: 2px solid var(--teal) !important;
-    padding-top: 20px !important;
+  .tech-mobile-card--amber { border-left-color: #ffd64f !important; }
+  .tech-mobile-card--green { border-left-color: #56f7d2 !important; }
+  .tech-mobile-card--pink { border-left-color: #ff5cd6 !important; }
+  .tech-mobile-card--blue { border-left-color: #5ca0ff !important; }
+
+  .tech-mobile-card__header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+  .tech-mobile-card__header > div {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+  }
+  .tech-mobile-card__rank {
+    font: 11px var(--mono) !important;
+    font-weight: 700 !important;
+    color: var(--teal) !important;
+  }
+  .tech-mobile-card__header h3 {
+    margin: 0 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: var(--bone) !important;
+  }
+  .tech-mobile-card__pct {
+    font: 11px var(--mono) !important;
+    color: #ffd64f !important;
+    font-weight: 700 !important;
+  }
+  .tech-mobile-card p {
+    margin: 0 !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    color: var(--muted) !important;
+  }
+  .tech-mobile-card__used {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    margin-top: 4px !important;
+    font: 10px var(--mono) !important;
+  }
+  .tech-mobile-card__used small {
+    color: var(--rust) !important;
+    letter-spacing: 0.08em !important;
+  }
+  .tech-mobile-card__used strong {
+    color: var(--bone) !important;
   }
 
-  /* 4. Portfolio Carousel Mobile Arrow Controls & Stage Height */
-  .portfolio-carousel__mobile-nav {
-    display: flex !important;
-  }
+  /* 4. Portfolio Carousel Mobile Arrow Controls & Overlap Elimination */
   .portfolio-carousel {
     min-height: 0 !important;
   }
   .portfolio-carousel__stage {
     height: 480px !important;
   }
+  /* Crucial: hide the desktop numbered rail on mobile so it doesn't overlap the PREV / NEXT arrow bar! */
+  .portfolio-carousel__rail {
+    display: none !important;
+  }
+  .portfolio-carousel__mobile-nav {
+    display: flex !important;
+    position: relative !important;
+    z-index: 10 !important;
+    margin: 16px auto 0 !important;
+  }
+}
+
+/* Hide mobile list by default on desktop */
+.tech-tree__mobile-list {
+  display: none;
 }
 
 
