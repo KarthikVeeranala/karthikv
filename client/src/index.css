@@ -3072,3 +3072,212 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
+
+
+/* =========================================================================
+   COMPREHENSIVE DEVICE RESPONSIVENESS & CALM AESTHETIC POLISH
+   ========================================================================= */
+
+/* Calm down background glyphs & pellets */
+.pixel-field__glyph {
+  opacity: 0.08 !important;
+  animation-duration: 18s !important;
+}
+.pacman-pellet {
+  opacity: 0.45 !important;
+  box-shadow: 0 0 6px var(--teal) !important;
+}
+.pixel-mascot.is-paused .pacman-sprite {
+  animation: none !important;
+  filter: grayscale(0.2) opacity(0.85);
+}
+.pixel-mascot.is-paused .pixel-mascot__bubble {
+  border-style: dashed;
+}
+
+/* TABLET & MOBILE REFINEMENTS (< 900px) */
+@media (max-width: 900px) {
+  /* Backstory Editorial Responsive Stack */
+  .backstory-editorial {
+    grid-template-columns: 1fr !important;
+    gap: 36px !important;
+    padding: 16px 0 28px !important;
+  }
+  .backstory-controller-dock {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 22px 18px !important;
+    gap: 18px !important;
+  }
+  .controller-diamond {
+    align-self: center !important;
+  }
+  .controller-readout {
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .controller-readout p {
+    text-align: center !important;
+  }
+  .backstory-inline-facts {
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 8px 14px !important;
+  }
+  .backstory-actions {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 14px !important;
+  }
+  .backstory-portrait-frame {
+    max-width: 360px !important;
+    margin: 0 auto !important;
+  }
+
+  /* Featured Carousel Responsive Stack */
+  .featured-carousel__card {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  .featured-carousel__header {
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+  }
+  .featured-carousel__counter em {
+    margin-left: 0 !important;
+    flex-basis: 100% !important;
+  }
+  .featured-carousel__actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .featured-carousel__actions .button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Demo Reel Player & Inline Chapters */
+  .reel-page__meta {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+  .reel-controls-dock {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .reel-controls-dock__left {
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+  .reel-controls-dock__right {
+    justify-content: space-between !important;
+    width: 100% !important;
+    border-top: 1px dashed var(--line) !important;
+    padding-top: 8px !important;
+  }
+  .reel-meta-chapters {
+    width: 100% !important;
+  }
+
+  /* Arcade Grids */
+  .aicade-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)) !important;
+  }
+  .aicade-modal,
+  .aicade-vault-window {
+    width: 96vw !important;
+    max-height: 92vh !important;
+  }
+}
+
+/* MOBILE PHONES (< 640px) */
+@media (max-width: 640px) {
+  /* Hide overstimulating background glyphs on small phone screens */
+  .pixel-field__glyph {
+    display: none !important;
+  }
+  .pellet-field {
+    display: none !important;
+  }
+  .pixel-mascot {
+    transform: scale(0.78) !important;
+    transform-origin: bottom left !important;
+  }
+
+  /* Site Nav Mobile Menu Day/Night Fix */
+  .site-nav__links {
+    background: var(--bg-elevated) !important;
+    border: 2px solid var(--line-strong) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4) !important;
+  }
+  .site-nav__links .nav-link,
+  .site-nav__links .nav-cta {
+    color: var(--ink) !important;
+    font-size: 10px !important;
+  }
+  .site-nav__links .nav-link:hover,
+  .site-nav__links .nav-link.is-active {
+    color: var(--teal) !important;
+  }
+
+  /* 3D Backstory Section Mobile Padding */
+  .backstory-section--highlight {
+    margin: 24px auto !important;
+    padding: 24px 16px !important;
+    box-shadow: 6px 6px 0 var(--line-strong) !important;
+  }
+  .backstory-section--highlight::before {
+    inset: 8px !important;
+  }
+  .ctrl-btn {
+    width: 42px !important;
+    height: 42px !important;
+  }
+  .ctrl-btn span {
+    font-size: 13px !important;
+  }
+  .backstory-inline-facts {
+    padding: 10px 12px !important;
+    font-size: 8px !important;
+  }
+
+  /* Hobbies Canvas on Phone: Clean Non-Overlapping Stack */
+  .hobby-field__canvas {
+    min-height: 980px !important;
+  }
+  .hobby-card {
+    width: calc(100% - 24px) !important;
+    max-width: 360px !important;
+    left: 12px !important;
+  }
+  .hobby-card__window {
+    position: static !important;
+    width: 100% !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    margin-top: 12px !important;
+    transform: none !important;
+  }
+
+  /* Arcade Cards Action Buttons */
+  .aicade-card__actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .aicade-card__play-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .aicade-card__aspect {
+    text-align: center !important;
+  }
+
+  /* Prevent any horizontal screen drift */
+  body, html, .site-shell {
+    overflow-x: hidden !important;
+  }
+}

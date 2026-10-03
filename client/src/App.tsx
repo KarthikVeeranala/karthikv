@@ -453,62 +453,38 @@ function PixelMascot() {
   const [dragging, setDragging] = useState(false);
   const [state, setState] = useState<"idle" | "wandering" | "dragging" | "excited">("idle");
   const [facing, setFacing] = useState<1 | -1>(1);
-  const [isPaused, setIsPaused] = useState(false);
-  const [message, setMessage] = useState("CLICK TO PAUSE // DRAG TO CHOMP");
+  const [isPaused, setIsPaused] = useState(() => {
+    try {
+      return localStorage.getItem("karthik-mascot-paused") === "true";
+    } catch {
+      return false;
+    }
+  });
+  const [message, setMessage] = useState(isPaused ? "PAUSED // CLICK TO RESUME" : "CALM MODE // CLICK TO PAUSE");
   const [pelletScore, setPelletScore] = useState(0);
   const [popups, setPopups] = useState<Array<{ id: number; x: number; y: number; text: string }>>([]);
   const speedMultiplierRef = useRef(1);
 
-  const generatePellets = useCallback((count = 4): Pellet[] => {
+  // Generate only 2 quiet, gentle ambient pellets
+  const generatePellets = useCallback((count = 2): Pellet[] => {
     if (typeof window === "undefined") return [];
     const w = window.innerWidth;
     const h = window.innerHeight;
     const now = Date.now();
     const spots = [
-      { x: Math.floor(w * 0.16), y: Math.floor(h * 0.28) },
-      { x: Math.floor(w * 0.82), y: Math.floor(h * 0.25) },
-      { x: Math.floor(w * 0.74), y: Math.floor(h * 0.72) },
-      { x: Math.floor(w * 0.24), y: Math.floor(h * 0.74) },
+      { x: Math.floor(w * 0.22), y: Math.floor(h * 0.32) },
+      { x: Math.floor(w * 0.78), y: Math.floor(h * 0.68) },
     ];
     return spots.slice(0, count).map((s, idx) => ({ id: now + idx + 1, x: s.x, y: s.y }));
   }, []);
 
-  const [pellets, setPellets] = useState<Pellet[]>(() => generatePellets(4));
-
-  useEffect(() => {
-    const onSpawnExtra = () => {
-      if (typeof window === "undefined") return;
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const now = Date.now();
-      const extra: Pellet[] = Array.from({ length: 20 }, (_, idx) => ({
-        id: now + idx + 100,
-        x: Math.floor(35 + Math.random() * (w - 110)),
-        y: Math.floor(80 + Math.random() * (h - 160)),
-      }));
-      setPellets((prev) => [...prev, ...extra]);
-      setMessage("★ PELLET SHOWER! +200 PTS ★");
-      playArcadeTone("win");
-    };
-
-    const onTurbo = () => {
-      speedMultiplierRef.current = speedMultiplierRef.current > 1 ? 1 : 2.5;
-      setMessage(speedMultiplierRef.current > 1 ? "⚡ TURBO NOM SPEED ENGAGED! ⚡" : "CRUISING SPEED RESTORED");
-      playArcadeTone("win");
-    };
-
-    window.addEventListener("karthik-spawn-pellets", onSpawnExtra);
-    window.addEventListener("karthik-turbo-mascot", onTurbo);
-    return () => {
-      window.removeEventListener("karthik-spawn-pellets", onSpawnExtra);
-      window.removeEventListener("karthik-turbo-mascot", onTurbo);
-    };
-  }, []);
-
+  const [pellets, setPellets] = useState<Pellet[]>(() => generatePellets(2));
   const mascotRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef(position);
   const dragOffset = useRef({ x: 0, y: 0 });
-  const moved = useRef(false);
+  const pointerDownRef = useRef({ x: 0, y: 0, time: 0 });
+  const hasMovedRef = useRef(false);
+  const restUntilRef = useRef(performance.now() + 2000); // Start with a calm 2s rest
   const lastActiveRef = useRef(Date.now());
 
   useEffect(() => {
@@ -525,7 +501,7 @@ function PixelMascot() {
       let eatenPos = { x: 0, y: 0 };
       for (const p of current) {
         const dist = Math.hypot(p.x - (x + 28), p.y - (y + 28));
-        if (dist < 42 && !ate) {
+        if (dist < 38 && !ate) {
           ate = true;
           eatenPos = { x: p.x, y: p.y };
         } else {
@@ -535,116 +511,126 @@ function PixelMascot() {
       if (ate) {
         playArcadeTone("chomp");
         setPelletScore((s) => s + 10);
+        // Rest peacefully for 4.5 seconds after eating to avoid non-stop zooming
+        restUntilRef.current = performance.now() + 4500;
+        setState("idle");
+        setMessage("NOM! RESTING...");
+
         const popId = Date.now() + Math.random();
         setPopups((pops) => [...pops, { id: popId, x: eatenPos.x, y: eatenPos.y, text: "+10" }]);
         setTimeout(() => {
           setPopups((pops) => pops.filter((p) => p.id !== popId));
-        }, 900);
+        }, 850);
 
         if (remaining.length === 0) {
-          playArcadeTone("win");
-          setMessage("POWER RUN! ALL PELLETS CLEARED! +50");
           setTimeout(() => {
-            setPellets(generatePellets());
-          }, 800);
+            setPellets(generatePellets(2));
+          }, 3000);
         }
       }
       return ate ? remaining : current;
     });
   }, [generatePellets]);
 
+  // Pointer move & up handlers with threshold to distinguish left click from drag
   useEffect(() => {
-    const move = (event: PointerEvent) => {
-      if (!dragging) return;
-      moved.current = true;
-      lastActiveRef.current = Date.now();
-      const prevX = positionRef.current.x;
-      const prevY = positionRef.current.y;
-      const nextX = Math.max(8, Math.min(window.innerWidth - 74, event.clientX - dragOffset.current.x));
-      const nextY = Math.max(64, Math.min(window.innerHeight - 76, event.clientY - dragOffset.current.y));
+    const onPointerMove = (event: PointerEvent) => {
+      if (pointerDownRef.current.time === 0) return;
+      const dist = Math.hypot(
+        event.clientX - pointerDownRef.current.x,
+        event.clientY - pointerDownRef.current.y
+      );
+      if (dist > 6) {
+        hasMovedRef.current = true;
+        if (!dragging) {
+          setDragging(true);
+          setState("dragging");
+          setMessage("DRAGGING PAC-KV!");
+        }
+        const prevX = positionRef.current.x;
+        const nextX = Math.max(8, Math.min(window.innerWidth - 74, event.clientX - dragOffset.current.x));
+        const nextY = Math.max(64, Math.min(window.innerHeight - 76, event.clientY - dragOffset.current.y));
 
-      const dx = nextX - prevX;
-      if (dx > 2) {
-        setFacing(1);
-      } else if (dx < -2) {
-        setFacing(-1);
+        if (nextX - prevX > 2) setFacing(1);
+        else if (nextX - prevX < -2) setFacing(-1);
+
+        const next = { x: nextX, y: nextY };
+        positionRef.current = next;
+        if (mascotRef.current) mascotRef.current.style.transform = `translate3d(${next.x}px, ${next.y}px, 0)`;
+        checkChomp(next.x, next.y);
+      }
+    };
+
+    const onPointerUp = () => {
+      if (pointerDownRef.current.time === 0) return;
+      const hadMoved = hasMovedRef.current;
+      pointerDownRef.current = { x: 0, y: 0, time: 0 };
+      hasMovedRef.current = false;
+
+      if (dragging) {
+        setDragging(false);
+        setState("idle");
+        setPosition(positionRef.current);
+        return;
       }
 
-      const next = { x: nextX, y: nextY };
-      positionRef.current = next;
-      if (mascotRef.current) mascotRef.current.style.transform = `translate3d(${next.x}px, ${next.y}px, 0)`;
-      checkChomp(next.x, next.y);
+      // If user clicked with no drag threshold exceeded: TOGGLE PAUSE!
+      if (!hadMoved) {
+        setIsPaused((prev) => {
+          const next = !prev;
+          try {
+            localStorage.setItem("karthik-mascot-paused", String(next));
+          } catch {}
+          if (next) {
+            setState("idle");
+            playArcadeTone("click");
+            setMessage("⏸ PAUSED // CLICK TO RESUME");
+          } else {
+            setState("idle");
+            playArcadeTone("win");
+            setMessage("▶ RESUMED // CRUISING CALMLY");
+            restUntilRef.current = performance.now() + 1500;
+          }
+          return next;
+        });
+      }
     };
 
-    const up = () => {
-      if (!dragging) return;
-      setDragging(false);
-      setState("idle");
-      setPosition(positionRef.current);
-      lastActiveRef.current = Date.now();
-    };
-
-    window.addEventListener("pointermove", move, { passive: true });
-    window.addEventListener("pointerup", up, { passive: true });
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
     return () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
     };
   }, [dragging, checkChomp]);
 
-  useEffect(() => {
-    if (!dragging) return;
-    setState("dragging");
-    const dragPhrases = ["NOM NOM NOM!", "WAKAWAKA!", "SPEED CHOMP!", "SWALLOWING BUGS!", "WHEEE!"];
-    const phrase = dragPhrases[Math.floor(Math.random() * dragPhrases.length)];
-    setMessage(phrase);
-    playArcadeTone("hover");
-  }, [dragging]);
-
-  // Continuous autonomous pellet-hunting loop
+  // Gentle, calm autonomous roaming loop (48px/s speed + resting pauses)
   useEffect(() => {
     let animId: number;
     let lastTime = performance.now();
-    let phraseTime = performance.now();
-
-    const huntPhrases = [
-      "HUNTING PELLETS...",
-      "WAKAWAKA...",
-      "CHOMP CHOMP!",
-      "SCANNING GRID",
-      "TARGET LOCKED",
-      "PAC-KV CRUISING",
-    ];
 
     const step = (now: number) => {
-      const dt = Math.min(0.1, (now - lastTime) / 1000);
+      const dt = Math.min(0.08, (now - lastTime) / 1000);
       lastTime = now;
 
       if (!dragging && !isPaused) {
-        // Change speech phrase periodically
-        if (now - phraseTime > 4500) {
-          phraseTime = now;
-          setMessage(huntPhrases[Math.floor(Math.random() * huntPhrases.length)]);
+        // Respect resting periods
+        if (now < restUntilRef.current) {
+          setState("idle");
+          animId = requestAnimationFrame(step);
+          return;
         }
 
-        const curX = positionRef.current.x + 22; // Pacman center
+        const curX = positionRef.current.x + 22;
         const curY = positionRef.current.y + 22;
 
-        // Find closest pellet
         let closest: Pellet | null = null;
         let minDist = Infinity;
         for (const p of pellets) {
           const d = Math.hypot(p.x - curX, p.y - curY);
           if (d < minDist) {
             minDist = d;
-          }
-        }
-
-        for (const p of pellets) {
-          const d = Math.hypot(p.x - curX, p.y - curY);
-          if (d === minDist) {
             closest = p;
-            break;
           }
         }
 
@@ -653,7 +639,8 @@ function PixelMascot() {
           const dx = closest.x - curX;
           const dy = closest.y - curY;
           const angle = Math.atan2(dy, dx);
-          const speed = 125 * speedMultiplierRef.current; // 125px per second smooth travel (boosted on turbo)
+          // Very gentle cruising speed: 48px per second (cut down from 125px/s)
+          const speed = 48 * speedMultiplierRef.current;
 
           const nextX = Math.max(8, Math.min(window.innerWidth - 74, positionRef.current.x + Math.cos(angle) * speed * dt));
           const nextY = Math.max(64, Math.min(window.innerHeight - 76, positionRef.current.y + Math.sin(angle) * speed * dt));
@@ -663,18 +650,14 @@ function PixelMascot() {
             mascotRef.current.style.transform = `translate3d(${nextX}px, ${nextY}px, 0)`;
           }
 
-          // Pure horizontal flip: face right (1) or face left (-1). Never rotated upside down!
-          if (dx > 2) {
-            setFacing(1);
-          } else if (dx < -2) {
-            setFacing(-1);
-          }
+          if (dx > 2) setFacing(1);
+          else if (dx < -2) setFacing(-1);
 
           if (minDist <= 32) {
             checkChomp(nextX, nextY);
           }
         } else if (pellets.length === 0) {
-          setPellets(generatePellets());
+          setPellets(generatePellets(2));
         }
       }
 
@@ -685,28 +668,8 @@ function PixelMascot() {
     return () => cancelAnimationFrame(animId);
   }, [dragging, isPaused, pellets, checkChomp, generatePellets]);
 
-  const handleClick = () => {
-    lastActiveRef.current = Date.now();
-    if (moved.current) return;
-    setIsPaused((p) => {
-      const nextPaused = !p;
-      if (nextPaused) {
-        setState("idle");
-        playArcadeTone("hover");
-        setMessage("⏸ PAUSED // CLICK TO RESUME!");
-      } else {
-        setState("excited");
-        playArcadeTone("win");
-        setMessage("▶ RESUMED // CHOMPING PELLETS!");
-        setTimeout(() => setState("idle"), 1800);
-      }
-      return nextPaused;
-    });
-  };
-
   return (
     <>
-      {/* Ambient collectible pixel pellets */}
       <div className="pellet-field" aria-hidden="true">
         {pellets.map((p) => (
           <span
@@ -728,27 +691,27 @@ function PixelMascot() {
 
       <div
         ref={mascotRef}
-        className={`pixel-mascot pixel-mascot--pacman ${dragging ? "is-dragging" : ""} is-${state}`}
+        className={`pixel-mascot pixel-mascot--pacman ${dragging ? "is-dragging" : ""} is-${state} ${isPaused ? "is-paused" : ""}`}
         style={{
           left: 0,
           top: 0,
           transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
-          transition: state === "wandering" ? "transform 2.2s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
         }}
         onPointerDown={(event) => {
-          event.preventDefault();
+          if (event.button !== 0) return;
           const rect = event.currentTarget.getBoundingClientRect();
           dragOffset.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-          moved.current = false;
-          lastActiveRef.current = Date.now();
-          setDragging(true);
+          pointerDownRef.current = { x: event.clientX, y: event.clientY, time: Date.now() };
+          hasMovedRef.current = false;
         }}
-        onClick={handleClick}
         role="button"
         tabIndex={0}
-        aria-label="Interactive Karthik Veeranala Pac-Man companion"
+        aria-label="Interactive Pac-Man mascot (Left click to pause or resume)"
+        title="Left click to pause/resume | Drag to move"
         onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") handleClick();
+          if (event.key === "Enter" || event.key === " ") {
+            setIsPaused((p) => !p);
+          }
         }}
       >
         <span className="pixel-mascot__bubble">{message}</span>
@@ -1076,10 +1039,10 @@ function SiteShell({ children }: { children: React.ReactNode }) {
     const [theme, setTheme] = useState<"beige" | "neon">(() => {
     try {
       const saved = localStorage.getItem("pixelguild-theme");
-      if (saved === "beige") return "beige";
-      return "neon";
+      if (saved === "neon") return "neon";
+      return "beige";
     } catch {
-      return "neon";
+      return "beige";
     }
   });
   const [soundOn, setSoundOn] = useState(() => {
@@ -2798,7 +2761,16 @@ function DemoReelPage() {
 
 
 function generateScatteredPositions() {
-  // 4 discrete spatial zones to guarantee non-overlapping scattered tabletop placement
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  if (isMobile) {
+    return {
+      games: { x: 12, y: 12, rot: 0 },
+      reading: { x: 12, y: 240, rot: 0 },
+      athletics: { x: 12, y: 468, rot: 0 },
+      creative: { x: 12, y: 696, rot: 0 },
+    };
+  }
+  // 4 discrete spatial zones for wide desktop screens
   const zones = [
     { minX: 24, maxX: 85, minY: 20, maxY: 65 },
     { minX: 330, maxX: 410, minY: 16, maxY: 60 },
@@ -2813,7 +2785,7 @@ function generateScatteredPositions() {
     const zone = shuffledZones[idx];
     const x = Math.round(zone.minX + Math.random() * (zone.maxX - zone.minX));
     const y = Math.round(zone.minY + Math.random() * (zone.maxY - zone.minY));
-    const rot = Number(((Math.random() - 0.5) * 5.5).toFixed(1)); // -2.7° to +2.7° organic tabletop tilt
+    const rot = Number(((Math.random() - 0.5) * 5.5).toFixed(1));
     res[id] = { x, y, rot };
   });
   return res;
