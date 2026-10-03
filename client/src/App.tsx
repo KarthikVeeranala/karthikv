@@ -3142,6 +3142,35 @@ function PortfolioCarousel({ items, onContributions }: { items: typeof projects;
           );
         })}
       </div>
+      <div className="portfolio-carousel__mobile-nav">
+        <button
+          type="button"
+          className="portfolio-carousel__mobile-btn"
+          onClick={() => {
+            playArcadeTone("hover");
+            rotate(-1);
+          }}
+          aria-label="Previous project"
+        >
+          <ChevronLeft size={20} />
+          <span>PREV</span>
+        </button>
+        <div className="portfolio-carousel__mobile-counter">
+          <strong>{String(active + 1).padStart(2, "0")}</strong> / {String(list.length).padStart(2, "0")}
+        </div>
+        <button
+          type="button"
+          className="portfolio-carousel__mobile-btn"
+          onClick={() => {
+            playArcadeTone("hover");
+            rotate(1);
+          }}
+          aria-label="Next project"
+        >
+          <span>NEXT</span>
+          <ChevronRight size={20} />
+        </button>
+      </div>
       <div className="portfolio-carousel__rail">{list.map((project, index) => <button key={project.slug} className={active === index ? "is-selected" : ""} onClick={() => setActive(index)}>{String(index + 1).padStart(2, "0")}</button>)}</div>
       {selected && <ProjectWindow project={selected} onClose={() => setSelected(null)} onContributions={() => { setSelected(null); onContributions(selected); }} />}
     </div>

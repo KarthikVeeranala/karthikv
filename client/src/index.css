@@ -3500,3 +3500,164 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   text-decoration: underline;
 }
 
+/* =========================================================================
+   UNIVERSAL: 3D PORTFOLIO CAROUSEL NON-FOCUSED TILE OVERLAY & DIMMING
+   ========================================================================= */
+.portfolio-carousel__card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: rgba(9, 13, 13, 0.72);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+  transition: opacity 0.4s ease, background 0.4s ease;
+  opacity: 1;
+}
+.site-shell:not(.theme-neon) .portfolio-carousel__card::before {
+  background: rgba(238, 227, 210, 0.7);
+}
+.portfolio-carousel__card.is-focus::before {
+  opacity: 0 !important;
+}
+.portfolio-carousel__card.is-focus {
+  box-shadow: 0 0 35px rgba(22, 214, 189, 0.35), 0 12px 28px rgba(0, 0, 0, 0.6) !important;
+  border-color: var(--teal) !important;
+}
+
+/* Portfolio Carousel Mobile Arrows Nav */
+.portfolio-carousel__mobile-nav {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 380px;
+  margin: 18px auto 0;
+  padding: 8px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+}
+.portfolio-carousel__mobile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(22, 214, 189, 0.1);
+  border: 1px solid var(--teal);
+  color: var(--teal);
+  font: 11px var(--mono);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.portfolio-carousel__mobile-btn:active {
+  background: var(--teal);
+  color: var(--bg);
+}
+.portfolio-carousel__mobile-counter {
+  font: 12px var(--mono);
+  color: var(--muted);
+}
+.portfolio-carousel__mobile-counter strong {
+  color: var(--teal);
+}
+
+/* =========================================================================
+   MOBILE RESPONSIVE CLEANUP (≤ 768px)
+   ========================================================================= */
+@media (max-width: 768px) {
+  /* 1. Fully remove dragging pacman mascot & ambient pellets on mobile */
+  .pixel-mascot,
+  .pellet-field,
+  .pacman-pellet,
+  .pellet-popup {
+    display: none !important;
+  }
+
+  /* 2. Hobbies: clean linear layout (one after another) */
+  .hobby-field {
+    padding-top: 14px !important;
+    padding-bottom: 50px !important;
+  }
+  .hobby-field__topline span {
+    display: none !important;
+  }
+  .hobby-field__canvas {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .hobby-field__canvas::before,
+  .hobby-field__canvas::after {
+    display: none !important;
+  }
+  .hobby-card {
+    position: static !important;
+    width: 100% !important;
+    min-height: 180px !important;
+    transform: none !important;
+    cursor: default !important;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.25) !important;
+  }
+  .hobby-card__window {
+    position: static !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+    transform: none !important;
+  }
+
+  /* 3. Tech Tree: clean linear vertical layout */
+  .tech-tree {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 32px !important;
+    padding-top: 16px !important;
+  }
+  .tech-tree__map {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 16px !important;
+    gap: 14px !important;
+  }
+  .tech-tree__svg-lines {
+    display: none !important;
+  }
+  .tech-tree__nodes-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+  .tech-node {
+    width: 100% !important;
+    min-height: 80px !important;
+  }
+  .tech-inspector {
+    width: 100% !important;
+    border-left: none !important;
+    border-top: 2px solid var(--teal) !important;
+    padding-top: 20px !important;
+  }
+
+  /* 4. Portfolio Carousel Mobile Arrow Controls & Stage Height */
+  .portfolio-carousel__mobile-nav {
+    display: flex !important;
+  }
+  .portfolio-carousel {
+    min-height: 0 !important;
+  }
+  .portfolio-carousel__stage {
+    height: 480px !important;
+  }
+}
+
+
