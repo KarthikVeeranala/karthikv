@@ -193,7 +193,7 @@ body { background: #eee3d2; color: #382d26; }
 
 /* CLEAN MEDIA + LIVING ARCADE FIELD */
 html { scroll-behavior: smooth; }
-body { overscroll-behavior-y: none; }
+body { overscroll-behavior-y: auto; }
 .site-shell { isolation: isolate; }
 .pixel-field { position: fixed; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; opacity: .58; }
 .pixel-field__bit { position: absolute; width: 5px; height: 5px; background: var(--teal); box-shadow: 5px 0 var(--teal), 0 5px var(--teal); opacity: .25; animation: pixel-float 6s steps(5) infinite; }
@@ -3276,8 +3276,70 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
     text-align: center !important;
   }
 
-  /* Prevent any horizontal screen drift */
-  body, html, .site-shell {
-    overflow-x: hidden !important;
+  /* Prevent horizontal screen drift without breaking vertical touch scrolling */
+  html, body {
+    overflow-x: clip !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: auto !important;
+    min-height: 100% !important;
+  }
+  .site-shell {
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    min-height: 100vh !important;
   }
 }
+
+/* =========================================================================
+   SERENE CALM PASS: REDUCE OVERSTIMULATION & FATIGUE
+   ========================================================================= */
+
+/* 1. Static Architectural Orbits: remove dizzying continuous rotation */
+.hero-orbit {
+  animation: none !important;
+  opacity: 0.22 !important;
+}
+
+/* 2. Quiet Background Glyphs: soften floating arcade characters */
+.pixel-field {
+  opacity: 0.12 !important;
+}
+.pixel-field__glyph {
+  opacity: 0.04 !important;
+  animation: none !important;
+}
+
+/* 3. Subdued Scanlines & Glitch Animations */
+.coin-catcher__scanline {
+  display: none !important;
+}
+.glitch-coin {
+  animation: none !important;
+  box-shadow: 2px 2px 0 var(--teal-dim) !important;
+}
+
+/* 4. Soft Subtle Noise Grain (Day & Night) */
+.noise {
+  opacity: 0.02 !important;
+}
+
+/* 5. Serene Pacman Mascot Rest State */
+.pixel-mascot.is-paused .pacman-sprite {
+  animation: none !important;
+  filter: opacity(0.85);
+}
+.pixel-mascot__bubble {
+  opacity: 0.75;
+  transition: opacity 0.2s;
+}
+.pixel-mascot:hover .pixel-mascot__bubble {
+  opacity: 1;
+}
+
+/* 6. Clean Text Contrast without High-Flicker Shadows */
+.site-shell:not(.theme-neon) .hero-identity h1,
+.site-shell:not(.theme-neon) .hero-identity h1 span {
+  text-shadow: none !important;
+}
+

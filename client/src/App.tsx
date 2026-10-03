@@ -455,12 +455,14 @@ function PixelMascot() {
   const [facing, setFacing] = useState<1 | -1>(1);
   const [isPaused, setIsPaused] = useState(() => {
     try {
-      return localStorage.getItem("karthik-mascot-paused") === "true";
+      const saved = localStorage.getItem("karthik-mascot-paused");
+      if (saved === "false") return false;
+      return true; // default: paused / resting
     } catch {
-      return false;
+      return true;
     }
   });
-  const [message, setMessage] = useState(isPaused ? "PAUSED // CLICK TO RESUME" : "CALM MODE // CLICK TO PAUSE");
+  const [message, setMessage] = useState(isPaused ? "RESTING // CLICK TO WAKE" : "CALM MODE // CLICK TO REST");
   const [pelletScore, setPelletScore] = useState(0);
   const [popups, setPopups] = useState<Array<{ id: number; x: number; y: number; text: string }>>([]);
   const speedMultiplierRef = useRef(1);
@@ -1157,7 +1159,7 @@ function SiteShell({ children }: { children: React.ReactNode }) {
       <PixelMascot />
       {children}
       <SocialRail />
-      <CursorFX />
+      {developerMode && <CursorFX />}
       <CheatTerminal
         open={terminalOpen}
         unlocked={developerMode}
