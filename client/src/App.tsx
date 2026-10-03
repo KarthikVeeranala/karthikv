@@ -32,6 +32,11 @@ import {
   Youtube,
   Zap,
   Monitor,
+  RotateCcw,
+  RotateCw,
+  Shield,
+  Flame,
+  Award,
 } from "lucide-react";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -45,19 +50,19 @@ function assetUrl(path: string) {
 const ACCENT = "#16d6bd";
 let arcadeAudio: AudioContext | null = null;
 let footerControls: { toggleSound: () => void; toggleCabinet: () => void } | null = null;
-function playArcadeTone(kind: "hover" | "click" | "transition" | "hit" | "win") {
+function playArcadeTone(kind: "hover" | "click" | "transition" | "hit" | "win" | "chomp" | "parry") {
   try {
     arcadeAudio ??= new AudioContext();
     const ctx = arcadeAudio;
     if (ctx.state === "suspended") void ctx.resume();
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
-    const frequencies = { hover: 420, click: 180, transition: 110, hit: 75, win: 720 };
-    oscillator.type = kind === "hit" ? "square" : "triangle";
+    const frequencies = { hover: 420, click: 180, transition: 110, hit: 75, win: 720, chomp: 320, parry: 880 };
+    oscillator.type = kind === "hit" ? "square" : kind === "parry" ? "sine" : "triangle";
     oscillator.frequency.setValueAtTime(frequencies[kind], ctx.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(kind === "win" ? 980 : frequencies[kind] * .68, ctx.currentTime + (kind === "transition" ? .22 : .09));
+    oscillator.frequency.exponentialRampToValueAtTime(kind === "win" ? 980 : kind === "chomp" ? 190 : frequencies[kind] * .68, ctx.currentTime + (kind === "transition" ? .22 : .09));
     gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(kind === "hover" ? .018 : .045, ctx.currentTime + .008);
+    gain.gain.exponentialRampToValueAtTime(kind === "hover" ? .018 : kind === "chomp" ? .035 : .045, ctx.currentTime + .008);
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (kind === "win" ? .35 : .12));
     oscillator.connect(gain).connect(ctx.destination);
     oscillator.start(); oscillator.stop(ctx.currentTime + (kind === "win" ? .36 : .14));
@@ -66,12 +71,12 @@ function playArcadeTone(kind: "hover" | "click" | "transition" | "hit" | "win") 
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "Backstory", href: "/backstory/" },
   { label: "Demo Reel", href: "/demo-reel/" },
-  { label: "Hobbies", href: "/hobbies/" },
-  { label: "Bio & Contact", href: "/bio/" },
-  { label: "Arcade", href: "/arcade/" },
+  { label: "Backstory", href: "/backstory/" },
   { label: "Tech Tree", href: "/skills/" },
+  { label: "Hobbies", href: "/hobbies/" },
+  { label: "Arcade", href: "/arcade/" },
+  { label: "Bio & Contact", href: "/bio/" },
 ];
 
 const DEMO_REEL_URL = assetUrl("karthik_veeranala_demo_reel.mp4");
@@ -394,18 +399,43 @@ function ArcadeBackground() {
   return <div className="pixel-field" aria-hidden="true">{glyphs.map((glyph, index) => <span key={`${glyph}-${index}`} className={`pixel-field__glyph pixel-field__glyph--${index % 5}`} style={{ left: `${(index * 37) % 94}%`, top: `${(index * 61) % 90}%`, animationDelay: `${(index % 9) * -0.7}s`, animationDuration: `${7 + (index % 5)}s` }}>{glyph}</span>)}</div>;
 }
 
+interface Pellet {
+  id: number;
+  x: number;
+  y: number;
+}
+
 function PixelMascot() {
   const [position, setPosition] = useState(() => {
     try {
       const saved = localStorage.getItem("karthik-mascot-position");
       if (saved) return JSON.parse(saved);
     } catch {}
-    return { x: 26, y: Math.max(120, typeof window !== "undefined" ? window.innerHeight - 165 : 400) };
+    return { x: 26, y: Math.max(120, typeof window !== "undefined" ? window.innerHeight - 175 : 400) };
   });
   const [dragging, setDragging] = useState(false);
   const [state, setState] = useState<"idle" | "wandering" | "dragging" | "excited">("idle");
-  const [facing, setFacing] = useState<"left" | "right">("right");
-  const [message, setMessage] = useState("DRAG ME");
+  const [rotation, setRotation] = useState(0);
+  const [message, setMessage] = useState("DRAG ME / CHOMP PELLETS");
+  const [pelletScore, setPelletScore] = useState(0);
+  const [popups, setPopups] = useState<Array<{ id: number; x: number; y: number; text: string }>>([]);
+
+  const generatePellets = useCallback((): Pellet[] => {
+    if (typeof window === "undefined") return [];
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    return [
+      { id: 1, x: Math.floor(w * 0.15), y: Math.floor(h * 0.25) },
+      { id: 2, x: Math.floor(w * 0.82), y: Math.floor(h * 0.35) },
+      { id: 3, x: Math.floor(w * 0.45), y: Math.floor(h * 0.65) },
+      { id: 4, x: Math.floor(w * 0.22), y: Math.floor(h * 0.78) },
+      { id: 5, x: Math.floor(w * 0.75), y: Math.floor(h * 0.82) },
+      { id: 6, x: Math.floor(w * 0.55), y: Math.floor(h * 0.20) },
+    ];
+  }, []);
+
+  const [pellets, setPellets] = useState<Pellet[]>(() => generatePellets());
+
   const mascotRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef(position);
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -418,21 +448,66 @@ function PixelMascot() {
     } catch {}
   }, [position]);
 
+  // Check collision with pellets
+  const checkChomp = useCallback((x: number, y: number) => {
+    setPellets((current) => {
+      const remaining: Pellet[] = [];
+      let ate = false;
+      let eatenPos = { x: 0, y: 0 };
+      for (const p of current) {
+        const dist = Math.hypot(p.x - (x + 28), p.y - (y + 28));
+        if (dist < 42 && !ate) {
+          ate = true;
+          eatenPos = { x: p.x, y: p.y };
+        } else {
+          remaining.push(p);
+        }
+      }
+      if (ate) {
+        playArcadeTone("chomp");
+        setPelletScore((s) => s + 10);
+        const popId = Date.now() + Math.random();
+        setPopups((pops) => [...pops, { id: popId, x: eatenPos.x, y: eatenPos.y, text: "+10" }]);
+        setTimeout(() => {
+          setPopups((pops) => pops.filter((p) => p.id !== popId));
+        }, 900);
+
+        if (remaining.length === 0) {
+          playArcadeTone("win");
+          setMessage("POWER RUN! ALL PELLETS CLEARED! +50");
+          setTimeout(() => {
+            setPellets(generatePellets());
+          }, 1200);
+        }
+      }
+      return ate ? remaining : current;
+    });
+  }, [generatePellets]);
+
   useEffect(() => {
     const move = (event: PointerEvent) => {
       if (!dragging) return;
       moved.current = true;
       lastActiveRef.current = Date.now();
       const prevX = positionRef.current.x;
+      const prevY = positionRef.current.y;
       const nextX = Math.max(8, Math.min(window.innerWidth - 74, event.clientX - dragOffset.current.x));
       const nextY = Math.max(64, Math.min(window.innerHeight - 76, event.clientY - dragOffset.current.y));
-      if (nextX !== prevX) {
-        setFacing(nextX > prevX ? "right" : "left");
+
+      const dx = nextX - prevX;
+      const dy = nextY - prevY;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        setRotation(dx > 0 ? 0 : 180);
+      } else if (Math.abs(dy) > 1) {
+        setRotation(dy > 0 ? 90 : 270);
       }
+
       const next = { x: nextX, y: nextY };
       positionRef.current = next;
       if (mascotRef.current) mascotRef.current.style.transform = `translate3d(${next.x}px, ${next.y}px, 0)`;
+      checkChomp(next.x, next.y);
     };
+
     const up = () => {
       if (!dragging) return;
       setDragging(false);
@@ -440,18 +515,19 @@ function PixelMascot() {
       setPosition(positionRef.current);
       lastActiveRef.current = Date.now();
     };
+
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerup", up, { passive: true });
     return () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
     };
-  }, [dragging]);
+  }, [dragging, checkChomp]);
 
   useEffect(() => {
     if (!dragging) return;
     setState("dragging");
-    const dragPhrases = ["WHOA!", "WHERE WE GOIN'?", "HOLD ON TIGHT!", "SYSTEMS OVERHEAT!", "WHEEE!"];
+    const dragPhrases = ["NOM NOM NOM!", "WAKAWAKA!", "SPEED CHOMP!", "SWALLOWING BUGS!", "WHEEE!"];
     const phrase = dragPhrases[Math.floor(Math.random() * dragPhrases.length)];
     setMessage(phrase);
     playArcadeTone("hover");
@@ -464,21 +540,24 @@ function PixelMascot() {
       if (idleTime > 4500) {
         setState("wandering");
         const cur = positionRef.current;
-        const stepX = (Math.random() > 0.5 ? 1 : -1) * (50 + Math.random() * 80);
+        const stepX = (Math.random() > 0.5 ? 1 : -1) * (50 + Math.random() * 90);
         const nextX = Math.max(16, Math.min(window.innerWidth - 80, cur.x + stepX));
-        const stepY = (Math.random() - 0.5) * 40;
+        const stepY = (Math.random() - 0.5) * 50;
         const nextY = Math.max(80, Math.min(window.innerHeight - 90, cur.y + stepY));
-        setFacing(nextX > cur.x ? "right" : "left");
+
+        setRotation(nextX > cur.x ? 0 : 180);
         const next = { x: nextX, y: nextY };
         positionRef.current = next;
         setPosition(next);
-        const wanderBubbles = ["PATROLLING...", "SCANNING...", "INSPECTION PASS", "KV-BOT ONLINE"];
+        checkChomp(next.x, next.y);
+
+        const wanderBubbles = ["CHOMPING AROUND...", "WAKAWAKA...", "SCANNING FOR DOTS", "PAC-KV ONLINE"];
         setMessage(wanderBubbles[Math.floor(Math.random() * wanderBubbles.length)]);
       }
     };
     const interval = window.setInterval(checkWander, 5000);
     return () => window.clearInterval(interval);
-  }, [dragging]);
+  }, [dragging, checkChomp]);
 
   const handleClick = () => {
     lastActiveRef.current = Date.now();
@@ -486,12 +565,13 @@ function PixelMascot() {
     setState("excited");
     playArcadeTone("win");
     const quotes = [
-      "HI PLAYER!",
+      "WAKAWAKA!",
       "READY FOR ACTION!",
       "3X HACKATHON WINNER!",
       "IGDC TOP 45 FINALIST!",
       "UNREAL 5.7 C++!",
       "PRESS START!",
+      "CHOMP ALL PELLETS!",
       "LET'S BUILD A GAME!",
     ];
     setMessage((cur) => {
@@ -504,42 +584,65 @@ function PixelMascot() {
   };
 
   return (
-    <div
-      ref={mascotRef}
-      className={`pixel-mascot ${dragging ? "is-dragging" : ""} is-${state} face-${facing}`}
-      style={{
-        left: 0,
-        top: 0,
-        transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
-        transition: state === "wandering" ? "transform 2.2s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
-      }}
-      onPointerDown={(event) => {
-        event.preventDefault();
-        const rect = event.currentTarget.getBoundingClientRect();
-        dragOffset.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-        moved.current = false;
-        lastActiveRef.current = Date.now();
-        setDragging(true);
-      }}
-      onClick={handleClick}
-      role="button"
-      tabIndex={0}
-      aria-label="Interactive Karthik Veeranala pixel companion"
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") handleClick();
-      }}
-    >
-      <span className="pixel-mascot__bubble">{message}</span>
-      <span className="pixel-mascot__sprite" aria-hidden="true">
-        <i className="pixel-mascot__eye pixel-mascot__eye--left" />
-        <i className="pixel-mascot__eye pixel-mascot__eye--right" />
-        <i className="pixel-mascot__mouth" />
-        <b className="pixel-mascot__foot pixel-mascot__foot--left" />
-        <b className="pixel-mascot__foot pixel-mascot__foot--right" />
-        <em className="pixel-mascot__arm" />
-      </span>
-      <span className="pixel-mascot__tag">KV-01</span>
-    </div>
+    <>
+      {/* Ambient collectible pixel pellets */}
+      <div className="pellet-field" aria-hidden="true">
+        {pellets.map((p) => (
+          <span
+            key={p.id}
+            className="pacman-pellet"
+            style={{ left: `${p.x}px`, top: `${p.y}px` }}
+          />
+        ))}
+        {popups.map((pop) => (
+          <span
+            key={pop.id}
+            className="pellet-popup"
+            style={{ left: `${pop.x}px`, top: `${pop.y}px` }}
+          >
+            {pop.text}
+          </span>
+        ))}
+      </div>
+
+      <div
+        ref={mascotRef}
+        className={`pixel-mascot pixel-mascot--pacman ${dragging ? "is-dragging" : ""} is-${state}`}
+        style={{
+          left: 0,
+          top: 0,
+          transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
+          transition: state === "wandering" ? "transform 2.2s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
+        }}
+        onPointerDown={(event) => {
+          event.preventDefault();
+          const rect = event.currentTarget.getBoundingClientRect();
+          dragOffset.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+          moved.current = false;
+          lastActiveRef.current = Date.now();
+          setDragging(true);
+        }}
+        onClick={handleClick}
+        role="button"
+        tabIndex={0}
+        aria-label="Interactive Karthik Veeranala Pac-Man companion"
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") handleClick();
+        }}
+      >
+        <span className="pixel-mascot__bubble">{message}</span>
+        <div
+          className="pacman-sprite"
+          style={{ transform: `rotate(${rotation}deg)` }}
+          aria-hidden="true"
+        >
+          <div className="pacman-wedge pacman-wedge--top" />
+          <div className="pacman-wedge pacman-wedge--bottom" />
+          <div className="pacman-eye" />
+        </div>
+        <span className="pixel-mascot__tag">PAC-KV • {pelletScore} PTS</span>
+      </div>
+    </>
   );
 }
 
@@ -652,12 +755,6 @@ function HeroVideo({ compact = false }: { compact?: boolean }) {
       <video autoPlay muted loop playsInline preload="metadata" aria-label="Karthik Veeranala Systems & Gameplay Master Reel">
         <source src={DEMO_REEL_URL} type="video/mp4" />
       </video>
-      <div className="hero-video__fallback" aria-hidden="true">
-        <div className="dungeon-arch"><span /><span /><span /></div>
-      </div>
-      <div className="hero-video__veil" />
-      <div className="hero-video__hud"><span>MASTER_REEL</span><span>02:20 / 02:20</span></div>
-      <div className="hero-video__caption"><span>SYSTEMS ARCHITECTURE & GAMEPLAY</span><span>Unreal Engine 5.7 C++ / Karthik Veeranala</span></div>
     </div>
   );
 }
@@ -676,6 +773,94 @@ function ProjectCard({ project, index, onContributions }: { project: typeof proj
   return <article className={`project-card project-card--${index % 2 === 0 ? "left" : "right"}`}><div className="project-card__number"><strong>{String(index + 1).padStart(2, "0")}</strong><span>/ {String(projects.length).padStart(2, "0")}</span></div><div className="project-card__content"><Link href={`/portfolio/${project.slug}/`} className="project-card__link"><ProjectVisual tone={project.tone} label={project.stat} media={project.media} /><div className="project-card__body"><div><span className="project-card__type">{project.type}</span><h3>{project.title}</h3></div><ArrowUpRight className="project-card__arrow" size={18} /><p>{project.description}</p><div className="tag-row">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div></Link>{onContributions && <button className="project-card__contrib" onClick={() => onContributions(project)}>My contributions <ArrowRight size={13} /></button>}</div></article>;
 }
 
+function FeaturedWorkCarousel({ onContributions }: { onContributions: (project: typeof projects[number]) => void }) {
+  const [active, setActive] = useState(0);
+  const next = () => {
+    playArcadeTone("hover");
+    setActive((prev) => (prev + 1) % projects.length);
+  };
+  const prev = () => {
+    playArcadeTone("hover");
+    setActive((prev) => (prev - 1 + projects.length) % projects.length);
+  };
+  const current = projects[active];
+
+  return (
+    <div className="featured-carousel">
+      <div className="featured-carousel__header">
+        <div className="featured-carousel__counter">
+          <strong>{String(active + 1).padStart(2, "0")}</strong>
+          <span>/ {String(projects.length).padStart(2, "0")}</span>
+          <em>{current.type}</em>
+        </div>
+        <div className="featured-carousel__nav-btns">
+          <button type="button" className="carousel-nav-btn" onClick={prev} aria-label="Previous project">
+            <ChevronLeft size={18} />
+          </button>
+          <button type="button" className="carousel-nav-btn" onClick={next} aria-label="Next project">
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div className="featured-carousel__card">
+        <div className="featured-carousel__visual-wrap">
+          <ProjectVisual tone={current.tone} label={current.stat} media={current.media} />
+          <video src={current.video ?? DEMO_REEL_URL} autoPlay muted loop playsInline />
+          <div className="featured-carousel__badge">
+            <span className="badge-stat">{current.stat}</span>
+            <span className="badge-name">{current.title}</span>
+          </div>
+        </div>
+
+        <div className="featured-carousel__info">
+          <div>
+            <span className="featured-carousel__kicker">{current.type}</span>
+            <h3>{current.title}</h3>
+            <p>{current.description}</p>
+            <div className="tag-row">
+              {current.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="featured-carousel__actions">
+            <Link href={`/portfolio/${current.slug}/`} className="button">
+              Open case study <ArrowUpRight size={14} />
+            </Link>
+            <button
+              type="button"
+              className="button button--outline"
+              onClick={() => onContributions(current)}
+            >
+              My contributions <ArrowRight size={13} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="featured-carousel__dots">
+        {projects.map((p, idx) => (
+          <button
+            key={p.slug}
+            type="button"
+            className={`carousel-dot ${active === idx ? "is-active" : ""}`}
+            onClick={() => {
+              playArcadeTone("hover");
+              setActive(idx);
+            }}
+            aria-label={`Jump to project ${idx + 1}`}
+          >
+            <span className="carousel-dot__num">{String(idx + 1).padStart(2, "0")}</span>
+            <span className="carousel-dot__line" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const contributionDetails: Record<string, { role: string; systems: string[]; snippet: string; metrics: string[] }> = {
   "e2e-automation-suite": { role: "Unreal Engine Systems & Automation Engineer at Cyrus 365 (2026 — Present)", systems: ["Win32 Desktop Sandboxing: Instantiates winsta0\\E2E_IsolatedDesktop, injecting hardware mouse/keyboard events without stealing OS cursor focus or user interruption.", "Slate & UMG Auto-Discovery: Recursively navigates runtime Slate widget trees via reflection, synthesizing click/drag events and validating UI state changes dynamically.", "GPU Backbuffer Video Streaming: Pipes raw frames directly from FViewport::ReadPixels to bundled FFmpeg via standard input (stdin), encoding 1080p H.264 recordings with automated pass/fail incident markers.", "Headless Multi-Instance CI Commandlet: Orchestrates dedicated server runs with 90-second deterministic state guards, validating networked replication and physics determinism in CI/CD pipelines."], snippet: `// Hardware Sandboxing & Backbuffer Stream\nvoid FE2ESandbox::InitializeIsolatedDesktop() {\n  HDESK hDesk = CreateDesktopA("E2E_Desk", ...);\n  SetThreadDesktop(hDesk);\n\n  // Stream backbuffer pixels directly to FFmpeg stdin\n  FViewport* Viewport = GEngine->GameViewport->Viewport;\n  PipeBackbufferToFFmpeg(Viewport, "H264_Artifact.mp4");\n}\n\n// Status: 100% Authoritative Sync Passed\nUE_LOG(LogE2E, Display, TEXT("All Test Suites Validated!"));`, metrics: ["0% (Zero Theft) / Focus Theft", "1080p H.264 Stream / Resolution", "Unreal Engine 5.7 / Engine Version", "100% Authoritative / Sync Determinism"] },
   "the-interlude": { role: "Solo Lead Gameplay & Systems Developer (24-Hour Competitive Sprint)", systems: ["6-DOF Zero-Gravity Physics: Responsive thruster inertia, pitch/yaw/roll torque dampening, and velocity vector alignment in zero gravity.", "Predictive Lead-Target AI: State-machine enemy AI calculating velocity vectors, lead-intercept angles, and evasive rolls.", "Visceral Combat Feedback: Procedural camera shake, laser collision particle trails via Niagara, and spatial 3D audio.", "Escalating Wave Director: Dynamic difficulty balancing managing enemy squad spawns and capital cruiser encounters."], snippet: `// Predictive Lead-Target Intercept Math\nFVector USpaceCombatComponent::CalculateLeadTarget(\n    const AActor* Target, float ProjectileSpeed, float DeltaTime) {\n  if (!Target) return FVector::ZeroVector;\n\n  FVector TargetVelocity = Target->GetVelocity();\n  float Distance = FVector::Dist(GetOwner()->GetActorLocation(), Target->GetActorLocation());\n  float TimeToImpact = Distance / FMath::Max(ProjectileSpeed, 100.0f);\n\n  // Lead compensation position vector\n  return Target->GetActorLocation() + (TargetVelocity * TimeToImpact);\n}`, metrics: ["🥇 1st Place Overall / Honor", "24-Hour Hackathon / Dev Cycle", "Unreal Engine 4 / Engine", "6-DOF Newtonian / Physics Model"] },
@@ -691,8 +876,19 @@ function ContributionDrawer({ project, onClose }: { project: typeof projects[num
 
 function ProjectWindow({ project, onClose, onContributions }: { project: typeof projects[number]; onClose: () => void; onContributions: () => void }) {
   return (
-    <div className="project-window__backdrop" role="dialog" aria-modal="true" aria-label={`${project.title} project window`} onClick={onClose}>
-      <article className="project-window" onClick={(event) => event.stopPropagation()}>
+    <div
+      className="project-window__backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${project.title} project window`}
+      onClick={onClose}
+      onWheel={(e) => e.stopPropagation()}
+    >
+      <article
+        className="project-window"
+        onClick={(event) => event.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
+      >
         <button className="project-window__close" onClick={onClose} aria-label="Close project window">×</button>
         <div className="project-window__media">
           <ProjectVisual tone={project.tone} label={project.stat} media={project.media} />
@@ -712,20 +908,121 @@ function ProjectWindow({ project, onClose, onContributions }: { project: typeof 
 }
 
 function BackstorySection() {
+  const [activeBtn, setActiveBtn] = useState<"X" | "A" | "Y" | "B">("X");
+  const controllerFocus = {
+    X: { title: "C++ SYSTEMS & WIN32", copy: "Low-level desktop isolation, hardware input hooks, Slate/UMG UI automation, and GPU backbuffer FFmpeg streaming." },
+    A: { title: "GAMEPLAY & COMBAT", copy: "Deterministic simulation, 5-hit melee combos, 180ms i-frame dodge rolls, and predictive lead-target AI." },
+    Y: { title: "3X HACKATHON WINNER", copy: "1st at CodeDay 2.0 (The Interlude), 2nd at HackRush (ByteOasis), and Top 3 at MLH FrostHacks (Geek'O'Wars)." },
+    B: { title: "COMMUNITY & LEADERSHIP", copy: "President of Elysium Gaming Club directing collegiate esports and mentoring 200+ student developers." },
+  };
+
+  const handleBtnClick = (btn: "X" | "A" | "Y" | "B") => {
+    setActiveBtn(btn);
+    playArcadeTone("click");
+  };
+
   return (
     <section className="backstory-section backstory-section--highlight page-pad" id="backstory">
-      <div className="backstory-section__stamp">01 / SAVE FILE<br /><strong>THE BACKSTORY</strong></div>
-      <div className="backstory-section__intro">
-        <Eyebrow number="01">The backstory</Eyebrow>
-        <h2>My story is<br /><span>built under pressure.</span></h2>
-        <p>I am a game developer and engine systems programmer focused on low-level graphics, deterministic simulation, and real-time interaction. I am currently pursuing a B.Tech in Computer Science and Engineering at IARE Hyderabad (2023–2027), with a deep focus on graphics, systems programming, and algorithms.</p>
-        <Link href="/backstory/" className="text-link">Read the full backstory <ArrowUpRight size={14} /></Link>
-      </div>
-      <div className="backstory-section__facts">
-        <div><strong>3</strong><span>Hackathon victories</span></div>
-        <div><strong>TOP 45</strong><span>IGDC indie finalist</span></div>
-        <div><strong>14+</strong><span>Playable prototypes</span></div>
-        <div><strong>200+</strong><span>Gaming Club developers</span></div>
+      <div className="backstory-editorial">
+        <div className="backstory-editorial__left">
+          <div className="backstory-section__stamp">01 / SAVE FILE<br /><strong>ENGINE & SYSTEMS PROFILE</strong></div>
+          <Eyebrow number="01">The backstory</Eyebrow>
+          <h2>Engineered under pressure.<br /><span>Built for production.</span></h2>
+          <p className="lead">
+            I am a game developer and engine systems programmer focused on low-level graphics, deterministic simulation, and real-time interaction. Pursuing a B.Tech in CSE at IARE Hyderabad (2023–2027), with production internship experience in Unreal Engine 5.7 C++.
+          </p>
+
+          {/* Interactive Retro Arcade Gamepad Button Cluster */}
+          <div className="backstory-controller-dock">
+            <div className="controller-diamond" aria-label="Arcade controller buttons">
+              <button
+                type="button"
+                className={`ctrl-btn ctrl-btn--y ${activeBtn === "Y" ? "is-active" : ""}`}
+                onClick={() => handleBtnClick("Y")}
+                title="Y: 3x Hackathon Victories"
+              >
+                <span>Y</span>
+              </button>
+              <div className="controller-diamond__middle">
+                <button
+                  type="button"
+                  className={`ctrl-btn ctrl-btn--x ${activeBtn === "X" ? "is-active" : ""}`}
+                  onClick={() => handleBtnClick("X")}
+                  title="X: C++ Systems & Win32"
+                >
+                  <span>X</span>
+                </button>
+                <button
+                  type="button"
+                  className={`ctrl-btn ctrl-btn--b ${activeBtn === "B" ? "is-active" : ""}`}
+                  onClick={() => handleBtnClick("B")}
+                  title="B: Community & Leadership"
+                >
+                  <span>B</span>
+                </button>
+              </div>
+              <button
+                type="button"
+                className={`ctrl-btn ctrl-btn--a ${activeBtn === "A" ? "is-active" : ""}`}
+                onClick={() => handleBtnClick("A")}
+                title="A: Gameplay & Combat"
+              >
+                <span>A</span>
+              </button>
+            </div>
+            <div className="controller-readout">
+              <span className="controller-readout__tag">PAD INPUT // [{activeBtn}] ACTIVE</span>
+              <strong>{controllerFocus[activeBtn].title}</strong>
+              <p>{controllerFocus[activeBtn].copy}</p>
+            </div>
+          </div>
+
+          <div className="backstory-actions">
+            <Link href="/backstory/" className="button button--outline">
+              Read complete backstory <ArrowUpRight size={14} />
+            </Link>
+            <Link href="/skills/" className="text-link">
+              Inspect tech tree <ArrowRight size={13} />
+            </Link>
+          </div>
+        </div>
+
+        <div className="backstory-editorial__right">
+          {/* Portrait Photo Frame with Fallback Cyber-Badge */}
+          <div className="backstory-portrait-frame">
+            <div className="portrait-wrap">
+              <img
+                src={assetUrl("karthik_portrait.png")}
+                alt="Karthik Veeranala portrait"
+                className="portrait-img"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  const fallback = e.currentTarget.parentElement?.querySelector(".portrait-fallback");
+                  if (fallback) (fallback as HTMLElement).style.display = "flex";
+                }}
+              />
+              <div className="portrait-fallback">
+                <span className="portrait-monogram">KV</span>
+                <small>SYSTEMS ENGINEER</small>
+                <span className="portrait-beacon" />
+              </div>
+              <div className="portrait-corners" aria-hidden="true"><i /><i /><i /><i /></div>
+              <div className="portrait-scanline" aria-hidden="true" />
+            </div>
+            <div className="portrait-meta">
+              <span>PILOT DOSSIER // HYDERABAD, IN</span>
+              <strong>KARTHIK VEERANALA</strong>
+              <small>B.Tech CSE / Systems & Prototyping</small>
+            </div>
+          </div>
+
+          <div className="backstory-section__facts">
+            <div><strong>3</strong><span>Hackathon victories</span></div>
+            <div><strong>TOP 45</strong><span>IGDC indie finalist</span></div>
+            <div><strong>14+</strong><span>Playable prototypes</span></div>
+            <div><strong>200+</strong><span>Gaming Club developers</span></div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -734,6 +1031,7 @@ function BackstorySection() {
 function BackstoryPage() {
   const milestones = [
     ["2026 — PRESENT", "Unreal Engine Systems Intern / Cyrus 365", "Architected an End-to-End Automation & Headless Verification harness in UE 5.7 C++, with Win32 isolated desktops, recursive Slate/UMG discovery, and direct backbuffer FFmpeg streaming."],
+    ["2025", "Mentor & Technical Judge / CodeDay 3.0", "Mentored collegiate teams in game design, gameplay programming, and Unreal Engine debugging; guided participants through mechanics prototyping, shader optimization, and game jam submissions."],
     ["2024 — 2025", "Game Developer & Systems Prototyper / Aicade", "Engineered 14 playable 2D prototypes testing combat feel, rigid-body ragdolls, and boss encounter choreography, including the IGDC finalist City of Aethel."],
     ["2024 — 2025", "President & Game Jam Organizer / Elysium Gaming Club — IARE", "Directing campus game development workshops, student hackathons, and collegiate esports tournaments for 200+ active student developers."],
     ["2022 — 2024", "Lead Systems & Gameplay Engineer / MLH & CodeDay", "Won 1st Place Overall at CodeDay 2.0 with The Interlude, 2nd at HackRush with ByteOasis, and Top 3 at FrostHacks with Geek'O'Wars."],
@@ -775,6 +1073,7 @@ function BackstoryPage() {
 function Home() {
   const roles = ["Game Design", "Combat Design", "Systems Design", "World Building"];
   const [roleIndex, setRoleIndex] = useState(0);
+  const [contribModal, setContribModal] = useState<typeof projects[number] | null>(null);
   useEffect(() => { const timer = window.setInterval(() => setRoleIndex((index) => (index + 1) % roles.length), 2200); return () => window.clearInterval(timer); }, []);
   return (
     <main>
@@ -805,7 +1104,7 @@ function Home() {
 
       <section className="featured-section page-pad">
         <div className="section-topline"><Eyebrow number="02">Featured work</Eyebrow><Link href="/portfolio/" className="text-link">Open portfolio <ArrowUpRight size={14} /></Link></div>
-        <div className="featured-grid">{projects.slice(0, 3).map((project, index) => <ProjectCard key={project.slug} project={project} index={index} />)}</div>
+        <FeaturedWorkCarousel onContributions={setContribModal} />
       </section>
 
       <section className="reel-band page-pad">
@@ -819,6 +1118,7 @@ function Home() {
       </section>
 
       <CoinCatcher />
+      {contribModal && <ContributionDrawer project={contribModal} onClose={() => setContribModal(null)} />}
       <Footer />
     </main>
   );
@@ -857,21 +1157,216 @@ function BossFight() {
   const [bossHp, setBossHp] = useState(100);
   const [playerHp, setPlayerHp] = useState(100);
   const [score, setScore] = useState(0);
-  const [message, setMessage] = useState("BOSS SIGNAL DETECTED");
-  const [highScores, setHighScores] = useState([3200, 2450, 1800]);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [message, setMessage] = useState("BOSS LOCK-ON // TIMED REFLEX COMBAT");
+  const [highScores, setHighScores] = useState([4500, 3200, 2450]);
+  const [bossState, setBossState] = useState<"idle" | "telegraph" | "recovering">("idle");
+  const [telegraphProgress, setTelegraphProgress] = useState(0);
+  const [isParryWindow, setIsParryWindow] = useState(false);
+
+  const bossStateRef = useRef(bossState);
+  bossStateRef.current = bossState;
+  const isParryWindowRef = useRef(isParryWindow);
+  isParryWindowRef.current = isParryWindow;
+  const isAlive = bossHp > 0 && playerHp > 0;
+  const isEnraged = bossHp < 50;
+
+  // Boss attack cycle
+  useEffect(() => {
+    if (!isAlive) return;
+
+    let progressInterval: number | null = null;
+    const attackTimer = setInterval(() => {
+      if (bossStateRef.current !== "idle") return;
+
+      setBossState("telegraph");
+      let p = 0;
+      const attackSpeed = isEnraged ? 18 : 26;
+
+      progressInterval = window.setInterval(() => {
+        p += 5;
+        setTelegraphProgress(p);
+        if (p >= 70 && p <= 95) {
+          setIsParryWindow(true);
+        } else {
+          setIsParryWindow(false);
+        }
+
+        if (p >= 100) {
+          clearInterval(progressInterval!);
+          setIsParryWindow(false);
+          setBossState("idle");
+          setTelegraphProgress(0);
+
+          const retaliation = isEnraged ? 20 : 13;
+          setPlayerHp((hp) => {
+            const nextHp = Math.max(0, hp - retaliation);
+            if (nextHp === 0) {
+              setMessage("SYSTEM CORE OVERLOAD // PRESS RESET");
+              playArcadeTone("hit");
+            }
+            return nextHp;
+          });
+          setCombo(0);
+          setMessage(`UNGUARDED HIT! -${retaliation} HP`);
+          playArcadeTone("hit");
+        }
+      }, attackSpeed);
+    }, isEnraged ? 2500 : 3600);
+
+    return () => {
+      clearInterval(attackTimer);
+      if (progressInterval) clearInterval(progressInterval);
+    };
+  }, [isAlive, isEnraged]);
+
   const strike = () => {
-    if (bossHp <= 0 || playerHp <= 0) return;
-    const damage = 9 + Math.floor(Math.random() * 13);
-    const retaliation = 4 + Math.floor(Math.random() * 10);
+    if (!isAlive) return;
+    const baseDamage = 9 + Math.floor(Math.random() * 8);
+    const multiplier = 1 + combo * 0.25;
+    const damage = Math.round(baseDamage * multiplier);
     const nextBoss = Math.max(0, bossHp - damage);
-    const nextPlayer = Math.max(0, playerHp - retaliation);
-    setBossHp(nextBoss); setPlayerHp(nextPlayer); setScore((value) => value + damage * 10);
-    if (nextBoss === 0) { setMessage("BOSS CLEARED / NEW HIGH SCORE"); playArcadeTone("win"); setHighScores((scores) => [...scores, score + damage * 10].sort((a, b) => b - a).slice(0, 3)); }
-    else if (nextPlayer === 0) { setMessage("PLAYER DOWN / INSERT COIN"); playArcadeTone("hit"); }
-    else { setMessage(`DIRECT HIT -${damage} / RETALIATION -${retaliation}`); playArcadeTone("hit"); }
+
+    setBossHp(nextBoss);
+    setScore((s) => s + damage * 15);
+    setCombo((c) => {
+      const nextC = c + 1;
+      if (nextC > maxCombo) setMaxCombo(nextC);
+      return nextC;
+    });
+    playArcadeTone("hit");
+
+    if (nextBoss === 0) {
+      setMessage("VICTORY! OVERCLOCK OVERLORD DEFEATED!");
+      playArcadeTone("win");
+      setHighScores((scores) => [...scores, score + damage * 20].sort((a, b) => b - a).slice(0, 3));
+    } else {
+      setMessage(`DIRECT STRIKE -${damage} (${Math.round(multiplier * 100)}% MULTIPLIER)`);
+    }
   };
-  const reset = () => { setBossHp(100); setPlayerHp(100); setScore(0); setMessage("BOSS SIGNAL DETECTED"); };
-  return <section className="boss-arena page-pad"><div className="boss-arena__copy"><Eyebrow number="09">Boss fight / score attack</Eyebrow><h2>Break the<br /><span>logic beast.</span></h2><p>Strike the systems boss before it overloads your player core. Every run is scored locally in this browser.</p><div className="boss-arena__stats"><span>PLAYER <b>{playerHp}%</b></span><span>BOSS <b>{bossHp}%</b></span><span>SCORE <b>{String(score).padStart(4, "0")}</b></span></div></div><div className="boss-arena__cabinet"><div className="boss-arena__screen"><div className="boss-sprite" aria-hidden="true"><i /><i /><i /><b /><b /><em /></div><span className="boss-arena__status">{message}</span><div className="health-bar"><i style={{ width: `${bossHp}%` }} /></div></div><div className="boss-arena__controls"><button className="button" onClick={strike} disabled={bossHp === 0 || playerHp === 0}>Strike <Zap size={14} /></button><button className="button button--tiny" onClick={reset}>Reset <RefreshCw size={12} /></button></div></div><div className="scoreboard"><Eyebrow>Local leaderboard</Eyebrow>{highScores.map((highScore, index) => <div key={`${highScore}-${index}`}><span>0{index + 1}</span><strong>{String(highScore).padStart(4, "0")}</strong><small>{index === 0 ? "SYSTEM BREAKER" : index === 1 ? "FAST PROTOTYPER" : "PLAYER 01"}</small></div>)}</div></section>;
+
+  const parry = () => {
+    if (!isAlive) return;
+    if (isParryWindowRef.current) {
+      playArcadeTone("parry");
+      setIsParryWindow(false);
+      setBossState("idle");
+      setTelegraphProgress(0);
+      const bonusScore = 250;
+      setScore((s) => s + bonusScore);
+      setCombo((c) => c + 2);
+      const counterDamage = 18;
+      setBossHp((hp) => Math.max(0, hp - counterDamage));
+      setMessage(`PERFECT PARRY! BOSS STUNNED! +${bonusScore} PTS`);
+    } else {
+      playArcadeTone("hit");
+      const penalty = 12;
+      setPlayerHp((hp) => Math.max(0, hp - penalty));
+      setCombo(0);
+      setMessage(`MISTIMED PARRY! -${penalty} HP (Watch the yellow zone!)`);
+    }
+  };
+
+  const dodge = () => {
+    if (!isAlive) return;
+    if (bossStateRef.current === "telegraph") {
+      playArcadeTone("transition");
+      setBossState("idle");
+      setTelegraphProgress(0);
+      setIsParryWindow(false);
+      setScore((s) => s + 50);
+      setMessage("DODGE ROLL SUCCESS! 0 DAMAGE");
+    } else {
+      playArcadeTone("hover");
+      setMessage("EVASIVE ROLL // CLEAR");
+    }
+  };
+
+  const reset = () => {
+    setBossHp(100);
+    setPlayerHp(100);
+    setScore(0);
+    setCombo(0);
+    setBossState("idle");
+    setTelegraphProgress(0);
+    setIsParryWindow(false);
+    setMessage("BOSS SIGNAL DETECTED // READY");
+  };
+
+  return (
+    <section className="boss-arena page-pad">
+      <div className="boss-arena__copy">
+        <Eyebrow number="09">Reflex combat / boss arena</Eyebrow>
+        <h2>Break the<br /><span>{isEnraged ? "ENRAGED BEAST" : "LOGIC BEAST"}</span></h2>
+        <p>A fast-paced reflex combat system modeled on <em>City of Aethel</em>. Watch the boss attack meter and parry inside the golden window to stun the boss and build combos!</p>
+        <div className="boss-arena__stats">
+          <span>PLAYER <b>{playerHp}%</b></span>
+          <span>BOSS <b>{bossHp}%</b></span>
+          <span>COMBO <b>{combo}x</b></span>
+          <span>SCORE <b>{String(score).padStart(4, "0")}</b></span>
+        </div>
+      </div>
+
+      <div className="boss-arena__cabinet">
+        <div className={`boss-arena__screen ${isEnraged ? "is-enraged" : ""}`}>
+          <div className={`boss-sprite ${bossState === "telegraph" ? "is-charging" : ""}`} aria-hidden="true">
+            <i /><i /><i /><b /><b /><em />
+          </div>
+
+          {/* Telegraph charging meter */}
+          <div className="attack-meter-wrap">
+            <span className="attack-meter-label">
+              {bossState === "telegraph" ? (isParryWindow ? "⚡ PARRY NOW! ⚡" : "CHARGING ATTACK...") : "READY"}
+            </span>
+            <div className="attack-meter-bar">
+              <div
+                className={`attack-meter-fill ${isParryWindow ? "is-parry-active" : ""}`}
+                style={{ width: `${telegraphProgress}%` }}
+              />
+              <span className="parry-zone-marker" title="Parry Window" />
+            </div>
+          </div>
+
+          <span className="boss-arena__status">{message}</span>
+          <div className="health-bar">
+            <i style={{ width: `${bossHp}%`, background: isEnraged ? "#ff3b30" : "var(--rust)" }} />
+          </div>
+        </div>
+
+        <div className="boss-arena__controls">
+          <button className="button" onClick={strike} disabled={!isAlive}>
+            <Zap size={14} /> Strike
+          </button>
+          <button
+            className={`button button--parry ${isParryWindow ? "is-alert" : ""}`}
+            onClick={parry}
+            disabled={!isAlive}
+            title="Time your parry when meter hits the gold zone"
+          >
+            <Shield size={14} /> Parry
+          </button>
+          <button className="button button--outline" onClick={dodge} disabled={!isAlive}>
+            Dodge
+          </button>
+          <button className="button button--tiny" onClick={reset}>
+            <RefreshCw size={12} /> Reset
+          </button>
+        </div>
+      </div>
+
+      <div className="scoreboard">
+        <Eyebrow>Local leaderboard</Eyebrow>
+        {highScores.map((highScore, index) => (
+          <div key={`${highScore}-${index}`}>
+            <span>0{index + 1}</span>
+            <strong>{String(highScore).padStart(4, "0")}</strong>
+            <small>{index === 0 ? "MASTER PARRY" : index === 1 ? "FAST PROTOTYPER" : "COMBAT PILOT"}</small>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function PageHeader({ number, kicker, title, copy }: { number: string; kicker: string; title: React.ReactNode; copy?: string }) {
@@ -891,38 +1386,178 @@ function PageHeader({ number, kicker, title, copy }: { number: string; kicker: s
 
 function DemoReelPage() {
   const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(140);
+  const [muted, setMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<HTMLDivElement>(null);
+
   const togglePlay = () => {
-    if (videoRef.current) {
-      if (playing) {
-        videoRef.current.pause();
-      } else {
-        void videoRef.current.play();
-      }
-      setPlaying(!playing);
+    if (!videoRef.current) return;
+    if (playing) {
+      videoRef.current.pause();
+      setPlaying(false);
+    } else {
+      void videoRef.current.play();
+      setPlaying(true);
     }
   };
+
+  const seekBy = (seconds: number) => {
+    if (!videoRef.current) return;
+    const target = Math.max(0, Math.min(duration, videoRef.current.currentTime + seconds));
+    videoRef.current.currentTime = target;
+    setCurrentTime(target);
+    playArcadeTone("click");
+  };
+
+  const seekTo = (seconds: number) => {
+    if (!videoRef.current) return;
+    videoRef.current.currentTime = seconds;
+    setCurrentTime(seconds);
+    if (!playing) {
+      void videoRef.current.play();
+      setPlaying(true);
+    }
+    playArcadeTone("click");
+  };
+
+  const toggleMute = () => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !muted;
+    setMuted(!muted);
+    playArcadeTone("click");
+  };
+
+  const toggleFullscreen = () => {
+    if (!playerRef.current) return;
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
+    } else {
+      void playerRef.current.requestFullscreen();
+    }
+  };
+
+  const handleScrub = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!videoRef.current) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    const target = ratio * duration;
+    videoRef.current.currentTime = target;
+    setCurrentTime(target);
+  };
+
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
+
+  const chapters = [
+    { title: "Headless E2E Automation Suite (UE 5.7 C++)", time: "00:00", seconds: 0 },
+    { title: "The Interlude (1st Place CodeDay)", time: "00:32", seconds: 32 },
+    { title: "ByteOasis: Code to Escape (2nd Place HackRush)", time: "01:05", seconds: 65 },
+    { title: "Geek'O'Wars (Top 3 MLH FrostHacks)", time: "01:25", seconds: 85 },
+    { title: "City of Aethel (Top 45 IGDC Finalist)", time: "01:40", seconds: 100 },
+  ];
+
   return (
     <main className="inner-page">
       <PageHeader number="01" kicker="Demo reel" title={<>Systems in<br /><span>motion.</span></>} />
       <section className="reel-page__player page-pad">
-        <div className="reel-player">
+        <div ref={playerRef} className="reel-player reel-player--enhanced">
           <div className="hero-video hero-video--compact">
-            <video ref={videoRef} autoPlay muted loop playsInline preload="metadata" aria-label="Karthik Veeranala Systems & Gameplay Reel">
+            <video
+              ref={videoRef}
+              autoPlay
+              muted={muted}
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Karthik Veeranala Systems & Gameplay Reel"
+              onTimeUpdate={() => {
+                if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
+              }}
+              onLoadedMetadata={() => {
+                if (videoRef.current) setDuration(videoRef.current.duration || 140);
+              }}
+              onPlay={() => setPlaying(true)}
+              onPause={() => setPlaying(false)}
+            >
               <source src={DEMO_REEL_URL} type="video/mp4" />
             </video>
-            <div className="hero-video__veil" />
-            <div className="hero-video__hud"><span>MASTER_REEL</span><span>02:20 / 02:20</span></div>
-            <div className="hero-video__caption"><span>SYSTEMS ARCHITECTURE & GAMEPLAY</span><span>Karthik Veeranala / B.Tech CSE</span></div>
           </div>
-          <button className="reel-player__play" onClick={togglePlay} aria-label={playing ? "Pause reel" : "Play reel"}>
-            {playing ? "Ⅱ" : <Play size={22} fill="currentColor" />}
-          </button>
-          <div className="reel-player__bar">
-            <span className="reel-player__progress" style={{ width: playing ? "68%" : "25%" }} />
-            <span className="reel-player__time">00:02:20</span>
+
+          {/* Scrubbable Duration Bar */}
+          <div className="reel-scrubber" onClick={handleScrub} title="Click to seek">
+            <div
+              className="reel-scrubber__fill"
+              style={{ width: `${(currentTime / Math.max(1, duration)) * 100}%` }}
+            />
+            <span
+              className="reel-scrubber__thumb"
+              style={{ left: `${(currentTime / Math.max(1, duration)) * 100}%` }}
+            />
+          </div>
+
+          {/* Player Controls Dock */}
+          <div className="reel-controls-dock">
+            <div className="reel-controls-dock__left">
+              <button
+                type="button"
+                className="reel-ctrl-btn"
+                onClick={togglePlay}
+                aria-label={playing ? "Pause reel" : "Play reel"}
+                title={playing ? "Pause" : "Play"}
+              >
+                {playing ? <Pause size={18} /> : <Play size={18} fill="currentColor" />}
+              </button>
+              <button
+                type="button"
+                className="reel-ctrl-btn reel-ctrl-btn--seek"
+                onClick={() => seekBy(-10)}
+                aria-label="Rewind 10 seconds"
+                title="Rewind 10s"
+              >
+                <RotateCcw size={15} /> <span>-10s</span>
+              </button>
+              <button
+                type="button"
+                className="reel-ctrl-btn reel-ctrl-btn--seek"
+                onClick={() => seekBy(10)}
+                aria-label="Forward 10 seconds"
+                title="Forward 10s"
+              >
+                <RotateCw size={15} /> <span>+10s</span>
+              </button>
+              <button
+                type="button"
+                className="reel-ctrl-btn"
+                onClick={toggleMute}
+                aria-label={muted ? "Unmute audio" : "Mute audio"}
+                title={muted ? "Unmute" : "Mute"}
+              >
+                {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+              </button>
+            </div>
+
+            <div className="reel-controls-dock__right">
+              <span className="reel-time-readout">
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+              <button
+                type="button"
+                className="reel-ctrl-btn"
+                onClick={toggleFullscreen}
+                aria-label="Toggle Fullscreen"
+                title="Fullscreen"
+              >
+                <Maximize2 size={17} />
+              </button>
+            </div>
           </div>
         </div>
+
         <div className="reel-page__meta">
           <div>
             <Eyebrow>Credits</Eyebrow>
@@ -934,19 +1569,21 @@ function DemoReelPage() {
           </div>
         </div>
       </section>
+
       <section className="chapter-list page-pad">
-        <div className="section-topline"><Eyebrow number="02">Selected chapters</Eyebrow><span className="muted-label">BREAKDOWN BY PROJECT</span></div>
-        {[
-          ["Headless E2E Automation Suite", "00:00"],
-          ["The Interlude (1st Place CodeDay)", "00:32"],
-          ["ByteOasis: Code to Escape (2nd Place HackRush)", "01:05"],
-          ["Geek'O'Wars (Top 3 MLH FrostHacks)", "01:25"],
-          ["City of Aethel (Top 45 IGDC Finalist)", "01:40"],
-        ].map(([item, time], index) => (
-          <div key={item} className="chapter-row">
+        <div className="section-topline"><Eyebrow number="02">Selected chapters</Eyebrow><span className="muted-label">CLICK ANY CHAPTER TO JUMP</span></div>
+        {chapters.map((ch, index) => (
+          <div
+            key={ch.title}
+            className="chapter-row"
+            onClick={() => seekTo(ch.seconds)}
+            role="button"
+            tabIndex={0}
+            aria-label={`Jump to ${ch.title}`}
+          >
             <span>0{index + 1}</span>
-            <strong>{item}</strong>
-            <small>{time}</small>
+            <strong>{ch.title}</strong>
+            <small>{ch.time}</small>
             <ArrowRight size={15} />
           </div>
         ))}
@@ -961,52 +1598,144 @@ function DemoReelPage() {
 function HobbiesPage() {
   const hobbies = [
     {
+      id: "games",
       title: "Gaming",
       label: "RETRO TO MODERN",
       copy: "Playing everything from retro icons to modern titles to dissect mechanics & feel: AC3, Tomb Raider, FIFA 16, Fortnite, Minecraft, Road Rash, Prince of Persia, OG Wolfenstein 3D, Doom, Tekken, and Mortal Kombat.",
       art: "games",
       note: "DISSECT / PLAY / ADAPT",
+      initX: 40,
+      initY: 45,
     },
     {
+      id: "reading",
       title: "Manga & Anime",
       label: "NARRATIVE & ART",
       copy: "Avid reader and collector with complete physical manga collections of Jujutsu Kaisen, Demon Slayer, and Attack on Titan, alongside following seasonal and classic anime.",
       art: "reading",
       note: "STORY / ART / LORE",
+      initX: 380,
+      initY: 35,
     },
     {
+      id: "athletics",
       title: "Football & F1",
       label: "PACE & TACTICS",
       copy: "Playing football on the pitch and watching European matchdays with the same adrenaline as following Formula 1 Grand Prix weekends—tracking race strategy, reaction windows, and pacing.",
       art: "athletics",
       note: "PACE / RESET / COMMIT",
+      initX: 80,
+      initY: 350,
     },
     {
+      id: "creative",
       title: "Guitar & Loot",
       label: "CREATIVE & COLLECTIBLES",
       copy: "Acoustic fingerstyle guitar, kitchen cooking experiments, and curating an ongoing collection of scale figures, rare Pokémon cards, and game posters.",
       art: "creative",
       note: "MAKE / TUNE / COLLECT",
+      initX: 440,
+      initY: 330,
     },
   ];
+
   const [active, setActive] = useState<string | null>(null);
+  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>(() => {
+    return hobbies.reduce((acc, h) => ({ ...acc, [h.id]: { x: h.initX, y: h.initY } }), {});
+  });
+  const [draggingCard, setDraggingCard] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
+
+  const handlePointerDown = (id: string, e: React.PointerEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    dragOffsetRef.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+    setDraggingCard(id);
+    setActive(id);
+    playArcadeTone("hover");
+  };
+
+  useEffect(() => {
+    if (!draggingCard) return;
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!canvasRef.current) return;
+      const canvasRect = canvasRef.current.getBoundingClientRect();
+      const cardWidth = 270;
+      const cardHeight = 220;
+
+      // Strictly clamp inside canvas bounds!
+      const rawX = e.clientX - canvasRect.left - dragOffsetRef.current.x;
+      const rawY = e.clientY - canvasRect.top - dragOffsetRef.current.y;
+      const clampedX = Math.max(12, Math.min(canvasRect.width - cardWidth - 12, rawX));
+      const clampedY = Math.max(12, Math.min(canvasRect.height - cardHeight - 12, rawY));
+
+      setPositions((prev) => ({
+        ...prev,
+        [draggingCard]: { x: clampedX, y: clampedY },
+      }));
+    };
+
+    const onPointerUp = () => {
+      setDraggingCard(null);
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+    };
+  }, [draggingCard]);
+
   return (
     <main className="inner-page hobbies-page">
       <PageHeader number="04" kicker="Creative pursuits / source notes" title={<>The things that<br /><span>keep me sharp.</span></>} />
       <section className="hobby-field page-pad">
         <div className="hobby-field__topline">
           <Eyebrow>4 signals found</Eyebrow>
-          <span>HOVER OR SELECT A CARD</span>
+          <span>DRAG CARDS ANYWHERE INSIDE THE BOX // CLICK TO EXPAND</span>
         </div>
-        <div className="hobby-field__canvas">
-          {hobbies.map((hobby, index) => (
-            <button key={hobby.title} className={`hobby-card hobby-card--${hobby.art} ${active === hobby.title ? "is-active" : ""}`} onClick={() => setActive(active === hobby.title ? null : hobby.title)}>
-              <span className="hobby-card__index">0{index + 1}</span>
-              <span className={`hobby-card__art hobby-card__art--${hobby.art}`} aria-hidden="true"><i /><i /><i /><b /></span>
-              <span className="hobby-card__body"><small>{hobby.label}</small><strong>{hobby.title}</strong><em>{hobby.note}</em></span>
-              <span className="hobby-card__window"><b>{hobby.title.toUpperCase()} // SIGNAL</b><span>{hobby.copy}</span></span>
-            </button>
-          ))}
+        <div ref={canvasRef} className="hobby-field__canvas">
+          {hobbies.map((hobby, index) => {
+            const pos = positions[hobby.id] ?? { x: hobby.initX, y: hobby.initY };
+            const isDragging = draggingCard === hobby.id;
+            const isSelected = active === hobby.id;
+            return (
+              <button
+                key={hobby.id}
+                className={`hobby-card hobby-card--${hobby.art} ${isSelected ? "is-active" : ""} ${isDragging ? "is-dragging" : ""}`}
+                style={{
+                  transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  cursor: isDragging ? "grabbing" : "grab",
+                  zIndex: isDragging ? 15 : isSelected ? 10 : 2,
+                  transition: isDragging ? "none" : "box-shadow 0.2s, border-color 0.2s",
+                }}
+                onPointerDown={(e) => handlePointerDown(hobby.id, e)}
+                onClick={() => setActive(active === hobby.id ? null : hobby.id)}
+                aria-label={hobby.title}
+              >
+                <span className="hobby-card__index">0{index + 1}</span>
+                <span className={`hobby-card__art hobby-card__art--${hobby.art}`} aria-hidden="true"><i /><i /><i /><b /></span>
+                <span className="hobby-card__body">
+                  <small>{hobby.label}</small>
+                  <strong>{hobby.title}</strong>
+                  <em>{hobby.note}</em>
+                </span>
+                <span className="hobby-card__window">
+                  <b>{hobby.title.toUpperCase()} // SIGNAL</b>
+                  <span>{hobby.copy}</span>
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
       <section className="hobby-note page-pad">
@@ -1060,8 +1789,6 @@ function BioPage() {
   );
 }
 
-
-
 const techNodes = [
   { id: "ue", label: "UNREAL ENGINE", rank: "S+", color: "teal", tools: ["UE 5.7", "UE 4", "Slate / UMG", "Niagara"], usedIn: "Headless E2E Automation Suite, ByteOasis, Geek'O'Wars", copy: "Engine architecture, headless verification, UI auto-discovery, physics, dedicated servers, and gameplay systems." },
   { id: "cpp", label: "C++ SYSTEMS", rank: "S", color: "rust", tools: ["Memory", "Threads", "Win32", "FFmpeg"], usedIn: "E2E Automation Suite / Cyrus 365", copy: "Low-level foundations for deterministic simulation, isolated desktops, GPU backbuffer streaming, and test orchestration." },
@@ -1069,9 +1796,98 @@ const techNodes = [
   { id: "gameplay", label: "GAMEPLAY SYSTEMS", rank: "S", color: "pink", tools: ["AI", "Physics", "Combat", "State machines"], usedIn: "The Interlude / 14+ prototypes", copy: "The layer where rules become feel: combat loops, predictive targeting, movement, encounters, and readable feedback." },
   { id: "tools", label: "TOOLS / PIPELINES", rank: "A", color: "blue", tools: ["Git", "CI", "Automation", "Profiling"], usedIn: "All projects / production systems", copy: "Build, test, profile, and ship workflows that let small teams move fast without losing system clarity." },
 ];
+
 function TechTreePage() {
   const [selected, setSelected] = useState(techNodes[0]);
-  return <main className="inner-page tech-page"><PageHeader number="10" kicker="Tech-stack inventory / interactive skill tree" title={<>Map the<br /><span>loadout.</span></>} copy="Don’t just read a list of tools. Pick a node to inspect the systems, engines, and projects behind the work." /><section className="tech-tree page-pad"><div className="tech-tree__map"><div className="tech-tree__lines" aria-hidden="true"><i /><i /><i /><i /></div>{techNodes.map((node) => <button key={node.id} className={`tech-node tech-node--${node.color} ${selected.id === node.id ? "is-selected" : ""}`} onClick={() => setSelected(node)}><span>{node.rank}</span><strong>{node.label}</strong><small>SELECT NODE</small></button>)}</div><aside className="tech-inspector"><Eyebrow>Selected node / {selected.rank}</Eyebrow><h2>{selected.label}</h2><p>{selected.copy}</p><div className="tech-inspector__tools">{selected.tools.map((tool) => <span key={tool}>{tool}</span>)}</div><div className="tech-inspector__used"><Eyebrow>Deployed in</Eyebrow><strong>{selected.usedIn}</strong></div><Link href="/portfolio/" className="button button--outline">View project dossiers <ArrowUpRight size={13} /></Link></aside></section><section className="inventory-strip page-pad"><Eyebrow>Inventory readout</Eyebrow><div><span><strong>05</strong> skill nodes</span><span><strong>14+</strong> prototypes</span><span><strong>04</strong> engine lanes</span><span><strong>∞</strong> combinations</span></div></section><Footer /></main>;
+  const nodeProficiency: Record<string, number> = {
+    ue: 95,
+    cpp: 95,
+    phaser: 85,
+    gameplay: 92,
+    tools: 90,
+  };
+
+  const selectNode = (node: typeof techNodes[number]) => {
+    setSelected(node);
+    playArcadeTone("click");
+  };
+
+  return (
+    <main className="inner-page tech-page">
+      <PageHeader
+        number="10"
+        kicker="Tech-stack inventory / interactive skill tree"
+        title={<>Map the<br /><span>loadout.</span></>}
+        copy="Don’t just read a list of tools. Hover and select a node to inspect the low-level systems, engine architecture, and project implementations behind the work."
+      />
+      <section className="tech-tree page-pad">
+        <div className="tech-tree__map">
+          <svg className="tech-tree__svg-lines" aria-hidden="true" viewBox="0 0 500 400">
+            <line x1="120" y1="100" x2="380" y2="100" className="circuit-line circuit-line--pulse" />
+            <line x1="120" y1="100" x2="120" y2="280" className="circuit-line" />
+            <line x1="380" y1="100" x2="380" y2="280" className="circuit-line circuit-line--pulse" />
+            <line x1="120" y1="280" x2="380" y2="280" className="circuit-line" />
+            <line x1="250" y1="100" x2="250" y2="280" className="circuit-line circuit-line--active" />
+          </svg>
+          <div className="tech-tree__nodes-grid">
+            {techNodes.map((node) => (
+              <button
+                key={node.id}
+                className={`tech-node tech-node--${node.color} ${selected.id === node.id ? "is-selected" : ""}`}
+                onClick={() => selectNode(node)}
+                onMouseEnter={() => playArcadeTone("hover")}
+              >
+                <span>{node.rank}</span>
+                <strong>{node.label}</strong>
+                <div className="tech-node__meta">
+                  <em>{nodeProficiency[node.id]}% MASTERY</em>
+                  <small>SELECT NODE</small>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <aside className="tech-inspector">
+          <Eyebrow>Selected node / {selected.rank}</Eyebrow>
+          <h2>{selected.label}</h2>
+          <div className="mastery-gauge">
+            <div className="mastery-gauge__bar">
+              <div
+                className="mastery-gauge__fill"
+                style={{ width: `${nodeProficiency[selected.id]}%` }}
+              />
+            </div>
+            <span>{nodeProficiency[selected.id]}% PROFICIENCY</span>
+          </div>
+          <p>{selected.copy}</p>
+          <div className="tech-inspector__tools">
+            {selected.tools.map((tool) => (
+              <span key={tool}>{tool}</span>
+            ))}
+          </div>
+          <div className="tech-inspector__used">
+            <Eyebrow>Deployed in production</Eyebrow>
+            <strong>{selected.usedIn}</strong>
+          </div>
+          <Link href="/portfolio/" className="button button--outline">
+            View project dossiers <ArrowUpRight size={13} />
+          </Link>
+        </aside>
+      </section>
+
+      <section className="inventory-strip page-pad">
+        <Eyebrow>Inventory readout</Eyebrow>
+        <div>
+          <span><strong>05</strong> skill nodes</span>
+          <span><strong>14+</strong> prototypes</span>
+          <span><strong>04</strong> engine lanes</span>
+          <span><strong>∞</strong> combinations</span>
+        </div>
+      </section>
+      <Footer />
+    </main>
+  );
 }
 
 function PortfolioCarousel({ items, onContributions }: { items: typeof projects; onContributions: (project: typeof projects[number]) => void }) {
@@ -1086,6 +1902,8 @@ function PortfolioCarousel({ items, onContributions }: { items: typeof projects;
     const node = carouselRef.current;
     if (!node) return;
     const onWheel = (event: WheelEvent) => {
+      // FIX: If a project dossier modal is open, let the user scroll inside it without rotating the carousel!
+      if (selected) return;
       event.preventDefault();
       event.stopPropagation();
       const now = performance.now();
@@ -1095,7 +1913,7 @@ function PortfolioCarousel({ items, onContributions }: { items: typeof projects;
     };
     node.addEventListener("wheel", onWheel, { passive: false });
     return () => node.removeEventListener("wheel", onWheel);
-  }, [rotate]);
+  }, [rotate, selected]);
   return (
     <div ref={carouselRef} className="portfolio-carousel" onKeyDown={(event) => { if (event.key === "ArrowDown") rotate(1); if (event.key === "ArrowUp") rotate(-1); }} tabIndex={0}>
       <div className="portfolio-carousel__hint"><Eyebrow>Scroll to rotate / click to inspect</Eyebrow><span>{String(active + 1).padStart(2, "0")} / {String(list.length).padStart(2, "0")}</span></div>
@@ -1135,6 +1953,7 @@ function ProjectMediaGallery({ gallery, tone, stat }: { gallery: ProjectMediaIte
   const [active, setActive] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [fitMode, setFitMode] = useState<"cover" | "contain">("cover");
   const [lightbox, setLightbox] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -1175,6 +1994,7 @@ function ProjectMediaGallery({ gallery, tone, stat }: { gallery: ProjectMediaIte
               loop
               playsInline
               key={current.url}
+              style={{ objectFit: fitMode }}
             />
             <div className="project-media-gallery__video-controls">
               <button
@@ -1196,6 +2016,15 @@ function ProjectMediaGallery({ gallery, tone, stat }: { gallery: ProjectMediaIte
               <button
                 type="button"
                 className="media-ctrl-btn"
+                onClick={() => setFitMode((f) => (f === "cover" ? "contain" : "cover"))}
+                title={fitMode === "cover" ? "Switch to Fit Screen" : "Switch to Fill Screen"}
+                aria-label="Toggle fit mode"
+              >
+                <Monitor size={14} />
+              </button>
+              <button
+                type="button"
+                className="media-ctrl-btn"
                 onClick={() => setLightbox(true)}
                 aria-label="Expand fullscreen"
               >
@@ -1205,19 +2034,38 @@ function ProjectMediaGallery({ gallery, tone, stat }: { gallery: ProjectMediaIte
           </div>
         ) : (
           <div className="project-media-gallery__image-wrap" onClick={() => setLightbox(true)}>
-            <img src={current.url} alt={current.title} loading="lazy" />
-            <button
-              type="button"
-              className="project-media-gallery__expand"
-              onClick={(e) => {
-                e.stopPropagation();
-                setLightbox(true);
-              }}
-              title="Expand image"
-              aria-label="Expand image"
-            >
-              <Maximize2 size={14} />
-            </button>
+            <img
+              src={current.url}
+              alt={current.title}
+              loading="lazy"
+              style={{ objectFit: fitMode }}
+            />
+            <div className="project-media-gallery__video-controls">
+              <button
+                type="button"
+                className="media-ctrl-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFitMode((f) => (f === "cover" ? "contain" : "cover"));
+                }}
+                title={fitMode === "cover" ? "Switch to Fit Screen" : "Switch to Fill Screen"}
+                aria-label="Toggle fit mode"
+              >
+                <Monitor size={14} />
+              </button>
+              <button
+                type="button"
+                className="media-ctrl-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightbox(true);
+                }}
+                title="Expand image"
+                aria-label="Expand image"
+              >
+                <Maximize2 size={14} />
+              </button>
+            </div>
           </div>
         )}
 
