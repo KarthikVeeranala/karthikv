@@ -19,15 +19,15 @@
   --mono: 'IBM Plex Mono', monospace;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; background: var(--bg); }
-body { margin: 0; min-width: 320px; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; }
+html { scroll-behavior: smooth; background: var(--bg); overflow-x: clip; }
+body { margin: 0; min-width: 320px; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; overflow-x: clip; }
 body, button, input, textarea { font-family: var(--sans); }
 a { color: inherit; text-decoration: none; }
 button, input, textarea { font: inherit; }
 button { color: inherit; border: 0; background: none; }
 ::selection { color: var(--bg); background: var(--teal); }
 :focus-visible { outline: 1px solid var(--teal); outline-offset: 4px; }
-.site-shell { position: relative; min-height: 100vh; overflow: hidden; background: var(--bg); }
+.site-shell { position: relative; min-height: 100vh; overflow-x: clip; overflow-y: visible; background: var(--bg); }
 .noise { pointer-events: none; position: fixed; z-index: 20; inset: 0; opacity: .055; mix-blend-mode: screen; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E"); }
 .site-shell::before { content: ''; pointer-events: none; position: fixed; z-index: 1; inset: 0; opacity: .14; background: linear-gradient(90deg, transparent 49.9%, rgba(22,214,189,.12) 50%, transparent 50.1%), linear-gradient(0deg, transparent 49.9%, rgba(22,214,189,.06) 50%, transparent 50.1%); }
 .site-nav { position: absolute; z-index: 10; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 24px; height: 58px; padding: 0 clamp(20px, 3vw, 48px); border-bottom: 1px solid rgba(213,227,222,.08); background: linear-gradient(180deg, rgba(9,13,13,.96), rgba(9,13,13,.72), transparent); }
@@ -78,7 +78,8 @@ body { background: var(--bg); color: var(--ink); image-rendering: pixelated; }
 .site-shell {
   position: relative;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   background: radial-gradient(circle at 50% 12%, rgba(255,255,255,0.04), transparent 30%), linear-gradient(180deg, var(--bg) 0%, var(--bg-elevated) 55%, var(--bg) 100%) !important;
 }
 .site-shell::before { opacity: .22; background-image: linear-gradient(rgba(86,247,210,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(86,247,210,.08) 1px, transparent 1px); background-size: 32px 32px; }
@@ -3281,7 +3282,7 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   /* Prevent horizontal screen drift without breaking vertical touch scrolling */
   html, body {
     overflow-x: clip !important;
-    overflow-y: auto !important;
+    overflow-y: visible !important;
     -webkit-overflow-scrolling: touch !important;
     height: auto !important;
     min-height: 100% !important;
@@ -3723,11 +3724,11 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
 /* 1. Chapter Quick Jumper Sticky Bar */
 .chapter-jumper {
   position: sticky;
-  top: 60px;
+  top: 58px;
   z-index: 20;
   padding-top: 10px;
   padding-bottom: 10px;
-  background: rgba(9, 13, 13, 0.92);
+  background: rgba(9, 13, 13, 0.94);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line-strong);
 }
@@ -3736,14 +3737,13 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
 }
 .chapter-jumper__inner {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chapter-jumper__header {
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.chapter-jumper__inner::-webkit-scrollbar {
-  display: none;
 }
 .chapter-jumper__label {
   font: 10px var(--mono);
@@ -3752,10 +3752,21 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   font-weight: 700;
   white-space: nowrap;
 }
+.chapter-jumper__indicator {
+  font: 10px var(--mono);
+  color: var(--rust);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
 .chapter-jumper__links {
   display: flex;
   align-items: center;
   gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chapter-jumper__links::-webkit-scrollbar {
+  display: none;
 }
 .chapter-jumper__btn {
   display: inline-flex;
@@ -3789,47 +3800,157 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
 .chapter-jumper__btn.is-active small {
   color: var(--bg);
 }
-
-/* 2. Scroll-Driven Documentary Acts Flow (Option 1: Scroll Slate Fade) */
-.documentary-scroll-series {
-  display: flex;
-  flex-direction: column;
+.chapter-jumper__progress-track {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.chapter-jumper__progress-bar {
+  height: 100%;
+  background: var(--teal);
+  box-shadow: 0 0 8px var(--teal);
+  transition: width 0.08s linear;
 }
 
-/* Each act is a generous 180vh scroll track to give natural scroll distance for the transition */
-.doc-scroll-track {
+/* 2. Master Cinema Scroll Track & Viewport Stage */
+.cinema-documentary-track {
   position: relative;
-  height: 180vh;
-  margin-bottom: 20px;
+  width: 100%;
+  height: 420vh;
+  margin-bottom: 30px;
 }
-
-/* The viewport stage sticks cleanly in place while user scrolls through the 180vh */
-.doc-sticky-stage {
+.cinema-viewport-stage {
   position: sticky;
-  top: 110px;
-  height: calc(100vh - 130px);
-  max-height: 720px;
+  top: 138px;
+  height: calc(100vh - 156px);
+  min-height: 520px;
+  max-height: 680px;
+  border: 1px solid var(--line-strong);
+  background: #060909;
+  border-radius: 4px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  border: 1px solid var(--line-strong);
-  background: #070b0b;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), inset 0 0 100px rgba(22, 214, 189, 0.04);
 }
-.site-shell:not(.theme-neon) .doc-sticky-stage {
+.site-shell:not(.theme-neon) .cinema-viewport-stage {
   background: #f4ecdf;
   border-color: rgba(183, 91, 69, 0.4);
 }
 
-.doc-stage-glow {
+.cinema-stage-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(22, 214, 189, 0.08), transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(22, 214, 189, 0.09), transparent 72%);
   pointer-events: none;
 }
+.cinema-stage-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image: linear-gradient(rgba(22, 214, 189, 0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(22, 214, 189, 0.25) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
 
-/* Stage Phase A: Theatrical Title Slate */
-.doc-stage-slate {
+/* 3. Cinema Stage HUD Overlays */
+.cinema-hud-top {
+  position: absolute;
+  top: 12px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.cinema-hud-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cinema-rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff3b30;
+  box-shadow: 0 0 8px #ff3b30;
+  animation: pulse-ring 2s infinite ease-in-out;
+}
+.cinema-hud-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cinema-hud-fps {
+  color: var(--teal);
+}
+
+.cinema-hud-bottom {
+  position: absolute;
+  bottom: 12px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+.cinema-hud-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cinema-hud-progress-bar {
+  width: 80px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.cinema-hud-progress-fill {
+  height: 100%;
+  background: var(--teal);
+  transition: width 0.08s linear;
+}
+.cinema-hud-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cinema-nav-btn {
+  padding: 4px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  color: var(--bone);
+  font: 9px var(--mono);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cinema-nav-btn:hover:not(:disabled) {
+  background: var(--teal);
+  color: var(--bg);
+  border-color: var(--teal);
+}
+.cinema-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.cinema-nav-btn--next {
+  border-color: var(--teal-dim);
+  color: var(--teal);
+}
+
+/* 4. Phase A: Theatrical Title Slate */
+.cinema-slate {
   position: absolute;
   inset: 0;
   display: flex;
@@ -3837,87 +3958,54 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px;
+  padding: 30px;
   z-index: 5;
-  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  transition: opacity 0.1s linear, transform 0.1s linear;
   will-change: opacity, transform;
 }
-.doc-stage-slate h2 {
-  margin: 14px 0 10px;
-  font-size: clamp(32px, 5.5vw, 68px);
-  font-weight: 700;
-  letter-spacing: -0.05em;
-  line-height: 0.98;
-  color: var(--bone);
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
-}
-.site-shell:not(.theme-neon) .doc-stage-slate h2 {
-  color: #382d26;
-  text-shadow: none;
-}
-
-/* Stage Phase B: Narrative Story Container (on the EXACT SAME STAGE) */
-.doc-stage-story {
-  position: absolute;
-  inset: 0;
+.cinema-slate__badge {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: clamp(20px, 4vw, 44px);
-  z-index: 6;
-  overflow-y: auto;
-  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
-  will-change: opacity, transform;
-}
-.doc-stage-story::-webkit-scrollbar {
-  width: 4px;
-}
-.doc-stage-story::-webkit-scrollbar-thumb {
-  background: var(--line-strong);
-}
-
-.doc-act__slate-badge {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 12px;
   font: 11px var(--mono);
 }
-.doc-act__slate-badge span {
-  padding: 4px 10px;
+.cinema-slate-act {
+  padding: 4px 12px;
   background: var(--teal);
   color: var(--bg);
   font-weight: 700;
   letter-spacing: 0.08em;
 }
-.doc-act__slate-badge em {
+.cinema-slate-year {
   color: var(--rust);
-  font-style: normal;
+  font-weight: 600;
   letter-spacing: 0.06em;
 }
-.doc-act__subtitle {
+.cinema-slate__title {
+  margin: 10px 0 12px;
+  font-size: clamp(28px, 5.2vw, 64px);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+  color: var(--bone);
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.8);
+}
+.site-shell:not(.theme-neon) .cinema-slate__title {
+  color: #382d26;
+  text-shadow: none;
+}
+.cinema-slate__subtitle {
   font: 11px var(--mono);
   color: var(--muted);
   letter-spacing: 0.08em;
-  margin: 0 0 20px;
+  margin: 0 0 24px;
 }
-.doc-act__scroll-prompt {
+.cinema-slate__hint {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  background: rgba(22, 214, 189, 0.08);
-  border: 1px solid var(--teal);
-  color: var(--teal);
-  font: 10px var(--mono);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-.doc-act__scroll-prompt {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
   background: rgba(22, 214, 189, 0.08);
   border: 1px solid var(--line);
   color: var(--teal);
@@ -3926,75 +4014,126 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   letter-spacing: 0.08em;
 }
 
-/* 4. Narrative Content & Overview Card */
-.doc-act__narrative {
+/* 5. Phase B: Narrative Story Card on the EXACT SAME STAGE */
+.cinema-story {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(20px, 4vw, 44px);
+  padding-top: 48px;
+  padding-bottom: 48px;
+  z-index: 6;
+  transition: opacity 0.1s linear, transform 0.1s linear;
+  will-change: opacity, transform;
+}
+.cinema-story__header {
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cinema-story__badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 10px var(--mono);
+  color: var(--teal);
+}
+.cinema-story__badge em {
+  color: var(--rust);
+  font-style: normal;
+}
+.cinema-story__title {
+  margin: 0;
+  font-size: clamp(20px, 2.6vw, 30px);
+  font-weight: 600;
+  color: var(--bone);
+  letter-spacing: -0.04em;
+}
+.site-shell:not(.theme-neon) .cinema-story__title {
+  color: #382d26;
+}
+
+.cinema-story__grid {
   display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  gap: clamp(24px, 4vw, 55px);
+  grid-template-columns: 0.82fr 1.18fr;
+  gap: clamp(20px, 3.5vw, 44px);
   align-items: start;
 }
-.doc-act__summary-card {
-  padding: 24px;
+.cinema-story__summary-panel {
+  padding: 18px;
   background: var(--bg-soft);
   border: 1px solid var(--line-strong);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
-.site-shell:not(.theme-neon) .doc-act__summary-card {
+.site-shell:not(.theme-neon) .cinema-story__summary-panel {
   background: #f7f0e3;
   border-color: rgba(183, 91, 69, 0.3);
 }
-.doc-act__lead {
-  font-size: 15px;
+.cinema-story__lead {
+  font-size: 14px;
   line-height: 1.6;
   color: var(--bone);
   font-weight: 500;
   margin: 0;
 }
-.site-shell:not(.theme-neon) .doc-act__lead {
+.site-shell:not(.theme-neon) .cinema-story__lead {
   color: #382d26;
 }
-.doc-act__metrics {
+.cinema-story__metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding-top: 14px;
+  gap: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--line);
 }
-.doc-metric {
+.cinema-metric {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
-.doc-metric strong {
-  font: 13px var(--mono);
+.cinema-metric strong {
+  font: 12px var(--mono);
   color: var(--teal);
 }
-.doc-metric small {
-  font: 9px var(--mono);
+.cinema-metric small {
+  font: 8px var(--mono);
   color: var(--muted);
   text-transform: uppercase;
 }
-.doc-act__prose {
+
+.cinema-story__narrative-panel {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
-.doc-act__prose p {
+.cinema-story__prose {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cinema-story__prose p {
   margin: 0;
-  font-size: 16px;
-  line-height: 1.75;
+  font-size: 15px;
+  line-height: 1.65;
   color: var(--muted);
 }
-.site-shell:not(.theme-neon) .doc-act__prose p {
+.site-shell:not(.theme-neon) .cinema-story__prose p {
   color: #55483f;
 }
-.doc-act__tags {
-  margin-top: 8px;
+.cinema-story__tags {
+  margin-top: 4px;
 }
 
-/* 5. Pilot Dossier Strip */
+/* 6. Pilot Dossier Strip */
 .backstory-portrait-strip {
   padding-top: 50px;
   padding-bottom: 90px;
@@ -4024,19 +4163,72 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
 
 /* Responsive adjustments for mobile */
 @media (max-width: 860px) {
-  .doc-act__narrative {
+  .cinema-story__grid {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 12px;
+  }
+  .cinema-viewport-stage {
+    top: 124px;
+    height: calc(100vh - 136px);
+    min-height: 480px;
+    max-height: none;
+  }
+  .cinema-story {
+    padding: 16px;
+    padding-top: 42px;
+    padding-bottom: 74px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cinema-story__prose p {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .cinema-story__lead {
+    font-size: 13px;
+  }
+  .cinema-hud-bottom {
+    background: rgba(9, 13, 13, 0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 10px;
+    border-radius: 4px;
+    bottom: 8px;
+    left: 12px;
+    right: 12px;
+  }
+  .site-shell:not(.theme-neon) .cinema-hud-bottom {
+    background: rgba(244, 236, 223, 0.94);
+    border-color: rgba(183, 91, 69, 0.3);
+  }
+  .cinema-hud-progress-bar {
+    width: 50px;
   }
   .backstory-portrait-strip__content {
     grid-template-columns: 1fr;
     gap: 32px;
   }
   .chapter-jumper {
-    top: 50px;
+    top: 52px;
+  }
+  .chapter-jumper__label {
+    font-size: 8px;
+  }
+  .chapter-jumper__indicator {
+    font-size: 8px;
+  }
+  .chapter-jumper__btn {
+    padding: 5px 8px;
+    font-size: 10px;
   }
   .chapter-jumper__btn small {
     display: none;
+  }
+  .cinema-hud-top {
+    font-size: 8px;
+    top: 8px;
+    left: 12px;
+    right: 12px;
   }
 }
 

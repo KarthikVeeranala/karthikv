@@ -982,7 +982,7 @@ function CheatTerminal({
         "ROLE: Game Developer & Designer (B.Tech CSE, IARE Hyderabad)",
         "ENGINES: Unreal Engine 5.7 / 4 (95%), C++ Gameplay (95%), Phaser 2D (85%)",
         "ACCOLADES: 1st Place CodeDay 2.0 (The Interlude), 2nd HackRush, Top 3 FrostHacks, Top 45 IGDC Indie Finalist",
-        "COMMUNITY: President, Elysium Gaming Club (200+ Developers)",
+        "COMMUNITY: President, Elysium Gaming Club (Organized Collegiate Esports Events)",
       ]);
       setInput("");
       return;
@@ -1653,122 +1653,103 @@ const BACKSTORY_ACTS: BackstoryAct[] = [
   }
 ];
 
-function DocumentaryActView({ act, index }: { act: BackstoryAct; index: number }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+function BackstoryPage() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
 
+  // Sync scroll progress through the master cinema track
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const totalDistance = rect.height - windowHeight;
+    let ticking = false;
+    const updateProgress = () => {
+      if (!trackRef.current) return;
+      const rect = trackRef.current.getBoundingClientRect();
+      const stickyTop = 138; // TopNav (58px) + chapter-jumper dock (~76px)
+      const stageHeight = stageRef.current ? stageRef.current.offsetHeight : 640;
+      const scrollableDistance = rect.height - stageHeight;
+      if (scrollableDistance <= 0) return;
 
-      if (totalDistance <= 0) {
-        setScrollProgress(0);
-        return;
-      }
-
-      // Calculate progress from 0 (entry) to 1 (exit of this 180vh track)
-      const currentScroll = -rect.top;
-      const progress = Math.max(0, Math.min(1, currentScroll / totalDistance));
-      setScrollProgress(progress);
+      const currentScrolled = stickyTop - rect.top;
+      const p = Math.max(0, Math.min(1, currentScrolled / scrollableDistance));
+      setProgress(p);
+      ticking = false;
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    updateProgress();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
-  // Exact math from Option 1 in the simulator:
-  // Phase 1 (0 to 0.42): Title Slate visible, shrinks slightly & dissolves out
-  // Phase 2 (0.42 to 1.0): Narrative story slides up and dissolves in on the exact same stage
-  const slateOpacity = Math.max(0, 1 - scrollProgress * 2.4);
-  const slateScale = Math.max(0.85, 1 - scrollProgress * 0.18);
-  const slateTranslateY = scrollProgress * -36;
+  const totalActs = BACKSTORY_ACTS.length;
+  // Calculate active act index (0 to 4)
+  const actIndex = Math.min(totalActs - 1, Math.floor(progress * totalActs));
+  // Local progress within the current act: [0, 1]
+  const localProgress = (progress * totalActs) - actIndex;
 
-  const narrativeOpacity = scrollProgress < 0.38 ? 0 : Math.min(1, (scrollProgress - 0.38) / 0.42);
-  const narrativeTranslateY = scrollProgress < 0.38 ? 40 : Math.max(0, (1 - narrativeOpacity) * 35);
-  const isNarrativeActive = scrollProgress >= 0.38;
-
-  return (
-    <div id={act.id} ref={containerRef} className="doc-scroll-track">
-      <div className="doc-sticky-stage page-pad">
-        {/* Background Ambient Glow */}
-        <div className="doc-stage-glow" aria-hidden="true" />
-
-        {/* Phase A: Bold Theatrical Title Slate */}
-        <div
-          className="doc-stage-slate"
-          style={{
-            opacity: slateOpacity,
-            transform: `scale(${slateScale}) translateY(${slateTranslateY}px)`,
-            pointerEvents: slateOpacity > 0.1 ? "auto" : "none",
-          }}
-        >
-          <div className="doc-act__slate-badge">
-            <span>{act.actNumber}</span>
-            <em>{act.year}</em>
-          </div>
-          <h2>{act.title}</h2>
-          <p className="doc-act__subtitle">{act.subtitle}</p>
-          <div className="doc-act__scroll-prompt">
-            <ChevronDown size={14} className="animate-bounce" />
-            <span>KEEP SCROLLING INTO STORY</span>
-          </div>
-        </div>
-
-        {/* Phase B: Narrative Story Card on the EXACT SAME STAGE */}
-        <div
-          className="doc-stage-story"
-          style={{
-            opacity: narrativeOpacity,
-            transform: `translateY(${narrativeTranslateY}px)`,
-            pointerEvents: isNarrativeActive ? "auto" : "none",
-          }}
-        >
-          <div className="doc-act__narrative">
-            <div className="doc-act__summary-card">
-              <Eyebrow>Chapter Overview // {act.actNumber}</Eyebrow>
-              <p className="doc-act__lead">{act.summary}</p>
-              <div className="doc-act__metrics">
-                {act.metrics.map((m) => (
-                  <div key={m.label} className="doc-metric">
-                    <strong>{m.value}</strong>
-                    <small>{m.label}</small>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="doc-act__prose">
-              {act.paragraphs.map((p, pIdx) => (
-                <p key={pIdx}>{p}</p>
-              ))}
-              <div className="tag-row doc-act__tags">
-                {act.tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function BackstoryPage() {
-  const [activeActId, setActiveActId] = useState("act-1");
-
-  const scrollToAct = (actId: string) => {
-    setActiveActId(actId);
+  // Jump directly to an act by calculating exact window scroll position
+  const jumpToAct = (targetIndex: number) => {
+    if (!trackRef.current) return;
     playArcadeTone("click");
-    const el = document.getElementById(actId);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    const rect = trackRef.current.getBoundingClientRect();
+    const stickyTop = 138;
+    const stageHeight = stageRef.current ? stageRef.current.offsetHeight : 640;
+    const scrollableDistance = trackRef.current.offsetHeight - stageHeight;
+    const targetProgress = targetIndex / totalActs;
+    const targetScrolled = targetProgress * scrollableDistance;
+    const currentScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+    const targetScrollY = currentScrollY + rect.top - stickyTop + targetScrolled + 4;
+
+    window.scrollTo({
+      top: targetScrollY,
+      behavior: "smooth",
+    });
   };
+
+  const currentAct = BACKSTORY_ACTS[actIndex] ?? BACKSTORY_ACTS[0];
+
+  // Exact Cinema Dissolve Math:
+  // Phase 1 (0 to 0.38): Title Slate visible, shrinks slightly and dissolves out
+  const slateOpacity = Math.max(0, 1 - localProgress * 2.6);
+  const slateScale = Math.max(0.88, 1 - localProgress * 0.16);
+  const slateTranslateY = localProgress * -28;
+
+  // Phase 2 (0.38 to 0.82): Story Narrative dissolves in on the EXACT SAME STAGE
+  // From 0.82 to 1.0 (for acts 0-3), story dissolves out to prepare for next act's Title Slate
+  let storyOpacity = 0;
+  let storyTranslateY = 30;
+
+  if (localProgress >= 0.38) {
+    if (localProgress < 0.52) {
+      // Dissolve in
+      const inT = (localProgress - 0.38) / 0.14;
+      storyOpacity = inT;
+      storyTranslateY = (1 - inT) * 25;
+    } else if (actIndex === totalActs - 1 || localProgress <= 0.82) {
+      // Sustained readability
+      storyOpacity = 1;
+      storyTranslateY = 0;
+    } else {
+      // Dissolve out into next act (only for acts 0 through 3)
+      const outT = (localProgress - 0.82) / 0.16;
+      storyOpacity = Math.max(0, 1 - outT);
+      storyTranslateY = -outT * 20;
+    }
+  }
+
+  const isSlateActive = slateOpacity > 0.08;
+  const isStoryActive = storyOpacity > 0.08;
 
   return (
     <main className="inner-page backstory-page">
@@ -1779,31 +1760,168 @@ function BackstoryPage() {
         copy="A scroll-driven cinematic documentary. Scroll down to watch each chapter title dissolve directly into the story."
       />
 
-      {/* QUICK JUMPER DOCK */}
+      {/* STICKY CHAPTER QUICK JUMPER DOCK */}
       <nav className="chapter-jumper page-pad" aria-label="Chapter quick navigation">
         <div className="chapter-jumper__inner">
-          <span className="chapter-jumper__label">CINEMA ACTS // QUICK JUMP:</span>
+          <div className="chapter-jumper__header">
+            <span className="chapter-jumper__label">DOCUMENTARY ACTS // QUICK JUMP:</span>
+            <span className="chapter-jumper__indicator">
+              ACT {actIndex + 1} OF {totalActs} • {Math.round(progress * 100)}%
+            </span>
+          </div>
+
           <div className="chapter-jumper__links">
-            {BACKSTORY_ACTS.map((act) => (
+            {BACKSTORY_ACTS.map((act, idx) => (
               <button
                 key={act.id}
                 type="button"
-                className={`chapter-jumper__btn ${activeActId === act.id ? "is-active" : ""}`}
-                onClick={() => scrollToAct(act.id)}
+                className={`chapter-jumper__btn ${actIndex === idx ? "is-active" : ""}`}
+                onClick={() => jumpToAct(idx)}
+                title={`Jump to ${act.actNumber} (${act.year})`}
               >
                 <strong>{act.actNumber}</strong>
                 <small>{act.title.split(":")[0]}</small>
               </button>
             ))}
           </div>
+
+          {/* Overall Documentary Progress Track */}
+          <div className="chapter-jumper__progress-track">
+            <div
+              className="chapter-jumper__progress-bar"
+              style={{ width: `${Math.max(0, Math.min(100, progress * 100))}%` }}
+            />
+          </div>
         </div>
       </nav>
 
-      {/* CINEMATIC DOCUMENTARY SCROLL ACTS */}
-      <section className="documentary-scroll-series">
-        {BACKSTORY_ACTS.map((act, index) => (
-          <DocumentaryActView key={act.id} act={act} index={index} />
-        ))}
+      {/* MASTER CINEMATIC SCROLL TRACK */}
+      <section ref={trackRef} className="cinema-documentary-track">
+        <div ref={stageRef} className="cinema-viewport-stage page-pad">
+          {/* Ambient Background & Grid */}
+          <div className="cinema-stage-glow" aria-hidden="true" />
+          <div className="cinema-stage-grid" aria-hidden="true" />
+
+          {/* Top Cinema HUD */}
+          <div className="cinema-hud-top">
+            <div className="cinema-hud-badge">
+              <span className="cinema-rec-dot" />
+              <span>KV CINEMA DOCUMENTARY // SCENE 0{actIndex + 1} OF 0{totalActs}</span>
+            </div>
+            <div className="cinema-hud-meta">
+              <span>{currentAct.actNumber} • {currentAct.year}</span>
+              <span className="cinema-hud-fps">[ 24 FPS ]</span>
+            </div>
+          </div>
+
+          {/* PHASE A: THEATRICAL TITLE SLATE */}
+          <div
+            className="cinema-slate"
+            style={{
+              opacity: slateOpacity,
+              transform: `scale(${slateScale}) translateY(${slateTranslateY}px)`,
+              pointerEvents: isSlateActive ? "auto" : "none",
+            }}
+          >
+            <div className="cinema-slate__badge">
+              <span className="cinema-slate-act">{currentAct.actNumber}</span>
+              <span className="cinema-slate-year">{currentAct.year}</span>
+            </div>
+            <h2 className="cinema-slate__title">{currentAct.title}</h2>
+            <p className="cinema-slate__subtitle">{currentAct.subtitle}</p>
+
+            <div className="cinema-slate__hint">
+              <ChevronDown size={14} className="animate-bounce" />
+              <span>SCROLL DOWN TO DISSOLVE INTO CHAPTER</span>
+            </div>
+          </div>
+
+          {/* PHASE B: NARRATIVE STORY CARD (ON THE EXACT SAME STAGE) */}
+          <div
+            className="cinema-story"
+            style={{
+              opacity: storyOpacity,
+              transform: `translateY(${storyTranslateY}px)`,
+              pointerEvents: isStoryActive ? "auto" : "none",
+            }}
+          >
+            <div className="cinema-story__header">
+              <div className="cinema-story__badge">
+                <span>{currentAct.actNumber} // CHAPTER ARCHIVE</span>
+                <em>{currentAct.year}</em>
+              </div>
+              <h3 className="cinema-story__title">{currentAct.title}</h3>
+            </div>
+
+            <div className="cinema-story__grid">
+              {/* Left Column: Summary & Metrics */}
+              <div className="cinema-story__summary-panel">
+                <Eyebrow>Chapter Overview</Eyebrow>
+                <p className="cinema-story__lead">{currentAct.summary}</p>
+
+                <div className="cinema-story__metrics">
+                  {currentAct.metrics.map((m) => (
+                    <div key={m.label} className="cinema-metric">
+                      <strong>{m.value}</strong>
+                      <small>{m.label}</small>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Narrative Prose & Tags */}
+              <div className="cinema-story__narrative-panel">
+                <div className="cinema-story__prose">
+                  {currentAct.paragraphs.map((p, idx) => (
+                    <p key={idx}>{p}</p>
+                  ))}
+                </div>
+
+                <div className="tag-row cinema-story__tags">
+                  {currentAct.tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Cinema Controls HUD */}
+          <div className="cinema-hud-bottom">
+            <div className="cinema-hud-progress">
+              <div className="cinema-hud-progress-bar">
+                <div
+                  className="cinema-hud-progress-fill"
+                  style={{ width: `${Math.round(localProgress * 100)}%` }}
+                />
+              </div>
+              <span>
+                {isSlateActive ? "TITLE SLATE" : "STORY ARCHIVE"} • {Math.round(localProgress * 100)}%
+              </span>
+            </div>
+
+            <div className="cinema-hud-nav">
+              <button
+                type="button"
+                className="cinema-nav-btn"
+                onClick={() => jumpToAct(Math.max(0, actIndex - 1))}
+                disabled={actIndex === 0}
+                aria-label="Previous chapter"
+              >
+                ◀ PREV ACT
+              </button>
+              <button
+                type="button"
+                className="cinema-nav-btn cinema-nav-btn--next"
+                onClick={() => jumpToAct(Math.min(totalActs - 1, actIndex + 1))}
+                disabled={actIndex === totalActs - 1}
+                aria-label="Next chapter"
+              >
+                NEXT ACT ▶
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* PILOT DOSSIER STATS STRIP */}
