@@ -76,7 +76,7 @@ An interactive, retro-arcade-inspired portfolio built to showcase production Unr
   <tr>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/portfolio/byteoasis/">
-        <img src="client/public/portfolio_media/screenshots/byte_oasis/action_captures/byte_oasis_frame_02_00m13s.jpg" width="100%" alt="ByteOasis: Code to Escape" style="border-radius: 4px;" />
+        <img src="client/public/portfolio_media/screenshots/byte_oasis/byte_oasis_title.jpg" width="100%" alt="ByteOasis: Code to Escape" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/portfolio/byteoasis/">ByteOasis: Code to Escape (UE4)</a></strong>
@@ -85,7 +85,7 @@ An interactive, retro-arcade-inspired portfolio built to showcase production Unr
     </td>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/portfolio/geek-o-wars/">
-        <img src="client/public/portfolio_media/screenshots/geek_o_wars/action_captures/geek_o_wars_frame_01_00m06s.jpg" width="100%" alt="Geek'O'Wars" style="border-radius: 4px;" />
+        <img src="client/public/portfolio_media/screenshots/geek_o_wars/geek_o_wars_hero.jpg" width="100%" alt="Geek'O'Wars" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/portfolio/geek-o-wars/">Geek'O'Wars (UE 4.21 / TPS)</a></strong>
@@ -96,7 +96,7 @@ An interactive, retro-arcade-inspired portfolio built to showcase production Unr
   <tr>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/arcade/?game=city_of_aethel">
-        <img src="client/public/portfolio_media/screenshots/phaser_games/fixed_city_of_aethel_arena.png" width="100%" alt="City of Aethel" style="border-radius: 4px;" />
+        <img src="client/public/portfolio_media/screenshots/phaser_games/city_of_aethel_title.png" width="100%" alt="City of Aethel" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/arcade/?game=city_of_aethel">City of Aethel (Phaser 3)</a></strong>
@@ -105,7 +105,7 @@ An interactive, retro-arcade-inspired portfolio built to showcase production Unr
     </td>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/arcade/">
-        <img src="client/public/portfolio_media/screenshots/phaser_games/00_main_hub.png" width="100%" alt="Aicade Arcade Vault" style="border-radius: 4px;" />
+        <img src="client/public/portfolio_media/screenshots/phaser_games/arcade_vault_showcase.png" width="100%" alt="Aicade Arcade Vault" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/arcade/">Playable 2D Arcade Vault (8 Games)</a></strong>
