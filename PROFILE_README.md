@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://karthikveeranala.github.io/karthikv/">
-    <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg" width="100%" alt="Karthik Veeranala — Game Developer & Designer Banner" style="border-radius: 8px; border: 2px solid #56f7d2;" />
+    <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/nanami_beach_banner.gif" width="100%" alt="Karthik Veeranala — Game Developer & Designer Banner" style="border-radius: 8px; border: 2px solid #56f7d2;" />
   </a>
   <p align="center">
     <a href="https://karthikveeranala.github.io/karthikv/">

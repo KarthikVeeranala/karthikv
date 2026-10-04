@@ -787,15 +787,7 @@ function PixelMascot() {
 }
 
 function CursorFX() {
-  const trailRefs = useRef<Array<HTMLSpanElement | null>>([]);
-  const pointer = useRef({ x: -100, y: -100 });
-  const frame = useRef(0);
-  useEffect(() => {
-    const move = (event: PointerEvent) => { pointer.current = { x: event.clientX, y: event.clientY }; if (!frame.current) frame.current = requestAnimationFrame(() => { frame.current = 0; trailRefs.current.forEach((node, index) => { if (node) node.style.transform = `translate3d(${pointer.current.x + index * 3}px, ${pointer.current.y + index * 3}px, 0) scale(${1 - index * .08})`; }); }); };
-    window.addEventListener("pointermove", move, { passive: true });
-    return () => { window.removeEventListener("pointermove", move); if (frame.current) cancelAnimationFrame(frame.current); };
-  }, []);
-  return <div className="cursor-fx" aria-hidden="true">{Array.from({ length: 6 }, (_, index) => <span key={index} ref={(node) => { trailRefs.current[index] = node; }} style={{ opacity: Math.max(0, .75 - index * .1) }} />)}</div>;
+  return null;
 }
 
 function CheatTerminal({
@@ -804,7 +796,6 @@ function CheatTerminal({
   theme,
   onClose,
   onToggleCabinet,
-  onDeveloper,
   onToggleTheme,
   onPartyMode,
   onMatrixMode,
@@ -816,7 +807,6 @@ function CheatTerminal({
   theme: "beige" | "neon";
   onClose: () => void;
   onToggleCabinet: () => void;
-  onDeveloper: () => void;
   onToggleTheme: () => void;
   onPartyMode: () => void;
   onMatrixMode: () => void;
@@ -1040,13 +1030,6 @@ function CheatTerminal({
       return;
     }
 
-    if (cmd === "dev") {
-      onDeveloper();
-      setLines((prev) => [...prev, `> ${raw}`, "DEVELOPER MODE ONLINE — hidden grid diagnostics enabled."]);
-      setInput("");
-      return;
-    }
-
     if (cmd === "clear" || cmd === "cls") {
       setLines([]);
       setInput("");
@@ -1127,7 +1110,6 @@ function SiteShell({ children }: { children: React.ReactNode }) {
   });
   const [cabinet, setCabinet] = useState(() => { try { return localStorage.getItem("pixelguild-cabinet") === "on"; } catch { return false; } });
   const [terminalOpen, setTerminalOpen] = useState(false);
-  const [developerMode, setDeveloperMode] = useState(false);
   const [partyMode, setPartyMode] = useState(false);
   const [matrixMode, setMatrixMode] = useState(false);
   const [bigheadMode, setBigheadMode] = useState(false);
@@ -1207,7 +1189,6 @@ function SiteShell({ children }: { children: React.ReactNode }) {
       if (cheatIndex.current === code.length) {
         cheatIndex.current = 0;
         handleOpenTerminal();
-        setDeveloperMode(true);
         playArcadeTone("win");
       }
     };
@@ -1227,21 +1208,19 @@ function SiteShell({ children }: { children: React.ReactNode }) {
   const paletteClass = theme === "neon" && palette ? `palette-${palette}` : "";
 
   return (
-    <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""} ${paletteClass} ${cabinet ? "cabinet-mode" : ""} ${developerMode ? "developer-mode" : ""} ${partyMode ? "party-mode" : ""} ${matrixMode ? "matrix-mode" : ""} ${bigheadMode ? "bighead-mode" : ""}`}> 
+    <div className={`site-shell ${theme === "neon" ? "theme-neon" : ""} ${paletteClass} ${cabinet ? "cabinet-mode" : ""} ${partyMode ? "party-mode" : ""} ${matrixMode ? "matrix-mode" : ""} ${bigheadMode ? "bighead-mode" : ""}`}> 
       <div className="noise" aria-hidden="true" />
       <ArcadeBackground />
       <TopNav theme={theme} onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")} />
       <PixelMascot />
       {children}
       <SocialRail />
-      {developerMode && <CursorFX />}
       <CheatTerminal
         open={terminalOpen}
-        unlocked={developerMode}
+        unlocked={true}
         theme={theme}
         onClose={handleCloseTerminal}
         onToggleCabinet={() => setCabinet((current) => !current)}
-        onDeveloper={() => setDeveloperMode(true)}
         onToggleTheme={() => setTheme((current) => current === "neon" ? "beige" : "neon")}
         onPartyMode={() => setPartyMode((v) => !v)}
         onMatrixMode={() => setMatrixMode((v) => !v)}
