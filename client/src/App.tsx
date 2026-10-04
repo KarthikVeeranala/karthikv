@@ -37,6 +37,12 @@ import {
   Shield,
   Flame,
   Award,
+  Briefcase,
+  Building2,
+  Calendar,
+  MapPin,
+  CheckCircle2,
+  ExternalLink,
 } from "lucide-react";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -83,6 +89,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "Demo Reel", href: "/demo-reel/" },
   { label: "Backstory", href: "/backstory/" },
+  { label: "Experience", href: "/experience/" },
   { label: "Tech Tree", href: "/skills/" },
   { label: "Hobbies", href: "/hobbies/" },
   { label: "Bio & Contact", href: "/bio/" },
@@ -102,7 +109,7 @@ const projects = [
   {
     slug: "e2e-automation-suite",
     title: "HEADLESS E2E AUTOMATION SUITE",
-    type: "Unreal Engine 5.7 / Systems internship",
+    type: "Cyrus 365 / UE 5.7 Systems Internship",
     description: "A project-agnostic Unreal Engine C++ harness for headless test flows, recursive Slate/UMG discovery, physics determinism, replication checks, and GPU backbuffer streaming.",
     tags: ["Unreal Engine 5.7", "C++", "Win32", "FFmpeg"],
     tone: "signal",
@@ -298,7 +305,7 @@ const projects = [
   {
     slug: "city-of-aethel",
     title: "CITY OF AETHEL & 2D ARCADE",
-    type: "Top 45 Indie Finalist / IGDC 2024",
+    type: "Aicade Internship / IGDC Top 45 Finalist",
     description: "A Phaser 3 showcase with multi-phase boss choreography, 5-hit melee combos, i-frame dodges, and eight playable web prototypes.",
     tags: ["Phaser 3", "Melee", "WebGL"],
     tone: "ember",
@@ -857,6 +864,10 @@ function CheatTerminal({
         arcade: "/arcade/",
         backstory: "/backstory/",
         story: "/backstory/",
+        experience: "/experience/",
+        internship: "/experience/",
+        internships: "/experience/",
+        work: "/experience/",
         "demo-reel": "/demo-reel/",
         reel: "/demo-reel/",
         demo: "/demo-reel/",
@@ -869,7 +880,6 @@ function CheatTerminal({
         bio: "/bio/",
         contact: "/bio/",
         portfolio: "/portfolio/",
-        work: "/portfolio/",
         projects: "/portfolio/",
       };
 
@@ -884,7 +894,7 @@ function CheatTerminal({
           ...prev,
           `> ${raw}`,
           `ERR: Target "${target}" not found.`,
-          `Available destinations: home, arcade, backstory, demo-reel, skills, hobbies, bio, portfolio`,
+          `Available destinations: home, arcade, backstory, experience, demo-reel, skills, hobbies, bio, portfolio`,
         ]);
         setInput("");
         return;
@@ -1999,6 +2009,448 @@ function BackstoryPage() {
   );
 }
 
+export interface WorkExperience {
+  id: string;
+  number: string;
+  company: string;
+  role: string;
+  period: string;
+  location: string;
+  type: string;
+  badge: string;
+  summary: string;
+  responsibilities: string[];
+  deliverables: {
+    title: string;
+    description: string;
+    metric?: string;
+  }[];
+  skills: string[];
+  primaryAction?: {
+    label: string;
+    href: string;
+  };
+  secondaryAction?: {
+    label: string;
+    href: string;
+  };
+}
+
+const workExperiences: WorkExperience[] = [
+  {
+    id: "cyrus365",
+    number: "01",
+    company: "Cyrus 365",
+    role: "Unreal Engine Developer & Tools Programmer",
+    period: "Jan 2026 — Present",
+    location: "Hyderabad, India (Hybrid)",
+    type: "Current Internship",
+    badge: "UE 5.7 Systems",
+    summary:
+      "Architecting and maintaining production Unreal Engine 5.7 C++ engine harnesses, headless automated test suites, Win32 desktop isolation, and real-time GPU backbuffer video capture pipelines.",
+    responsibilities: [
+      "Engineered a project-agnostic Unreal Engine 5.7 C++ test automation harness for headless gameplay verification, replication checks, and physics determinism in CI/CD pipelines.",
+      "Built an isolated Win32 desktop sandboxing system (winsta0\\E2E_IsolatedDesktop) to inject hardware-level mouse and keyboard events without stealing OS cursor focus or disrupting user workflow.",
+      "Developed recursive Slate and UMG widget tree inspection using Unreal Engine reflection, dynamically discovering interactive elements and validating UI state transitions.",
+      "Streamed raw GPU backbuffer frames directly from FViewport::ReadPixels to bundled FFmpeg via stdin, encoding 1080p H.264 video test artifacts with automated pass/fail incident markers.",
+      "Architected dedicated server commandlet runners with 90-second deterministic state guards, ensuring multiplayer network synchrony and physics simulation stability.",
+    ],
+    deliverables: [
+      {
+        title: "Win32 Hardware Sandboxing",
+        description: "Zero-focus-theft isolated desktop environment for background automated testing.",
+        metric: "0% OS Focus Steal",
+      },
+      {
+        title: "Slate & UMG Auto-Discovery",
+        description: "Reflection-based UI widget traversal and automated synthetic input injection.",
+        metric: "Recursive Tree Inspection",
+      },
+      {
+        title: "GPU Backbuffer Video Stream",
+        description: "Direct FViewport::ReadPixels pipe to FFmpeg stdin for 1080p H.264 video generation.",
+        metric: "1080p H.264 @ 60 FPS",
+      },
+      {
+        title: "Headless Server State Guards",
+        description: "Commandlet harness executing deterministic 90s state guards for engine stability.",
+        metric: "100% Replication Sync",
+      },
+    ],
+    skills: [
+      "Unreal Engine 5.7",
+      "C++ Systems",
+      "Win32 API",
+      "Slate / UMG",
+      "FFmpeg Pipelines",
+      "CI/CD Automation",
+      "Multithreading",
+      "Replication Guards",
+    ],
+    primaryAction: {
+      label: "Inspect Case Study",
+      href: "/portfolio/e2e-automation-suite/",
+    },
+    secondaryAction: {
+      label: "Contact Me",
+      href: "/bio/",
+    },
+  },
+  {
+    id: "aicade",
+    number: "02",
+    company: "Aicade",
+    role: "Gameplay Engineering Intern",
+    period: "May 2024 — Nov 2024",
+    location: "Remote / Studio",
+    type: "Studio Internship",
+    badge: "IGDC Top 45 Finalist",
+    summary:
+      "Engineered 14+ rapid 2D combat and gameplay prototypes in Phaser 3 / WebGL, focusing on tight player feel, animation state machines, combo buffering, and rigid-body physics.",
+    responsibilities: [
+      "Programmed core combat loops including 5-hit attack combo buffering, 180ms i-frame dodge rolls, posture-breaking parries, and multi-phase boss fight state machines for City of Aethel (Top 45 Indie Finalist at IGDC 2024).",
+      "Built and deployed 14 interactive prototypes testing Matter.js rigid-body physics, ballistic parabolic trajectory arcs, multi-joint Verlet ragdolls, and tilemap stealth AI.",
+      "Iterated rapidly with game designers on combat tuning, enemy attack telegraphs, hit-stop visual feedback, screen shake, and responsive mobile touch controls.",
+      "Optimized WebGL rendering pipelines, texture atlases, and audio memory footprints to maintain a locked 60 FPS across desktop and mobile browsers.",
+    ],
+    deliverables: [
+      {
+        title: "City of Aethel Combat Engine",
+        description: "Lead gameplay programming for award-nominated melee action game.",
+        metric: "IGDC 2024 Top 45 Finalist",
+      },
+      {
+        title: "14 Interactive Prototypes",
+        description: "Built complete mechanics library of combat, ragdolls, and trajectory physics.",
+        metric: "14 Live Web Prototypes",
+      },
+      {
+        title: "Precision Combat Feel",
+        description: "5-hit combo input buffering and 180ms invulnerability windows.",
+        metric: "180ms i-Frame Timing",
+      },
+      {
+        title: "Browser & Mobile Optimization",
+        description: "Responsive game canvas adapters for portrait and landscape touch controls.",
+        metric: "Locked 60 FPS WebGL",
+      },
+    ],
+    skills: [
+      "Phaser 3",
+      "TypeScript / JS",
+      "Matter.js Physics",
+      "Combat Mechanics",
+      "Finite State Machines",
+      "Hit-Stop & Game Feel",
+      "Mobile Optimization",
+    ],
+    primaryAction: {
+      label: "Open City of Aethel",
+      href: "/portfolio/city-of-aethel/",
+    },
+    secondaryAction: {
+      label: "Play Prototypes in Arcade",
+      href: "/arcade/",
+    },
+  },
+  {
+    id: "elysium",
+    number: "03",
+    company: "Elysium Gaming Club",
+    role: "President & Esports Lead",
+    period: "Aug 2024 — Present",
+    location: "IARE Hyderabad",
+    type: "Collegiate Leadership",
+    badge: "Campus Gaming Lead",
+    summary:
+      "Leading the official collegiate gaming community, directing competitive esports tournaments, mentoring aspiring game developers, and organizing technical workshops.",
+    responsibilities: [
+      "Directing a collegiate community of 250+ student game developers, designers, and competitive esports players across campus events and regional tournaments.",
+      "Organized university-wide competitive esports tournaments (Valorant, BGMI, Rocket League) with live broadcast production, shoutcasting, and tournament bracket coordination.",
+      "Conducted practical introductory game development workshops on Unreal Engine, C++ programming basics, and game design fundamentals for junior students.",
+      "Coached and supported competitive campus teams to podium finishes at inter-college tech fests and collegiate gaming circuits.",
+    ],
+    deliverables: [
+      {
+        title: "Esports Tournaments",
+        description: "Organized multi-title campus tournaments with live broadcast coordination.",
+        metric: "250+ Community Members",
+      },
+      {
+        title: "Game Dev Workshops",
+        description: "Mentored junior students on Unreal Engine architecture and game design fundamentals.",
+        metric: "Student Mentorship",
+      },
+      {
+        title: "Competitive Team Coaching",
+        description: "Guided collegiate teams to podium finishes across regional tech fests.",
+        metric: "Collegiate Championships",
+      },
+      {
+        title: "Community Culture",
+        description: "Built an active gaming, esports, and developer culture within the university.",
+        metric: "Campus Gaming Lead",
+      },
+    ],
+    skills: [
+      "Leadership",
+      "Esports Production",
+      "Event Organization",
+      "Community Building",
+      "Technical Mentorship",
+      "Tournament Brackets",
+    ],
+    primaryAction: {
+      label: "Explore Hobbies & Bio",
+      href: "/hobbies/",
+    },
+    secondaryAction: {
+      label: "Contact Me",
+      href: "/bio/",
+    },
+  },
+];
+
+function HomeExperienceSection() {
+  return (
+    <section className="home-experience-section page-pad" id="experience">
+      <div className="section-topline">
+        <div>
+          <Eyebrow number="02">Work experience</Eyebrow>
+          <SectionHeading
+            kicker="Commercial & Studio Work"
+            title="Work Experience."
+            copy="From low-level Unreal Engine 5.7 C++ engine automation to shipping playable 2D combat prototypes."
+          />
+        </div>
+        <Link href="/experience/" className="text-link">
+          Explore all experience <ArrowUpRight size={14} />
+        </Link>
+      </div>
+
+      <div className="home-experience-grid">
+        {workExperiences.map((exp) => (
+          <article key={exp.id} className="home-exp-card">
+            <div className="home-exp-card__header">
+              <span className="home-exp-card__index">{exp.number}</span>
+              <span className="home-exp-card__badge">{exp.type}</span>
+            </div>
+
+            <h3 className="home-exp-card__company">{exp.company}</h3>
+            <div className="home-exp-card__role">{exp.role}</div>
+            <div className="home-exp-card__period">
+              <Calendar size={12} /> {exp.period}
+            </div>
+
+            <p className="home-exp-card__desc">{exp.summary}</p>
+
+            <div className="home-exp-card__skills">
+              {exp.skills.slice(0, 4).map((s) => (
+                <span key={s}>{s}</span>
+              ))}
+              {exp.skills.length > 4 && <span>+{exp.skills.length - 4} more</span>}
+            </div>
+
+            <div className="home-exp-card__footer">
+              <Link href={`/experience/?role=${exp.id}`} className="home-exp-card__link">
+                View role details <ArrowRight size={13} />
+              </Link>
+              {exp.primaryAction && (
+                <Link
+                  href={exp.primaryAction.href}
+                  className="home-exp-card__sublink"
+                  title={exp.primaryAction.label}
+                >
+                  <ExternalLink size={13} />
+                </Link>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ExperiencePage() {
+  const [activeId, setActiveId] = useState<string>("cyrus365");
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const roleParam = params.get("role");
+      if (roleParam && workExperiences.some((w) => w.id === roleParam)) {
+        setActiveId(roleParam);
+      }
+    } catch {}
+  }, []);
+
+  const activeExp =
+    workExperiences.find((w) => w.id === activeId) ?? workExperiences[0];
+
+  return (
+    <main className="inner-page experience-page">
+      <PageHeader
+        number="03"
+        kicker="Experience"
+        title={<>Work &amp;<br /><span>Experience.</span></>}
+        copy="Commercial internships and leadership roles in Unreal Engine 5.7 C++ engine systems, studio gameplay prototyping, and collegiate esports management."
+      />
+
+      <section className="experience-station page-pad">
+        {/* Left Column: Role Selector Cards */}
+        <div className="experience-selector">
+          <div className="experience-selector__header">
+            <span className="experience-selector__title">SELECT EXPERIENCE ({workExperiences.length})</span>
+            <span className="experience-selector__hint">CLICK TO INSPECT</span>
+          </div>
+
+          <div className="experience-selector__list">
+            {workExperiences.map((exp) => {
+              const isSelected = exp.id === activeExp.id;
+              return (
+                <button
+                  key={exp.id}
+                  type="button"
+                  className={`experience-card ${isSelected ? "is-selected" : ""}`}
+                  onClick={() => {
+                    playArcadeTone("hover");
+                    setActiveId(exp.id);
+                  }}
+                  aria-pressed={isSelected}
+                >
+                  <div className="experience-card__top">
+                    <span className="experience-card__number">{exp.number}</span>
+                    <span className="experience-card__type-badge">{exp.type}</span>
+                  </div>
+
+                  <h3 className="experience-card__company">{exp.company}</h3>
+                  <div className="experience-card__role">{exp.role}</div>
+
+                  <div className="experience-card__meta">
+                    <span><Calendar size={12} /> {exp.period}</span>
+                    <span><MapPin size={12} /> {exp.location.split("(")[0].trim()}</span>
+                  </div>
+
+                  <div className="experience-card__footer">
+                    <span className="experience-card__badge-tag">★ {exp.badge}</span>
+                    <span className="experience-card__arrow">
+                      {isSelected ? "ACTIVE •" : "INSPECT →"}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="experience-quick-stats">
+            <div className="experience-quick-stats__row">
+              <span className="stat-num">03</span>
+              <span className="stat-label">Commercial &amp; Campus Roles</span>
+            </div>
+            <div className="experience-quick-stats__row">
+              <span className="stat-num">10+</span>
+              <span className="stat-label">Key Systems &amp; Deliverables</span>
+            </div>
+            <div className="experience-quick-stats__row">
+              <span className="stat-num">UE 5.7</span>
+              <span className="stat-label">Production C++ Engine Architecture</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Active Role Detail Display */}
+        <div className="experience-display">
+          <div className="experience-display__header">
+            <div className="experience-display__kicker">
+              <span>{activeExp.number} // {activeExp.type.toUpperCase()}</span>
+              <span className="experience-display__badge-pill">★ {activeExp.badge}</span>
+            </div>
+
+            <h2 className="experience-display__title">{activeExp.company}</h2>
+            <div className="experience-display__role-lead">{activeExp.role}</div>
+
+            <div className="experience-display__meta-strip">
+              <span className="meta-pill"><Calendar size={13} /> {activeExp.period}</span>
+              <span className="meta-pill"><MapPin size={13} /> {activeExp.location}</span>
+              <span className="meta-pill"><Building2 size={13} /> {activeExp.type}</span>
+            </div>
+          </div>
+
+          <div className="experience-display__summary">
+            <p>{activeExp.summary}</p>
+          </div>
+
+          {/* Deliverables Grid */}
+          <div className="experience-display__section">
+            <div className="experience-display__section-head">
+              <Eyebrow>What I Built &amp; Key Deliverables</Eyebrow>
+              <span className="section-head-note">4 CORE DELIVERABLES</span>
+            </div>
+
+            <div className="experience-deliverables-grid">
+              {activeExp.deliverables.map((item, idx) => (
+                <div key={idx} className="deliverable-card">
+                  <div className="deliverable-card__top">
+                    <strong>{item.title}</strong>
+                    {item.metric && <span className="deliverable-metric">{item.metric}</span>}
+                  </div>
+                  <p>{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Core Responsibilities */}
+          <div className="experience-display__section">
+            <div className="experience-display__section-head">
+              <Eyebrow>Key Responsibilities &amp; Technical Work</Eyebrow>
+            </div>
+
+            <ul className="experience-responsibilities-list">
+              {activeExp.responsibilities.map((resp, idx) => (
+                <li key={idx}>
+                  <CheckCircle2 size={15} className="resp-bullet-icon" />
+                  <span>{resp}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Skills & Technologies */}
+          <div className="experience-display__section">
+            <div className="experience-display__section-head">
+              <Eyebrow>Key Skills &amp; Technologies</Eyebrow>
+            </div>
+
+            <div className="experience-skills-tags">
+              {activeExp.skills.map((skill) => (
+                <span key={skill} className="skill-pill">{skill}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Actions Footer */}
+          <div className="experience-display__actions">
+            {activeExp.primaryAction && (
+              <Link href={activeExp.primaryAction.href} className="button">
+                {activeExp.primaryAction.label} <ArrowUpRight size={14} />
+              </Link>
+            )}
+            {activeExp.secondaryAction && (
+              <Link href={activeExp.secondaryAction.href} className="button button--outline">
+                {activeExp.secondaryAction.label} <ArrowRight size={13} />
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+
 function Home() {
   const roles = ["Game Developer", "Game Designer", "Gameplay Programmer", "Unreal Engine Developer"];
   const [roleIndex, setRoleIndex] = useState(0);
@@ -2020,18 +2472,20 @@ function Home() {
 
       <BackstorySection />
 
+      <HomeExperienceSection />
+
       <section className="featured-section page-pad">
-        <div className="section-topline"><Eyebrow number="02">Featured work</Eyebrow><Link href="/portfolio/" className="text-link">Open portfolio <ArrowUpRight size={14} /></Link></div>
+        <div className="section-topline"><Eyebrow number="03">Featured work</Eyebrow><Link href="/portfolio/" className="text-link">Open portfolio <ArrowUpRight size={14} /></Link></div>
         <FeaturedWorkCarousel onContributions={setContribModal} />
       </section>
 
       <section className="reel-band page-pad">
-        <div className="reel-band__copy"><Eyebrow number="03">Demo Reel</Eyebrow><h2>Demo Reel<br /><span>in motion.</span></h2><p>A 2-minute comprehensive demonstration of Unreal Engine 5.7 C++ gameplay mechanics, combat feel, and playable prototypes.</p><Link href="/demo-reel/" className="button button--outline">Watch Demo Reel <Play size={13} fill="currentColor" /></Link></div>
+        <div className="reel-band__copy"><Eyebrow number="04">Demo Reel</Eyebrow><h2>Demo Reel<br /><span>in motion.</span></h2><p>A 2-minute comprehensive demonstration of Unreal Engine 5.7 C++ gameplay mechanics, combat feel, and playable prototypes.</p><Link href="/demo-reel/" className="button button--outline">Watch Demo Reel <Play size={13} fill="currentColor" /></Link></div>
         <HeroVideo />
       </section>
 
       <section className="manifesto page-pad">
-        <div className="manifesto__rail"><span>MORE THAN A PORTFOLIO</span><span>04</span></div>
+        <div className="manifesto__rail"><span>MORE THAN A PORTFOLIO</span><span>05</span></div>
         <div className="manifesto__content"><p>Every mechanic hides a story. Every prototype is a question made playable.</p><div className="manifesto__mark"><BrandMark /><span>KV / 2026</span></div></div>
       </section>
 
@@ -2053,7 +2507,7 @@ function CoinCatcher() {
   return (
     <section className="coin-catcher page-pad">
       <div className="coin-catcher__copy">
-        <Eyebrow number="05">Easter egg / coin hunt</Eyebrow>
+        <Eyebrow number="06">Easter egg / coin hunt</Eyebrow>
         <h2>Catch the<br /><span>glitch coin.</span></h2>
         <p>Tap the coin before it jumps. A tiny reward for exploring the page.</p>
         <p className="coin-catcher__secret-hint">
@@ -2326,7 +2780,7 @@ function ArcadePage() {
   return (
     <main className="inner-page arcade-page">
       <PageHeader
-        number="06"
+        number="07"
         kicker="Arcade"
         title={<>Take a break.<br /><span>Play the prototypes.</span></>}
         copy="Done exploring the systems and demo reel? Jump into these retro-inspired arcade builds and production Phaser prototypes engineered with custom state machines, timing reflexes, and physics simulations."
@@ -3267,7 +3721,7 @@ function HobbiesPage() {
 
   return (
     <main className="inner-page hobbies-page">
-      <PageHeader number="04" kicker="Hobbies" />
+      <PageHeader number="05" kicker="Hobbies" />
       <section className="hobby-field page-pad">
         <div className="hobby-field__topline">
           <Eyebrow>4 signals found</Eyebrow>
@@ -3327,7 +3781,7 @@ function BioPage() {
   const [sent, setSent] = useState(false);
   return (
     <main className="inner-page">
-      <PageHeader number="05" kicker="Bio & Contact" />
+      <PageHeader number="06" kicker="Bio & Contact" />
       <section className="bio-layout page-pad">
         <div className="bio-copy">
           <Eyebrow>About the player</Eyebrow>
@@ -3390,7 +3844,7 @@ function TechTreePage() {
 
   return (
     <main className="inner-page tech-page">
-      <PageHeader number="03" kicker="Tech Tree" />
+      <PageHeader number="04" kicker="Tech Tree" />
       <section className="tech-tree page-pad">
         <div className="tech-tree__map">
           <svg className="tech-tree__svg-lines" aria-hidden="true" viewBox="0 0 500 400">
@@ -3587,7 +4041,7 @@ function PortfolioPage() {
   const [contribution, setContribution] = useState<typeof projects[number] | null>(null);
   return (
     <main className="inner-page portfolio-page-new">
-      <PageHeader number="07" kicker="Portfolio" />
+      <PageHeader number="08" kicker="Portfolio" />
       <section className="portfolio-page page-pad">
         <PortfolioCarousel items={projects} onContributions={setContribution} />
       </section>
@@ -3963,6 +4417,8 @@ function Router() {
   if (path === "/") return <Home />;
   if (path === "/demo-reel/") return <DemoReelPage />;
   if (path === "/backstory/") return <BackstoryPage />;
+  if (path === "/experience/") return <ExperiencePage />;
+  if (path === "/skills/") return <TechTreePage />;
   if (path === "/hobbies/") return <HobbiesPage />;
   if (path === "/bio/") return <BioPage />;
   if (path === "/arcade/") return <ArcadePage />;
