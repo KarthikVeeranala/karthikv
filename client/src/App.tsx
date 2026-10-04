@@ -911,7 +911,7 @@ function CheatTerminal({
         "  theme                   : Toggle Day (Beige) / Night (Neon)",
         "  theme <palette>         : cobalt | bloodmoon | matrix | tokyo | neon",
         "[SYSTEM]",
-        "  whoami / stats          : Display pilot dossier & proficiencies",
+        "  whoami / stats          : Display player profile & proficiencies",
         "  clear / cls             : Clear console screen",
         "  exit / quit             : Close console modal",
       ]);
@@ -1000,7 +1000,7 @@ function CheatTerminal({
       setLines((prev) => [
         ...prev,
         `> ${raw}`,
-        "PILOT: KARTHIK VEERANALA",
+        "PLAYER: KARTHIK VEERANALA",
         "ROLE: Game Developer & Designer (B.Tech CSE, IARE Hyderabad)",
         "ENGINES: Unreal Engine 5.7 / 4 (95%), C++ Gameplay (95%), Phaser 2D (85%)",
         "ACCOLADES: 1st Place CodeDay 2.0 (The Interlude), 2nd HackRush, Top 3 FrostHacks, Top 45 IGDC Indie Finalist",
@@ -1425,7 +1425,7 @@ function ProjectWindow({ project, onClose, onContributions }: { project: typeof 
           <ProjectVisual tone={project.tone} label={project.stat} media={project.media} />
           <video src={project.video ?? DEMO_REEL_URL} autoPlay muted loop playsInline controls />
         </div>
-        <Eyebrow>Project dossier / {project.type}</Eyebrow>
+        <Eyebrow>Project archive / {project.type}</Eyebrow>
         <h2>{project.title}</h2>
         <p>{project.description}</p>
         <div className="tag-row">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
@@ -1470,43 +1470,43 @@ function BackstorySection() {
                 type="button"
                 className={`ctrl-btn ctrl-btn--y ${activeBtn === "Y" ? "is-active" : ""}`}
                 onClick={() => handleBtnClick("Y")}
-                title="Y: 3x Hackathon Victories"
+                title="Y: 3x Hackathon Victories (Click/Tap to view)"
                 aria-pressed={activeBtn === "Y"}
               >
                 <span>Y</span>
-                <small>HACK</small>
+                <small>TAP</small>
               </button>
               <div className="controller-diamond__middle">
                 <button
                   type="button"
                   className={`ctrl-btn ctrl-btn--x ${activeBtn === "X" ? "is-active" : ""}`}
                   onClick={() => handleBtnClick("X")}
-                  title="X: Gameplay & Combat"
+                  title="X: Gameplay & Combat (Click/Tap to view)"
                   aria-pressed={activeBtn === "X"}
                 >
                   <span>X</span>
-                  <small>PLAY</small>
+                  <small>TAP</small>
                 </button>
                 <button
                   type="button"
                   className={`ctrl-btn ctrl-btn--b ${activeBtn === "B" ? "is-active" : ""}`}
                   onClick={() => handleBtnClick("B")}
-                  title="B: Community & Leadership"
+                  title="B: Community & Leadership (Click/Tap to view)"
                   aria-pressed={activeBtn === "B"}
                 >
                   <span>B</span>
-                  <small>LEAD</small>
+                  <small>TAP</small>
                 </button>
               </div>
               <button
                 type="button"
                 className={`ctrl-btn ctrl-btn--a ${activeBtn === "A" ? "is-active" : ""}`}
                 onClick={() => handleBtnClick("A")}
-                title="A: Unreal Engine & C++"
+                title="A: Unreal Engine & C++ (Click/Tap to view)"
                 aria-pressed={activeBtn === "A"}
               >
                 <span>A</span>
-                <small>UE/C++</small>
+                <small>TAP</small>
               </button>
             </div>
             <div className="controller-readout">
@@ -1528,7 +1528,7 @@ function BackstorySection() {
             <span className="backstory-inline-facts__sep">•</span>
             <span className="backstory-inline-facts__item"><strong>14+</strong> Playable Prototypes</span>
             <span className="backstory-inline-facts__sep">•</span>
-            <span className="backstory-inline-facts__item"><strong>200+</strong> Gaming Club Devs</span>
+            <span className="backstory-inline-facts__item"><strong>PRESIDENT</strong> Gaming Club</span>
           </div>
 
           <div className="backstory-actions">
@@ -1564,7 +1564,7 @@ function BackstorySection() {
               <div className="portrait-scanline" aria-hidden="true" />
             </div>
             <div className="portrait-meta">
-              <span>PILOT DOSSIER // HYDERABAD, IN</span>
+              <span>PLAYER PROFILE // HYDERABAD, IN</span>
               <strong>KARTHIK VEERANALA</strong>
               <small>B.Tech CSE / Game Development & Design</small>
             </div>
@@ -1956,7 +1956,7 @@ function BackstoryPage() {
       </section>
       </div>
 
-      {/* PILOT DOSSIER STATS STRIP */}
+      {/* PLAYER PROFILE STATS STRIP */}
       <section className="backstory-portrait-strip page-pad">
         <div className="backstory-portrait-strip__content">
           <div className="backstory-portrait-frame">
@@ -1981,7 +1981,7 @@ function BackstoryPage() {
             </div>
           </div>
           <div className="backstory-dossier-meta">
-            <Eyebrow>Pilot Dossier</Eyebrow>
+            <Eyebrow>Player Profile</Eyebrow>
             <h2>KARTHIK VEERANALA</h2>
             <p>Game Developer &amp; Designer pursuing B.Tech in CSE at IARE Hyderabad (2023–2027). Specializing in Unreal Engine 5.7 C++, combat feel, physics simulation, and rapid prototyping.</p>
             <div className="bio-stats" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", marginTop: "24px" }}>
@@ -2904,7 +2904,7 @@ function BossFight() {
           <div key={`${highScore}-${index}`}>
             <span>0{index + 1}</span>
             <strong>{String(highScore).padStart(4, "0")}</strong>
-            <small>{index === 0 ? "MASTER PARRY" : index === 1 ? "FAST PROTOTYPER" : "COMBAT PILOT"}</small>
+            <small>{index === 0 ? "MASTER PARRY" : index === 1 ? "FAST PROTOTYPER" : "COMBAT MASTER"}</small>
           </div>
         ))}
       </div>
@@ -3452,7 +3452,7 @@ function TechTreePage() {
             <strong>{selected.usedIn}</strong>
           </div>
           <Link href="/portfolio/" className="button button--outline">
-            View project dossiers <ArrowUpRight size={13} />
+            View project archives <ArrowUpRight size={13} />
           </Link>
         </aside>
 
@@ -3485,7 +3485,7 @@ function TechTreePage() {
             </article>
           ))}
           <Link href="/portfolio/" className="button button--outline" style={{ justifyContent: "center", marginTop: "12px" }}>
-            View project dossiers <ArrowUpRight size={13} />
+            View project archives <ArrowUpRight size={13} />
           </Link>
         </div>
       </section>
@@ -3543,7 +3543,7 @@ function PortfolioCarousel({ items, onContributions }: { items: typeof projects;
                 <ProjectVisual tone={project.tone} label={project.stat} media={project.media} />
                 {(hovered === index || isFocus) && <video src={project.video ?? DEMO_REEL_URL} autoPlay muted loop playsInline />}
               </div>
-              <div className="portfolio-carousel__caption"><span>{project.type}</span><strong>{project.title}</strong><small>{isFocus ? "OPEN DOSSIER ↗" : project.stat}</small></div>
+              <div className="portfolio-carousel__caption"><span>{project.type}</span><strong>{project.title}</strong><small>{isFocus ? "OPEN ARCHIVE ↗" : project.stat}</small></div>
             </button>
           );
         })}
