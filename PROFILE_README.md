@@ -1,8 +1,9 @@
-# <div align="center"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmw4NG1reXU3dGQ4OHFpbTA3czd4cDk2bDh3YTJjcjEyaWt4ZHc5OCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/35JL2FvHK04fUoSGQH/giphy.gif" width="40"> Hello there, I'm Karthik Veeranala</div>
+# <div align="center"><img src="https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aHZsYnBlNmdkYWd1YmRyb28yNnhwZjJpMXNqYWwzbHJ5aW5tMWh5cyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/BZlvPwfbvTkO2yCZkJ/giphy.gif" width="50"> Hello there, I'm Karthik Veeranala</div>
+
 
 <div align="center">
-  <a href="https://karthikveeranala.github.io/karthikv/">
-    <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/nanami_beach_banner.gif" width="100%" alt="Karthik Veeranala — Game Developer & Designer Banner" style="border-radius: 8px; border: 2px solid #56f7d2;" />
+<a href="https://karthikveeranala.github.io/karthikv/">
+  <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/nanami_beach_banner.gif" width="70%" alt="Karthik Veeranala — Game Developer & Designer Banner" style="border-radius: 8px; border: 2px solid #56f7d2;" />
   </a>
   <p align="center">
     <a href="https://karthikveeranala.github.io/karthikv/">
@@ -33,42 +34,19 @@ During my tenure as an Unreal Engine Game Programmer Intern at **Cyrus 365**, I 
 
 Over the past three years, I have spearheaded teams in 24–48 hour competitive game hackathons—winning **1st Place Overall at CodeDay 2.0**, **2nd Place at HackRush**, and **Top 3 at MLH FrostHacks**—alongside earning a **Top 45 Indie Finalist** selection at the **India Game Developer Conference (IGDC 2024)** for *City of Aethel*.
 
-As **President of the Elysium Gaming Club** at IARE, I direct campus game development bootcamps, Unreal and Unity workshops, and collegiate esports tournaments for a community of **200+ active student developers**.
+As **President of the Elysium Gaming Club** at IARE, I organize campus gaming culture and collegiate esports tournaments.
 
 > 🏆 **1st Place Overall Winner** at CodeDay 2.0 with *The Interlude* (6-DOF Zero-G Space Dogfight in UE4).<br>
 > 🥈 **2nd Place Overall Winner** at HackRush with *ByteOasis: Code to Escape* (Terminal Simulation & Environmental Puzzles).<br>
 > 🥉 **Top 3 Overall Winner** at MLH FrostHacks with *Geek'O'Wars* (Third-Person Cyber Malware Survival).<br>
 > 🎖️ **Top 45 Indie Finalist** at India Game Developer Conference (IGDC 2024) for *City of Aethel* (5-Hit Melee & i-Frame Dodge Rolls).<br>
-> 🕹️ **President & Game Jam Director** at Elysium Gaming Club (Mentoring 200+ student game developers).
+> 🕹️ **President** at Elysium Gaming Club.
 
 ---
 
-## <img src="https://media.giphy.com/media/4oIphVfzbpifdWjdd7/giphy.gif" width="36"> Player Profile // C++ Identity
-
-```cpp
-struct FKarthikVeeranala
-{
-    FString Role = TEXT("Game Developer & Game Designer");
-    FString Education = TEXT("B.Tech CSE, IARE Hyderabad (2023–2027)");
-    TArray<FString> Experience = {
-        TEXT("Unreal Engine Game Programmer Intern @ Cyrus 365 (UE 5.7 C++)"),
-        TEXT("Game Developer Intern @ Aicade (14 Playable 2D Prototypes)"),
-        TEXT("President @ Elysium Gaming Club (200+ Student Developers)")
-    };
-    TArray<FString> CoreCompetencies = {
-        TEXT("Unreal Engine 5.7 / 4 Core C++ Architecture"),
-        TEXT("Real-Time Combat Feel & 180ms i-Frame Buffering"),
-        TEXT("Isolated Win32 Subsystems & Slate/UMG Discovery"),
-        TEXT("6-DOF Newtonian Zero-G Physics & Predictive Lead AI"),
-        TEXT("Playable 2D Web Prototypes (Phaser 3 / WebGL / Matter.js)")
-    };
-    FString EngineeringPhilosophy = TEXT("Every mechanic hides a story. Every prototype is a question made playable.");
-};
-```
-
 ---
 
-## <img src="https://media.giphy.com/media/D4wj7Ffx9fsEAy7B0h/giphy.gif" width="36"> Technical Proficiencies & Engines
+## <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmR2eGk4bzA5NTFyd2dhazhodWlzMGlnNGJqbzhnNmptNHZhM2RrNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/eSwGh3YK54JKU/giphy.gif" width="40"> Technical Proficiencies & Engines
 
 ### Engines & Frameworks
 [![UnrealEngine](https://img.shields.io/badge/Unreal_Engine_5.7_/_4-0E1128?style=for-the-badge&logo=unrealengine&logoColor=white&labelColor=101010)](https://karthikveeranala.github.io/karthikv/skills/)
@@ -92,18 +70,7 @@ struct FKarthikVeeranala
 
 ---
 
-## <img src="https://media.giphy.com/media/iIZO5d4IfSa0nkyLju/giphy.gif" width="36"> Master Demo Reel (In Motion)
-
-<div align="center">
-  <a href="https://karthikveeranala.github.io/karthikv/demo-reel/">
-    <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg" width="85%" alt="Watch Karthik Veeranala Gameplay Demo Reel" style="border: 2px solid #56f7d2; border-radius: 6px;" />
-  </a>
-  <p><em>Click the banner above to watch the comprehensive 2-minute Unreal Engine 5.7 C++ & Gameplay Systems Demo Reel.</em></p>
-</div>
-
----
-
-## <img src="https://media.giphy.com/media/Vv3whmM9XJpqE/giphy.gif" width="36"> Featured Game Development Projects
+## <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXIxb2RxN2k3bHVwaDcwMXh1bHh0MGl1a2RibnFuamg3MTk2OGozNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/P8ef3Dkynk0xLx1h1T/giphy.gif" width="40"> Featured Game Development Projects
 
 <table style="width:100%">
   <tr>
@@ -170,7 +137,7 @@ struct FKarthikVeeranala
 
 ---
 
-## 🕹️ In-Browser Playable Prototypes (Direct Launch)
+## <div align="left"><img src="https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3Z2dienRoaGZtZnZjc2l5d3ZkbzM1NDF4OHZlYzc4MTMzdmtwbHR3NSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/mlBDoVLOGidEc/giphy.gif" width="50">In-Browser Playable Prototypes (Direct Launch)</div>
 
 Launch any of the 8 production Phaser 3 / Matter.js prototypes directly in your browser:
 
@@ -187,11 +154,11 @@ Launch any of the 8 production Phaser 3 / Matter.js prototypes directly in your 
 
 ## <img src="https://media.giphy.com/media/cKW0BJ33aO8ZcF7wlo/giphy.gif" width="36"> Connect & Collaborate
 
-[![Portfolio](https://img.shields.io/badge/Portfolio_Website-karthikv-16D6BD?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=101010)](https://karthikveeranala.github.io/karthikv/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Karthik_Veeranala-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&labelColor=101010)](https://www.linkedin.com/in/karthikveeranala/)
-[![YouTube](https://img.shields.io/badge/YouTube-@karthikkkk.v-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=101010)](https://www.youtube.com/@karthikkkk.v)
-[![Discord](https://img.shields.io/badge/Discord-karthikkkkv-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=101010)](https://discord.com/users/karthikkkkv)
-[![Email](https://img.shields.io/badge/Email-veeranalakarthik@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white&labelColor=101010)](mailto:veeranalakarthik@gmail.com)
+[![Portfolio](https://img.shields.io/badge/Portfolio-16D6BD?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=101010)](https://karthikveeranala.github.io/karthikv/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyBmaWxsPSJ3aGl0ZSIgcm9sZT0iaW1nIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI%2BPHRpdGxlPkxpbmtlZEluPC90aXRsZT48cGF0aCBkPSJNMjAuNDQ3IDIwLjQ1MmgtMy41NTR2LTUuNTY5YzAtMS4zMjgtLjAyNy0zLjAzNy0xLjg1Mi0zLjAzN2MtMS44NTMgMC0yLjEzNiAxLjQ0NS0yLjEzNiAyLjkzOXY1LjY2N0g5LjM1MVY5aDMuNDE0djEuNTYxaC4wNDZjLjQ3Ny0uOSAxLjYzNy0xLjg1IDMuMzctMS44NWMzLjYwMSAwIDQuMjY3IDIuMzcgNC4yNjcgNS40NTV2Ni4yODZ6TTUuMzM3IDcuNDMzYTIuMDYgMi4wNiAwIDAgMS0yLjA2My0yLjA2NWEyLjA2NCAyLjA2NCAwIDEgMSAyLjA2MyAyLjA2NW0xLjc4MiAxMy4wMTlIMy41NTVWOWgzLjU2NHpNMjIuMjI1IDBIMS43NzFDLjc5MiAwIDAgLjc3NCAwIDEuNzI5djIwLjU0MkMwIDIzLjIyNy43OTIgMjQgMS43NzEgMjRoMjAuNDUxQzIzLjIgMjQgMjQgMjMuMjI3IDI0IDIyLjI3MVYxLjcyOUMyNCAuNzc0IDIzLjIgMCAyMi4yMjIgMHoiLz48L3N2Zz4%3D&labelColor=101010)](https://www.linkedin.com/in/karthikveeranala/)
+[![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=101010)](https://www.youtube.com/@karthikkkk.v)
+[![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=101010)](https://discord.com/users/karthikkkkv)
+[![Email](https://img.shields.io/badge/Email-14836?style=for-the-badge&logo=gmail&logoColor=white&labelColor=101010)](mailto:veeranalakarthik@gmail.com)
 
 <br>
 
