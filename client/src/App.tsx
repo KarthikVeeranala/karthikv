@@ -922,6 +922,7 @@ function CheatTerminal({
         "  theme <palette>         : cobalt | bloodmoon | matrix | tokyo | neon",
         "[SYSTEM]",
         "  whoami / stats          : Display player profile & proficiencies",
+        "  spiderman / thwip       : Secret Web-Head collector dossier 🕸️",
         "  clear / cls             : Clear console screen",
         "  exit / quit             : Close console modal",
       ]);
@@ -1015,6 +1016,25 @@ function CheatTerminal({
         "ENGINES: Unreal Engine 5.7 / 4 (95%), C++ Gameplay (95%), Phaser 2D (85%)",
         "ACCOLADES: 1st Place CodeDay 2.0 (The Interlude), 2nd HackRush, Top 3 FrostHacks, Top 45 IGDC Indie Finalist",
         "COMMUNITY: President, Elysium Gaming Club (Organized Collegiate Esports Events)",
+      ]);
+      setInput("");
+      return;
+    }
+
+    if (cmd === "spiderman" || cmd === "spider-man" || cmd === "thwip" || cmd === "spidey") {
+      playArcadeTone("win");
+      setLines((prev) => [
+        ...prev,
+        `> ${raw}`,
+        "🕸️ THWIP! CERTIFIED SPIDER-MAN FANATIC DETECTED.",
+        "──────────────────────────────────────────────",
+        "[+] Posters & Prints   : Mounted & Wall-to-Wall.",
+        "[+] Scale Figures      : Displayed in the Vault.",
+        "[+] Collector Merch    : Acquired.",
+        "[+] Spider-Man Tattoo  : Scheduled & Queued.",
+        "[+] Traversal & Feel   : Inspired by Insomniac swinging & momentum.",
+        "──────────────────────────────────────────────",
+        "\"With great power comes great responsibility.\"",
       ]);
       setInput("");
       return;
@@ -3625,20 +3645,22 @@ function generateScatteredPositions() {
   if (isMobile) {
     return {
       games: { x: 12, y: 12, rot: 0 },
-      reading: { x: 12, y: 240, rot: 0 },
-      athletics: { x: 12, y: 468, rot: 0 },
-      creative: { x: 12, y: 696, rot: 0 },
+      reading: { x: 12, y: 220, rot: 0 },
+      athletics: { x: 12, y: 430, rot: 0 },
+      creative: { x: 12, y: 640, rot: 0 },
+      spiderman: { x: 12, y: 850, rot: 0 },
     };
   }
-  // 4 discrete spatial zones for wide desktop screens
+  // 5 discrete spatial zones for wide desktop screens
   const zones = [
-    { minX: 24, maxX: 85, minY: 20, maxY: 65 },
-    { minX: 330, maxX: 410, minY: 16, maxY: 60 },
-    { minX: 25, maxX: 85, minY: 310, maxY: 355 },
-    { minX: 335, maxX: 415, minY: 305, maxY: 350 },
+    { minX: 20, maxX: 75, minY: 20, maxY: 65 },
+    { minX: 320, maxX: 395, minY: 16, maxY: 60 },
+    { minX: 20, maxX: 75, minY: 320, maxY: 365 },
+    { minX: 320, maxX: 395, minY: 320, maxY: 365 },
+    { minX: 170, maxX: 235, minY: 160, maxY: 210 },
   ];
   const shuffledZones = [...zones].sort(() => Math.random() - 0.5);
-  const ids = ["games", "reading", "athletics", "creative"];
+  const ids = ["games", "reading", "athletics", "creative", "spiderman"];
   const res: Record<string, { x: number; y: number; rot: number }> = {};
 
   ids.forEach((id, idx) => {
@@ -3684,6 +3706,14 @@ function HobbiesPage() {
       copy: "Acoustic fingerstyle guitar, kitchen cooking experiments, and curating an ongoing collection of scale figures, rare Pokémon cards, and game posters.",
       art: "creative",
       note: "MAKE / TUNE / COLLECT",
+    },
+    {
+      id: "spiderman",
+      title: "Spider-Man",
+      label: "THE WEB-HEAD VAULT",
+      copy: "Unapologetically obsessed with Spider-Man. My sanctuary is stacked with wall-to-wall posters, scale figures, and collector merch—with an upcoming Spidey tattoo locked in. Beyond being the ultimate superhero, Peter Parker's agility and kinetic momentum are a huge subconscious inspiration for how I design traversal and combat feel in games.",
+      art: "spiderman",
+      note: "FIGURES / POSTERS / INK",
     },
   ];
 
@@ -3759,7 +3789,7 @@ function HobbiesPage() {
       <PageHeader number="05" kicker="Hobbies" />
       <section className="hobby-field page-pad">
         <div className="hobby-field__topline">
-          <Eyebrow>4 signals found</Eyebrow>
+          <Eyebrow>5 signals found</Eyebrow>
           <span>DRAG CARDS ANYWHERE INSIDE THE BOX // HOVER TO REVEAL</span>
         </div>
         <div ref={canvasRef} className="hobby-field__canvas">
@@ -3805,7 +3835,7 @@ function HobbiesPage() {
       </section>
       <section className="hobby-note page-pad">
         <Eyebrow>Why it matters</Eyebrow>
-        <p>These are not side quests. They are inputs: gaming dissects player feel, manga & anime inspire composition, football & F1 tune reaction speed, and guitar & collecting keep creativity tactile.</p>
+        <p>These are not side quests. They are inputs: gaming dissects player feel, manga & anime inspire composition, football & F1 tune reaction speed, guitar & collecting keep creativity tactile, and Spider-Man embodies the kinetic traversal and heart of high-stakes play.</p>
       </section>
       <Footer />
     </main>
