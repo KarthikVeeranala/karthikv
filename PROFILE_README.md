@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://karthikveeranala.github.io/karthikv/">
-    <img src="https://karthikveeranala.github.io/karthikv/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg" width="100%" alt="Karthik Veeranala — Game Developer & Designer Banner" style="border-radius: 8px; border: 2px solid #56f7d2;" />
+    <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg" width="100%" alt="Karthik Veeranala — Game Developer & Designer Banner" style="border-radius: 8px; border: 2px solid #56f7d2;" />
   </a>
   <p align="center">
     <a href="https://karthikveeranala.github.io/karthikv/">
@@ -29,9 +29,9 @@
 
 I am a **Game Developer and Game Designer** pursuing a **B.Tech in Computer Science and Engineering** at the Institute of Aeronautical Engineering (IARE), Hyderabad (2023–2027). My engineering philosophy centers on **ruthless execution under constraints**, deterministic combat feel, low-latency animation buffering, and real-time player experience.
 
-Over the past three years, I have spearheaded teams in 24–48 hour competitive game hackathons—winning **1st Place Overall at CodeDay 2.0**, **2nd Place at HackRush**, and **Top 3 at MLH FrostHacks**—alongside earning a **Top 45 Indie Finalist** selection at the **India Game Developer Conference (IGDC 2024)** for *City of Aethel*.
+During my tenure as an Unreal Engine Game Programmer Intern at **Cyrus 365**, I architected headless automation test infrastructure in **UE 5.7 C++**, featuring Win32 isolated virtual desktop execution, recursive Slate/UMG widget tree discovery, and raw GPU backbuffer FFmpeg streaming. As a Game Developer Intern at **Aicade**, I engineered **14 playable 2D combat prototypes** testing rigid-body ragdoll physics, projectile ballistics, and multi-phase boss choreography.
 
-During my gameplay engineering and combat design tenure at **Aicade**, I architected **14 playable 2D prototypes** testing combat feel, rigid-body ragdoll impulses, projectile parabolas, and boss encounter choreography.
+Over the past three years, I have spearheaded teams in 24–48 hour competitive game hackathons—winning **1st Place Overall at CodeDay 2.0**, **2nd Place at HackRush**, and **Top 3 at MLH FrostHacks**—alongside earning a **Top 45 Indie Finalist** selection at the **India Game Developer Conference (IGDC 2024)** for *City of Aethel*.
 
 As **President of the Elysium Gaming Club** at IARE, I direct campus game development bootcamps, Unreal and Unity workshops, and collegiate esports tournaments for a community of **200+ active student developers**.
 
@@ -43,13 +43,18 @@ As **President of the Elysium Gaming Club** at IARE, I direct campus game develo
 
 ---
 
-## <img src="https://media.giphy.com/media/4oIphVfzbpifdWjdd7/giphy.gif" width="36"> Pilot Dossier // C++ Identity
+## <img src="https://media.giphy.com/media/4oIphVfzbpifdWjdd7/giphy.gif" width="36"> Player Profile // C++ Identity
 
 ```cpp
 struct FKarthikVeeranala
 {
     FString Role = TEXT("Game Developer & Game Designer");
     FString Education = TEXT("B.Tech CSE, IARE Hyderabad (2023–2027)");
+    TArray<FString> Experience = {
+        TEXT("Unreal Engine Game Programmer Intern @ Cyrus 365 (UE 5.7 C++)"),
+        TEXT("Game Developer Intern @ Aicade (14 Playable 2D Prototypes)"),
+        TEXT("President @ Elysium Gaming Club (200+ Student Developers)")
+    };
     TArray<FString> CoreCompetencies = {
         TEXT("Unreal Engine 5.7 / 4 Core C++ Architecture"),
         TEXT("Real-Time Combat Feel & 180ms i-Frame Buffering"),
@@ -91,7 +96,7 @@ struct FKarthikVeeranala
 
 <div align="center">
   <a href="https://karthikveeranala.github.io/karthikv/demo-reel/">
-    <img src="https://karthikveeranala.github.io/karthikv/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg" width="85%" alt="Watch Karthik Veeranala Gameplay Demo Reel" style="border: 2px solid #56f7d2; border-radius: 6px;" />
+    <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg" width="85%" alt="Watch Karthik Veeranala Gameplay Demo Reel" style="border: 2px solid #56f7d2; border-radius: 6px;" />
   </a>
   <p><em>Click the banner above to watch the comprehensive 2-minute Unreal Engine 5.7 C++ & Gameplay Systems Demo Reel.</em></p>
 </div>
@@ -104,7 +109,7 @@ struct FKarthikVeeranala
   <tr>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/portfolio/the-interlude/">
-        <img src="https://karthikveeranala.github.io/karthikv/portfolio_media/screenshots/the_interlude/action_captures/interlude_frame_02_00m11s.jpg" width="100%" alt="The Interlude" style="border-radius: 4px;" />
+        <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/the_interlude/action_captures/interlude_frame_02_00m11s.jpg" width="100%" alt="The Interlude" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/portfolio/the-interlude/">The Interlude (UE4 / C++)</a></strong>
@@ -113,7 +118,7 @@ struct FKarthikVeeranala
     </td>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/portfolio/e2e-automation-suite/">
-        <img src="https://karthikveeranala.github.io/karthikv/portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_suite_workspace.png" width="100%" alt="UE5 E2E Automation Suite" style="border-radius: 4px;" />
+        <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/e2e_plugin/00_ue5_editor_e2e_suite_workspace.png" width="100%" alt="UE5 E2E Automation Suite" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/portfolio/e2e-automation-suite/">Headless E2E Suite (UE 5.7 C++)</a></strong>
@@ -124,7 +129,7 @@ struct FKarthikVeeranala
   <tr>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/portfolio/byteoasis/">
-        <img src="https://karthikveeranala.github.io/karthikv/portfolio_media/screenshots/byte_oasis/action_captures/byte_oasis_frame_02_00m13s.jpg" width="100%" alt="ByteOasis: Code to Escape" style="border-radius: 4px;" />
+        <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/byte_oasis/byte_oasis_title.jpg" width="100%" alt="ByteOasis: Code to Escape" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/portfolio/byteoasis/">ByteOasis: Code to Escape (UE4)</a></strong>
@@ -133,7 +138,7 @@ struct FKarthikVeeranala
     </td>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/portfolio/geek-o-wars/">
-        <img src="https://karthikveeranala.github.io/karthikv/portfolio_media/screenshots/geek_o_wars/action_captures/geek_o_wars_frame_01_00m06s.jpg" width="100%" alt="Geek'O'Wars" style="border-radius: 4px;" />
+        <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/geek_o_wars/geek_o_wars_hero.jpg" width="100%" alt="Geek'O'Wars" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/portfolio/geek-o-wars/">Geek'O'Wars (UE 4.21 / TPS)</a></strong>
@@ -144,7 +149,7 @@ struct FKarthikVeeranala
   <tr>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/arcade/?game=city_of_aethel">
-        <img src="https://karthikveeranala.github.io/karthikv/portfolio_media/screenshots/phaser_games/fixed_city_of_aethel_arena.png" width="100%" alt="City of Aethel" style="border-radius: 4px;" />
+        <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/phaser_games/city_of_aethel_title.png" width="100%" alt="City of Aethel" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/arcade/?game=city_of_aethel">City of Aethel (Phaser 3)</a></strong>
@@ -153,7 +158,7 @@ struct FKarthikVeeranala
     </td>
     <td align="center" width="50%">
       <a href="https://karthikveeranala.github.io/karthikv/arcade/">
-        <img src="https://karthikveeranala.github.io/karthikv/portfolio_media/screenshots/phaser_games/00_main_hub.png" width="100%" alt="Aicade Arcade Vault" style="border-radius: 4px;" />
+        <img src="https://raw.githubusercontent.com/KarthikVeeranala/karthikv/main/portfolio_media/screenshots/phaser_games/arcade_vault_showcase.png" width="100%" alt="Playable 2D Arcade Vault" style="border-radius: 4px;" />
       </a>
       <br>
       <strong><a href="https://karthikveeranala.github.io/karthikv/arcade/">Playable 2D Arcade Vault (8 Games)</a></strong>
