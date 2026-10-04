@@ -2274,6 +2274,8 @@ function HomeExperienceSection() {
 
 function ExperiencePage() {
   const [activeId, setActiveId] = useState<string>("cyrus365");
+  const detailRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   useEffect(() => {
     try {
@@ -2284,6 +2286,22 @@ function ExperiencePage() {
       }
     } catch {}
   }, []);
+
+  const selectRole = (id: string, scroll = false) => {
+    playArcadeTone("hover");
+    setActiveId(id);
+    if (scroll && window.innerWidth <= 900) {
+      requestAnimationFrame(() => {
+        detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (window.innerWidth <= 768 && cardRefs.current[activeId]) {
+      cardRefs.current[activeId]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, [activeId]);
 
   const activeExp =
     workExperiences.find((w) => w.id === activeId) ?? workExperiences[0];
@@ -2298,6 +2316,25 @@ function ExperiencePage() {
       />
 
       <section className="experience-station page-pad">
+        {/* Mobile Sticky Quick Switcher (visible on mobile / tablet) */}
+        <div className="experience-mobile-dock" aria-label="Mobile role quick switcher">
+          {workExperiences.map((exp) => {
+            const isSelected = exp.id === activeExp.id;
+            return (
+              <button
+                key={exp.id}
+                type="button"
+                className={`exp-mobile-tab ${isSelected ? "is-selected" : ""}`}
+                onClick={() => selectRole(exp.id, true)}
+                aria-pressed={isSelected}
+              >
+                <span className="exp-mobile-tab__num">{exp.number}</span>
+                <span className="exp-mobile-tab__name">{exp.company}</span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Left Column: Role Selector Cards */}
         <div className="experience-selector">
           <div className="experience-selector__header">
@@ -2311,12 +2348,10 @@ function ExperiencePage() {
               return (
                 <button
                   key={exp.id}
+                  ref={(el) => { cardRefs.current[exp.id] = el; }}
                   type="button"
                   className={`experience-card ${isSelected ? "is-selected" : ""}`}
-                  onClick={() => {
-                    playArcadeTone("hover");
-                    setActiveId(exp.id);
-                  }}
+                  onClick={() => selectRole(exp.id, true)}
                   aria-pressed={isSelected}
                 >
                   <div className="experience-card__top">
@@ -2360,7 +2395,7 @@ function ExperiencePage() {
         </div>
 
         {/* Right Column: Active Role Detail Display */}
-        <div className="experience-display">
+        <div ref={detailRef} className="experience-display">
           <div className="experience-display__header">
             <div className="experience-display__kicker">
               <span>{activeExp.number} // {activeExp.type.toUpperCase()}</span>
