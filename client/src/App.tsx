@@ -2779,6 +2779,8 @@ function AicadeCabinetModal({ game, onClose }: { game: AicadeGame; onClose: () =
   );
 }
 
+const AicadeModal = AicadeCabinetModal;
+
 function ArcadePage() {
   const [activeGame, setActiveGame] = useState<AicadeGame | null>(null);
   const [vaultModalOpen, setVaultModalOpen] = useState(false);
@@ -2971,7 +2973,7 @@ function ArcadePage() {
 
       {/* Cabinet Play Modal */}
       {activeGame && (
-        <AicadeModal game={activeGame} onClose={() => setActiveGame(null)} />
+        <AicadeCabinetModal game={activeGame} onClose={() => setActiveGame(null)} />
       )}
 
       {/* All 8 Games Vault Modal Window */}
