@@ -190,7 +190,10 @@
   <script src="../shared/aicade-runtime.js"></script>
 
   <script>
+    let gameLaunched = false;
     function launchGame() {
+      if (gameLaunched) return;
+      gameLaunched = true;
       const splash = document.getElementById("splash");
       if (splash) splash.style.display = "none";
       const container = document.getElementById("game-container");

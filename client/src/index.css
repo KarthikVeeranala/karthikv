@@ -2711,8 +2711,7 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   position: fixed;
   z-index: 99999;
   inset: 0;
-  background: rgba(4, 2, 8, 0.88);
-  backdrop-filter: blur(8px);
+  background: rgba(4, 2, 8, 0.94);
   display: grid;
   place-items: center;
   padding: 16px;
@@ -2726,8 +2725,10 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   flex-direction: column;
   background: #0d0818;
   border: 3px solid var(--teal);
-  box-shadow: 10px 10px 0 var(--teal-dim), 0 0 50px rgba(86, 247, 210, 0.35);
-  animation: modal-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 8px 8px 0 var(--teal-dim);
+  animation: modal-fade-in 0.15s ease-out;
+  transform: translateZ(0);
+  contain: layout style paint;
 }
 .aicade-modal--portrait {
   width: min(520px, 98vw);
@@ -2804,6 +2805,8 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   display: grid;
   place-items: center;
   overflow: hidden;
+  transform: translateZ(0);
+  contain: strict;
 }
 .aicade-modal__viewport--landscape {
   aspect-ratio: 16 / 10;

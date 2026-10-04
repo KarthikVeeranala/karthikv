@@ -2759,7 +2759,8 @@ function AicadeCabinetModal({ game, onClose }: { game: AicadeGame; onClose: () =
             src={assetUrl(`aicade/${game.path}`)}
             title={game.title}
             className="aicade-modal__iframe"
-            allow="fullscreen; gamepad"
+            allow="fullscreen; gamepad; autoplay"
+            loading="eager"
           />
         </div>
 
@@ -2969,7 +2970,7 @@ function ArcadePage() {
       </section>
 
       {/* Reflex Combat Boss Fight Arena */}
-      <BossFight />
+      <BossFight isPaused={Boolean(activeGame || vaultModalOpen)} />
 
       {/* Cabinet Play Modal */}
       {activeGame && (
@@ -3081,7 +3082,7 @@ function ArcadePage() {
   );
 }
 
-function BossFight() {
+function BossFight({ isPaused = false }: { isPaused?: boolean }) {
   const [bossHp, setBossHp] = useState(100);
   const [playerHp, setPlayerHp] = useState(() => {
     try {
@@ -3108,7 +3109,7 @@ function BossFight() {
 
   // Boss attack cycle
   useEffect(() => {
-    if (!isAlive) return;
+    if (!isAlive || isPaused) return;
 
     let progressInterval: number | null = null;
     let lungeTimeout: number | null = null;

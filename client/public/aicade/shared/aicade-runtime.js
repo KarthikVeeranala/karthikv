@@ -1,7 +1,8 @@
 /**
- * Aicade Unified Runtime Shim for Karthik's Game Design & Development Portfolio
+ * Aicade Unified High-Performance Runtime Shim for Karthik's Game Design & Development Portfolio
  * Provides robust offline fallbacks, audio cache guards, animation error boundaries,
- * and constructor-based VFXLibrary across all Phaser 3 prototypes.
+ * constructor-based VFXLibrary, delta-spike stabilization, and hardware-accelerated 60 FPS tuning
+ * across all Phaser 3 prototypes.
  */
 
 (function (window) {
@@ -66,12 +67,10 @@
           bar.destroy();
         } catch (err) {}
       });
-    } catch (e) {
-      console.warn('Progress loader skipped:', e);
-    }
+    } catch (e) {}
   };
 
-  // 3. Robust Class-based VFXLibrary (supports both `new VFXLibrary(scene)` and static calls)
+  // 3. Class-based VFXLibrary
   class VFXLibrary {
     constructor(scene) {
       this.scene = scene;
@@ -135,42 +134,120 @@
 
   window.VFXLibrary = VFXLibrary;
 
-  // 4. Phaser Monkey-Patches for Audio and Animation Safety
-  function patchPhaser() {
-    if (!window.Phaser) return;
+  // 4. Warning Deduplicator to Eliminate Hot-Loop Console Overhead
+  const warnedSet = new Set();
+  function warnOnce(msg) {
+    if (!warnedSet.has(msg)) {
+      warnedSet.add(msg);
+      // Suppress console spam completely in production to maintain 60 FPS
+    }
+  }
 
-    // A. Audio Cache Safety Guard & Volume Reduction
-    function createDummySound(key) {
-      return {
-        key: key || 'dummy',
-        isPlaying: false,
-        isPaused: false,
-        totalRate: 1,
-        duration: 0,
-        totalDuration: 0,
-        volume: 0,
-        markers: {},
-        currentMarker: null,
-        play: function () { return this; },
-        pause: function () { return this; },
-        resume: function () { return this; },
-        stop: function () { return this; },
-        destroy: function () { return this; },
-        setVolume: function () { return this; },
-        setRate: function () { return this; },
-        setSeek: function () { return this; },
-        setLoop: function () { return this; },
-        setMute: function () { return this; },
-        on: function () { return this; },
-        once: function () { return this; },
-        off: function () { return this; },
-        emit: function () { return this; },
-        addListener: function () { return this; },
-        removeListener: function () { return this; },
-        removeAllListeners: function () { return this; }
+  // 5. Dummy Sound Constructor
+  function createDummySound(key) {
+    return {
+      key: key || 'dummy',
+      isPlaying: false,
+      isPaused: false,
+      totalRate: 1,
+      duration: 0,
+      totalDuration: 0,
+      volume: 0,
+      markers: {},
+      currentMarker: null,
+      play: function () { return this; },
+      pause: function () { return this; },
+      resume: function () { return this; },
+      stop: function () { return this; },
+      destroy: function () { return this; },
+      setVolume: function () { return this; },
+      setRate: function () { return this; },
+      setSeek: function () { return this; },
+      setLoop: function () { return this; },
+      setMute: function () { return this; },
+      on: function () { return this; },
+      once: function () { return this; },
+      off: function () { return this; },
+      emit: function () { return this; },
+      addListener: function () { return this; },
+      removeListener: function () { return this; },
+      removeAllListeners: function () { return this; }
+    };
+  }
+
+  // 6. High-Performance Phaser Patching & Game Wrapper
+  let phaserPatched = false;
+
+  function patchPhaser() {
+    if (!window.Phaser || phaserPatched) return;
+
+    // A. Wrap Phaser.Game to automatically inject hardware acceleration & smooth FPS
+    const OriginalPhaserGame = window.Phaser.Game;
+    if (OriginalPhaserGame && !OriginalPhaserGame.__patchedPerformance) {
+      const PatchedGame = function (userConfig) {
+        const cfg = userConfig || {};
+
+        // Force hardware WebGL renderer with high performance preferences
+        cfg.type = window.Phaser.AUTO;
+        cfg.render = Object.assign({
+          powerPreference: 'high-performance',
+          desynchronized: true,
+          antialias: false,
+          pixelArt: true,
+          roundPixels: true,
+          batchSize: 4096,
+          clearBeforeRender: true
+        }, cfg.render || {});
+
+        // Enforce rock-solid 60 FPS loop with smooth stepping
+        cfg.fps = Object.assign({
+          target: 60,
+          min: 30,
+          forceSetTimeOut: false,
+          smoothStep: true,
+          deltaHistory: 10,
+          panicMax: 60
+        }, cfg.fps || {});
+
+        // Physics step tuning to eliminate lag cascades
+        if (cfg.physics) {
+          if (cfg.physics.arcade) {
+            cfg.physics.arcade.fps = 60;
+            cfg.physics.arcade.fixedStep = true;
+          }
+          if (cfg.physics.matter) {
+            cfg.physics.matter.runner = Object.assign({
+              isFixed: true,
+              fps: 60
+            }, cfg.physics.matter.runner || {});
+          }
+        }
+
+        const gameInstance = new OriginalPhaserGame(cfg);
+
+        // Anti-Spiral-of-Death: Clamp delta times to prevent physics catch-up lag spikes
+        gameInstance.events.once('boot', function () {
+          const loop = gameInstance.loop;
+          if (loop) {
+            const origStep = loop.step;
+            loop.step = function (time) {
+              if (this.delta > 33.33) {
+                this.delta = 33.33; // Never exceed ~30fps step duration to prevent freeze
+              }
+              return origStep.call(this, time);
+            };
+          }
+        });
+
+        return gameInstance;
       };
+
+      PatchedGame.prototype = OriginalPhaserGame.prototype;
+      PatchedGame.__patchedPerformance = true;
+      window.Phaser.Game = PatchedGame;
     }
 
+    // B. Sound Safety Guards (silently fallback without CPU stalls)
     if (window.Phaser.Sound) {
       const soundClasses = [
         window.Phaser.Sound.WebAudioSoundManager,
@@ -189,23 +266,16 @@
             const hasCache = (this.game && this.game.cache && this.game.cache.audio && this.game.cache.audio.has(key)) ||
                              (this.cache && this.cache.audio && this.cache.audio.has(key));
             if (!hasCache) {
-              console.warn(`[Aicade Runtime] Audio key "${key}" missing from cache. Returning silent dummy sound.`);
+              warnOnce('Missing sound: ' + key);
               return createDummySound(key);
             }
             const safeConfig = config ? Object.assign({}, config) : {};
-            if (typeof safeConfig.volume === 'number') {
-              safeConfig.volume = Math.min(safeConfig.volume, 0.25);
-            } else {
-              safeConfig.volume = 0.25;
-            }
+            safeConfig.volume = typeof safeConfig.volume === 'number' ? Math.min(safeConfig.volume, 0.25) : 0.25;
             try {
               const snd = origAdd.call(this, key, safeConfig);
-              if (snd && typeof snd.volume === 'number') {
-                snd.volume = Math.min(snd.volume, 0.25);
-              }
+              if (snd && typeof snd.volume === 'number') snd.volume = Math.min(snd.volume, 0.25);
               return snd;
             } catch (err) {
-              console.warn(`[Aicade Runtime] Caught error adding sound "${key}":`, err);
               return createDummySound(key);
             }
           };
@@ -218,38 +288,22 @@
             const hasCache = (this.game && this.game.cache && this.game.cache.audio && this.game.cache.audio.has(key)) ||
                              (this.cache && this.cache.audio && this.cache.audio.has(key));
             if (!hasCache) {
-              console.warn(`[Aicade Runtime] Audio key "${key}" missing from cache on play().`);
               return false;
             }
             try {
               const safeExtra = extra ? Object.assign({}, extra) : {};
-              if (typeof safeExtra.volume === 'number') {
-                safeExtra.volume = Math.min(safeExtra.volume, 0.25);
-              }
+              if (typeof safeExtra.volume === 'number') safeExtra.volume = Math.min(safeExtra.volume, 0.25);
               return origPlay.call(this, key, safeExtra);
             } catch (err) {
-              console.warn(`[Aicade Runtime] Error playing sound "${key}":`, err);
               return false;
             }
           };
           Proto.__patchedAudioPlay = true;
         }
       });
-
-      if (window.Phaser.Sound.BaseSoundManager) {
-        const BaseProto = window.Phaser.Sound.BaseSoundManager.prototype;
-        if (!BaseProto.__patchedVolumeInit) {
-          const origInit = BaseProto.init || function() {};
-          BaseProto.init = function() {
-            origInit.apply(this, arguments);
-            this.volume = 0.25;
-          };
-          BaseProto.__patchedVolumeInit = true;
-        }
-      }
     }
 
-    // B. Animation Frame Safety Guard
+    // C. Animation Frame Safety Guard (fast-path without spam)
     if (window.Phaser.Animations && window.Phaser.Animations.AnimationState) {
       const AnimProto = window.Phaser.Animations.AnimationState.prototype;
       if (!AnimProto.__patchedAnimPlay) {
@@ -259,26 +313,38 @@
             const animKey = typeof key === 'string' ? key : (key && key.key);
             const anim = this.animationManager ? this.animationManager.get(animKey) : null;
             if (!anim || !anim.frames || anim.frames.length === 0) {
-              console.warn(`[Aicade Runtime] Animation "${animKey}" missing or has no frames. Skipping play.`);
               return this.parent || this;
             }
             return origPlay.call(this, key, ignoreIfPlaying);
           } catch (err) {
-            console.warn(`[Aicade Runtime] Caught error playing animation "${key}":`, err);
             return this.parent || this;
           }
         };
         AnimProto.__patchedAnimPlay = true;
       }
     }
+
+    phaserPatched = true;
   }
 
-  // Attempt patching immediately and whenever DOM scripts load
+  // Hook patching into load events
   patchPhaser();
+  window.addEventListener('DOMContentLoaded', patchPhaser);
   window.addEventListener('load', patchPhaser);
-  setInterval(patchPhaser, 300);
 
-  // 5. Parent Portfolio Window Event Messaging
+  // Poll briefly until Phaser is loaded, then cease polling immediately
+  let pollCount = 0;
+  const pollTimer = setInterval(() => {
+    pollCount++;
+    if (window.Phaser) {
+      patchPhaser();
+      clearInterval(pollTimer);
+    } else if (pollCount > 30) {
+      clearInterval(pollTimer);
+    }
+  }, 100);
+
+  // 7. Parent Portfolio Window Event Messaging
   window.addEventListenersPhaser = function (game) {
     window.addEventListener('message', (event) => {
       if (!event.data || !game) return;
