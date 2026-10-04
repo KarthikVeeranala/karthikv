@@ -1,9 +1,6 @@
 # 🕹️ Karthik Veeranala — Interactive Game Developer Portfolio
 
 <div align="center">
-  <a href="https://karthikveeranala.github.io/karthikv/">
-    <img src="client/public/portfolio_media/screenshots/the_interlude/interlude_maxres_thumbnail.jpg" width="100%" alt="Karthik Veeranala Portfolio Banner" style="border-radius: 8px; border: 2px solid #56f7d2;" />
-  </a>
   <p align="center">
     <a href="https://karthikveeranala.github.io/karthikv/">
       <img alt="Interactive Portfolio" src="https://img.shields.io/badge/Playable_Portfolio-Live_Site-0066A1?style=flat&labelColor=1f1f1f&color=56f7d2&logo=googlechrome&logoColor=white">
