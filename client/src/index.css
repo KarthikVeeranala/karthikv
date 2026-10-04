@@ -85,9 +85,15 @@ body { background: var(--bg); color: var(--ink); image-rendering: pixelated; }
 .site-shell::before { opacity: .22; background-image: linear-gradient(rgba(86,247,210,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(86,247,210,.08) 1px, transparent 1px); background-size: 32px 32px; }
 .noise { opacity: .08; }
 .site-nav {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 300 !important;
   border-bottom: 2px solid var(--line) !important;
   background: var(--bg-elevated) !important;
   box-shadow: 0 4px 0 rgba(0,0,0,.2), 0 0 24px rgba(0,0,0,.2);
+}
+.site-nav__links {
+  z-index: 310 !important;
 }
 .site-nav__name, .site-footer__mark, .hero-identity h1, .page-header h1, .project-card h3, .market-card h2, .blog-row h2, .side-quest h2, .github-profile h2, .next-project strong { text-shadow: 3px 3px 0 var(--line-strong); }
 .site-nav__name { font-family: var(--mono); font-size: 10px; }.nav-link, .nav-cta, .eyebrow, .muted-label, .text-link, .button, .status-pill, .hero-bottomline, .hero-side-note, .site-footer__bottom, .project-card__type, .project-visual__label, .market-card__category, .blog-row__meta, .reel-page__meta p, .chapter-row span, .chapter-row small { font-family: var(--mono); }
@@ -606,42 +612,34 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   width: 44px;
   height: 44px;
   transition: transform 0.15s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.pacman-wedge {
-  position: absolute;
+.pacman-svg {
+  display: block;
   width: 44px;
-  height: 22px;
-  background: #ffd64f;
-  box-shadow: 0 0 14px rgba(255, 214, 79, 0.4);
+  height: 44px;
+  overflow: visible;
+  filter: drop-shadow(0 0 10px rgba(255, 214, 79, 0.45));
 }
-.pacman-wedge--top {
-  top: 0;
-  border-radius: 44px 44px 0 0;
-  transform-origin: bottom center;
-  animation: chomp-top 0.28s infinite alternate ease-in-out;
+.pacman-svg__body {
+  fill: #ffd600;
+  stroke: #100820;
+  stroke-width: 4.5px;
+  stroke-linejoin: round;
 }
-.pacman-wedge--bottom {
-  bottom: 0;
-  border-radius: 0 0 44px 44px;
-  transform-origin: top center;
-  animation: chomp-bottom 0.28s infinite alternate ease-in-out;
+.pacman-svg__eye {
+  fill: #100820;
 }
-.pacman-eye {
-  position: absolute;
-  top: 8px;
-  left: 20px;
-  width: 6px;
-  height: 6px;
-  background: #100820;
-  border-radius: 50%;
-  z-index: 2;
+.pixel-mascot--pacman.is-excited .pacman-svg__body {
+  fill: #56f7d2;
 }
-.pixel-mascot--pacman.is-excited .pacman-wedge {
-  background: #56f7d2;
-  box-shadow: 0 0 16px rgba(86, 247, 210, 0.6);
+.pixel-mascot--pacman.is-excited .pacman-svg__eye {
+  fill: #ff6b9d;
 }
-.pixel-mascot--pacman.is-excited .pacman-eye {
-  background: #ff6b9d;
+.pixel-mascot.is-paused .pacman-svg {
+  filter: grayscale(0.1) opacity(0.9);
 }
 .pixel-mascot__tag {
   margin-top: 6px;
@@ -1734,13 +1732,13 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
   cursor: grabbing !important;
 }
 
-/* 11. DAY MODE PAC-MAN & PELLETS HIGH-CONTRAST RETRO STYLES */
-.site-shell:not(.theme-neon) .pixel-mascot--pacman .pacman-wedge {
-  border: 2px solid #100820 !important;
-  box-shadow: 0 0 0 1px #100820, 3px 3px 0 rgba(0, 0, 0, 0.45) !important;
+.site-shell:not(.theme-neon) .pixel-mascot--pacman .pacman-svg__body {
+  fill: #ffd600 !important;
+  stroke: #100820 !important;
+  stroke-width: 4.5px !important;
 }
-.site-shell:not(.theme-neon) .pixel-mascot--pacman .pacman-eye {
-  background: #100820 !important;
+.site-shell:not(.theme-neon) .pixel-mascot--pacman .pacman-svg__eye {
+  fill: #100820 !important;
 }
 .site-shell:not(.theme-neon) .pacman-pellet {
   background: #d97706 !important;
@@ -4244,6 +4242,154 @@ main > section:not(.home-hero) { content-visibility: auto; contain-intrinsic-siz
     right: 12px;
   }
 }
+
+/* =========================================================================
+   MOBILE & UNIVERSAL REFINEMENTS
+   ========================================================================= */
+
+/* 1. Mobile Menu Isolation: Hide Chapter Jumper completely when menu is open */
+.site-shell:has(.site-nav__links.is-open) .chapter-jumper,
+body:has(.site-nav__links.is-open) .chapter-jumper {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* 2. Hero Identity Text Overflow & Cutoff Fix (Mobile) */
+@media (max-width: 640px) {
+  .hero-identity {
+    max-width: 100% !important;
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+  .hero-identity h1 {
+    font-size: clamp(20px, 6.5vw, 34px) !important;
+    line-height: 1.15 !important;
+    letter-spacing: -0.06em !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
+  }
+  .hero-identity .eyebrow {
+    font-size: 7.5px !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    line-height: 1.4 !important;
+    justify-content: center !important;
+  }
+  .hero-identity__sub {
+    max-width: 100% !important;
+    font-size: 8px !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    justify-content: center !important;
+  }
+  .hero-identity__sub small {
+    display: block !important;
+    font-size: 7.5px !important;
+    text-align: center !important;
+  }
+  .hero-bottomline {
+    max-width: calc(100% - 56px) !important;
+    left: 14px !important;
+    bottom: 14px !important;
+  }
+
+  /* Completely remove the dragging Pac-Man on mobile as requested */
+  .pixel-mascot,
+  .pacman-pellet,
+  .pellet-popup,
+  .pellet-field {
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+}
+
+/* 3. Portfolio 3D Carousel Video Full Dimensions, Clean Borders & Non-Focus Overlay */
+.portfolio-carousel__poster {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 16 / 9 !important;
+  overflow: hidden !important;
+  background: #000 !important;
+  border-bottom: 2px solid var(--line-strong) !important;
+}
+.portfolio-carousel__poster video {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 4 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+  display: block !important;
+}
+.portfolio-carousel__poster .project-visual {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+}
+.portfolio-carousel__poster .project-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Universal non-focus card overlay & dimmer */
+.portfolio-carousel__card:not(.is-focus) {
+  opacity: 0.36 !important;
+  filter: grayscale(0.4) brightness(0.65) !important;
+}
+.portfolio-carousel__card:not(.is-focus)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+.site-shell:not(.theme-neon) .portfolio-carousel__card:not(.is-focus)::after {
+  background: rgba(238, 227, 210, 0.5);
+}
+.portfolio-carousel__card.is-focus {
+  opacity: 1 !important;
+  filter: none !important;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.45), 0 0 0 2px var(--teal) !important;
+}
+.site-shell:not(.theme-neon) .portfolio-carousel__card.is-focus {
+  box-shadow: 0 16px 45px rgba(61, 47, 37, 0.24), 0 0 0 2px #b75b45 !important;
+}
+
+/* 4. Day Mode Contact Form Crisp & Warm Styling */
+.site-shell:not(.theme-neon) .contact-form {
+  background: #fdfbf7 !important;
+  border: 2px solid #b75b45 !important;
+  box-shadow: 6px 6px 0 rgba(183, 91, 69, 0.25) !important;
+}
+.site-shell:not(.theme-neon) .contact-form label {
+  color: #746357 !important;
+  font-weight: 600 !important;
+}
+.site-shell:not(.theme-neon) .contact-form input,
+.site-shell:not(.theme-neon) .contact-form textarea {
+  color: #382d26 !important;
+  border-bottom: 2px solid rgba(183, 91, 69, 0.35) !important;
+  background: transparent !important;
+}
+.site-shell:not(.theme-neon) .contact-form input:focus,
+.site-shell:not(.theme-neon) .contact-form textarea:focus {
+  border-bottom-color: #b75b45 !important;
+}
+.site-shell:not(.theme-neon) .contact-form input::placeholder,
+.site-shell:not(.theme-neon) .contact-form textarea::placeholder {
+  color: #a39587 !important;
+}
+
 
 
 

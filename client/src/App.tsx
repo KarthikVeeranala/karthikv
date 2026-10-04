@@ -745,9 +745,31 @@ function PixelMascot() {
           style={{ transform: `scaleX(${facing})` }}
           aria-hidden="true"
         >
-          <div className="pacman-wedge pacman-wedge--top" />
-          <div className="pacman-wedge pacman-wedge--bottom" />
-          <div className="pacman-eye" />
+          <svg
+            className="pacman-svg"
+            viewBox="0 0 100 100"
+            width="44"
+            height="44"
+          >
+            <path
+              className="pacman-svg__body"
+              d={isPaused ? "M 50 50 L 86 25 A 44 44 0 1 0 86 75 Z" : undefined}
+            >
+              {!isPaused && (
+                <animate
+                  attributeName="d"
+                  dur="0.28s"
+                  repeatCount="indefinite"
+                  values="
+                    M 50 50 L 86 25 A 44 44 0 1 0 86 75 Z;
+                    M 50 50 L 93.8 44 A 44 44 0 1 0 93.8 56 Z;
+                    M 50 50 L 86 25 A 44 44 0 1 0 86 75 Z
+                  "
+                />
+              )}
+            </path>
+            <circle className="pacman-svg__eye" cx="56" cy="27" r="5.5" />
+          </svg>
         </div>
         <span className="pixel-mascot__tag">
           PAC-KV • {pelletScore} PTS {isPaused ? "• PAUSED" : ""}
@@ -1766,7 +1788,7 @@ function BackstoryPage() {
         <nav className={`chapter-jumper page-pad ${progress >= 0.96 ? "is-hidden" : ""}`} aria-label="Chapter quick navigation">
         <div className="chapter-jumper__inner">
           <div className="chapter-jumper__header">
-            <span className="chapter-jumper__label">DOCUMENTARY ACTS // QUICK JUMP:</span>
+            <span className="chapter-jumper__label">MY BACKSTORY // CHAPTERS:</span>
             <span className="chapter-jumper__indicator">
               ACT {actIndex + 1} OF {totalActs} • {Math.round(progress * 100)}%
             </span>
@@ -1815,7 +1837,7 @@ function BackstoryPage() {
           <div className="cinema-hud-top">
             <div className="cinema-hud-badge">
               <span className="cinema-rec-dot" />
-              <span>KV CINEMA DOCUMENTARY // SCENE 0{actIndex + 1} OF 0{totalActs}</span>
+              <span>MY BACKSTORY // ACT 0{actIndex + 1} OF 0{totalActs}</span>
             </div>
             <div className="cinema-hud-meta">
               <span>{currentAct.actNumber} • {currentAct.year}</span>
