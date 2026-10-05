@@ -415,6 +415,8 @@
         osc.start(now);
         osc.stop(now + 0.35);
       } catch (e) {}
+    }
+
     playBossRumble(durationMs = 600) {
       if (!this.enabled) return;
       this._resume();

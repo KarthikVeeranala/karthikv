@@ -5942,14 +5942,16 @@ init(data) {
     if (this.controlsEnabled && !this.inConversation && distance < 80 && !this.conversationWithNpcHad) {
         this.startNpcConversation();
     }
-    else if (distance < 80 && this.conversationWithNpcHad) {
-        if (this.isReturnVisit) {
-            this.sound.stopAll();
-            this.scene.start("RewardScene");
-        } else {
-            this.showDialogue("npc", "The Rune Gate to the east is open! Head through it to enter the dungeon, or press [ENTER] to warp there now.");
+        else if (distance < 80 && this.conversationWithNpcHad) {
+            if (this.isReturnVisit) {
+                this.sound.stopAll();
+                this.scene.start("RewardScene");
+            } else {
+                this.showDialogue("npc", "The Rune Gate to the east is open! Head through it to enter the dungeon, or press [ENTER] to warp there now.");
+            }
         }
     });
+
     this.input.keyboard.on("keydown-ENTER", () => {
         const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.npc.x, this.npc.y);
         if (this.controlsEnabled && !this.inConversation && dist < 120 && this.conversationWithNpcHad && !this.isReturnVisit) {
@@ -5961,8 +5963,7 @@ init(data) {
                 this.scene.start("TeleportScene", { fromPortal: { x: 2000, y: 1050 } });
             });
         }
-    }
-});
+    });
 
 // --- NEW: Implement WASD controls using the state object approach ---
 this.keyState = { W: false, A: false, S: false, D: false, SHIFT: false };

@@ -1843,6 +1843,8 @@ handleWeaponHit(body, damage, angle) {
     if (this.koMeter >= this.koMeterMax) {
         this.handleKO();
     }
+}
+
 handleExplosionHit(position, radius, damage) {
     if (window.IndieAudioSynth) {
         window.IndieAudioSynth.playExplosion();

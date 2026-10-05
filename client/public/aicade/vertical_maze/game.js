@@ -747,6 +747,7 @@ this.ladders = null // <-- Add this
     this.createWeaponUI()
     this.createPowerupUI()
     this.createAltitudeMeterUI()
+    this.generatePlayerSpritesheet()
     this.createCrosshair()
     this.reloadText = this.add
       .bitmapText(this.width / 2, this.height - 150, "pixel_font", "Press R to Reload", 22)
@@ -1422,7 +1423,8 @@ this.placeLaddersProcedurally(); // This new function will handle placing ladder
       this.player.body.setVelocity(0, 0)
     } else {
       // Create new player
-      const playerSprite = this.add.sprite(0, 0, "player").setDisplaySize(30, 30)
+      const playerSprite = this.textures.exists("player_runner_sheet") ? this.add.sprite(0, 0, "player_runner_sheet", 0).setDisplaySize(38, 38) : this.add.sprite(0, 0, "player").setDisplaySize(30, 30);
+      if (this.anims.exists("player_idle")) { playerSprite.play("player_idle"); }
       const shadow = this.add.graphics()
       shadow.fillStyle(0x000000, 0.35)
       shadow.fillEllipse(0, playerSprite.displayHeight / 2 - 4, playerSprite.displayWidth * 0.9, 15)
