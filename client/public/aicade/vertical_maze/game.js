@@ -718,6 +718,20 @@ this.ladders = null // <-- Add this
     this.activePowerups = {}
     this.activePowerupsUI = {}
 
+    // Procedural Magma Embers Hazard Timer
+    this.time.addEvent({
+      delay: 280,
+      loop: true,
+      callback: () => {
+        if (this.rows && this.cols && window.IndieJuice && this.mazeTiles) {
+          const randCol = Phaser.Math.Between(2, this.cols - 3);
+          const emberX = randCol * this.tileSize + this.mazeOffsetX;
+          const emberY = (this.rows - 1) * this.tileSize + this.mazeOffsetY - 10;
+          window.IndieJuice.spawnEmber(this, emberX, emberY, 2);
+        }
+      },
+    });
+
     //this.setupGraphics()
     this.createModernUI()
     this.initializeLevel()
@@ -732,6 +746,7 @@ this.ladders = null // <-- Add this
     this.createScoreUI()
     this.createWeaponUI()
     this.createPowerupUI()
+    this.createAltitudeMeterUI()
     this.createCrosshair()
     this.reloadText = this.add
       .bitmapText(this.width / 2, this.height - 150, "pixel_font", "Press R to Reload", 22)
@@ -740,6 +755,47 @@ this.ladders = null // <-- Add this
     this.gameUI.add(this.reloadText)
      this.setupControls() 
     this.add.existing(this.gameUI)
+  }
+
+  createAltitudeMeterUI() {
+    const meterX = this.width - 35
+    const meterY = 110
+    const trackHeight = 150
+    const trackWidth = 8
+
+    this.altitudeContainer = this.add.container(meterX, meterY)
+    this.gameUI.add(this.altitudeContainer)
+
+    const trackBg = this.add.graphics()
+    trackBg.fillStyle(0x0f172a, 0.8)
+    trackBg.fillRoundedRect(-trackWidth / 2, 0, trackWidth, trackHeight, 4)
+    trackBg.lineStyle(1.5, 0x38bdf8, 0.6)
+    trackBg.strokeRoundedRect(-trackWidth / 2, 0, trackWidth, trackHeight, 4)
+
+    this.altitudeFill = this.add.graphics()
+    this.altitudeMarker = this.add.circle(0, trackHeight, 6, 0x38bdf8)
+    this.altitudeMarker.setStrokeStyle(1.5, 0xffffff)
+
+    const labelTop = this.add.text(0, -14, "SUMMIT", {
+      fontSize: "9px",
+      fontFamily: "monospace",
+      color: "#38bdf8",
+      fontStyle: "bold",
+    }).setOrigin(0.5)
+
+    const labelBottom = this.add.text(0, trackHeight + 12, "BASE", {
+      fontSize: "9px",
+      fontFamily: "monospace",
+      color: "#94a3b8",
+    }).setOrigin(0.5)
+
+    this.altitudePctText = this.add.text(-12, trackHeight / 2, "0%", {
+      fontSize: "9px",
+      fontFamily: "monospace",
+      color: "#f8fafc",
+    }).setOrigin(1, 0.5)
+
+    this.altitudeContainer.add([trackBg, this.altitudeFill, this.altitudeMarker, labelTop, labelBottom, this.altitudePctText])
   }
 
   createHealthUI() {
@@ -825,7 +881,30 @@ this.ladders = null // <-- Add this
 
   createCrosshair() {
     this.input.setDefaultCursor("none")
-    this.crosshair = this.add.image(0, 0, "crosshair").setDisplaySize(20, 20).setDepth(6000)
+    if (!this.textures.exists("crosshair")) {
+      const cvs = this.textures.createCanvas("crosshair", 32, 32)
+      const ctx = cvs.context
+      ctx.strokeStyle = "#00d2ff"
+      ctx.lineWidth = 2
+      // Outer reticle circle
+      ctx.beginPath()
+      ctx.arc(16, 16, 9, 0, Math.PI * 2)
+      ctx.stroke()
+      // Crosshair tick marks
+      ctx.beginPath()
+      ctx.moveTo(16, 1); ctx.lineTo(16, 7)
+      ctx.moveTo(16, 25); ctx.lineTo(16, 31)
+      ctx.moveTo(1, 16); ctx.lineTo(7, 16)
+      ctx.moveTo(25, 16); ctx.lineTo(31, 16)
+      ctx.stroke()
+      // Center red dot
+      ctx.fillStyle = "#ef4444"
+      ctx.beginPath()
+      ctx.arc(16, 16, 2, 0, Math.PI * 2)
+      ctx.fill()
+      cvs.refresh()
+    }
+    this.crosshair = this.add.image(0, 0, "crosshair").setDisplaySize(24, 24).setDepth(6000)
   }
 
   createUIBackground() {
@@ -1896,6 +1975,10 @@ this.physics.add.existing(this.endpointSprite);
     this.levelTransitioning = true
     this.physics.pause()
 
+    window.IndieAudioSynth?.playLevelUp()
+    window.IndieJuice?.screenFlash(this, 0xffffff, 200, 0.4)
+    window.IndieJuice?.screenShake(this, 300, 0.025)
+
     // Clean panel background
     const panel = this.add
       .rectangle(this.width / 2, this.height / 2, this.width * 0.7, this.height * 0.4, 0x1a1a1a, 0.9)
@@ -1977,12 +2060,16 @@ this.physics.add.existing(this.endpointSprite);
     const enemyY = enemy.y
     this.sfx.enemyKill.play()
 
+    window.IndieAudioSynth?.playEnemyDeath()
+    window.IndieJuice?.spawnDust(this, enemyX, enemyY, 14)
+    window.IndieJuice?.spawnShockwave(this, enemyX, enemyY, 1.4)
+    window.IndieJuice?.floatingText(this, enemyX, enemyY - 30, "DEFEATED!", "#f59e0b", 16)
+    window.IndieJuice?.screenShake(this, 180, 0.02)
+
     // Spawn powerup chance
     if (Phaser.Math.Between(0, 100) < 45) {
       this.spawnRandomPowerup(enemyX, enemyY)
     }
-
-    this.cameras.main.shake(200, 0.015)
 
     this.enemiesKilled++
 
@@ -2407,6 +2494,27 @@ const powerup = this.add.sprite(0, 0, powerupData.spriteKey).setDisplaySize(30, 
       // Calculate the barrel tip's world position
       spawnX = weaponWorldX + Math.cos(finalAngle) * barrelLength
       spawnY = weaponWorldY + Math.sin(finalAngle) * barrelLength
+
+      // Procedural weapon recoil kickback
+      if (weapon) {
+        const origX = weapon.x
+        const kickback = this.player.sprite && this.player.sprite.flipX ? 5 : -5
+        this.tweens.add({
+          targets: weapon,
+          x: origX + kickback,
+          duration: 45,
+          yoyo: true,
+          ease: "Quad.easeOut",
+          onComplete: () => {
+            if (weapon) weapon.x = origX
+          },
+        })
+      }
+
+      // Procedural audio, muzzle sparks, and brass casing
+      window.IndieAudioSynth?.playGunshot(false)
+      window.IndieJuice?.spawnSparks(this, spawnX, spawnY, 8)
+      window.IndieJuice?.spawnCasing(this, spawnX, spawnY, this.player.sprite && this.player.sprite.flipX ? -1 : 1)
     } else {
       // Original logic for enemies
       const spawnOffset = 35 * this.scaleFactor
@@ -2450,8 +2558,10 @@ bullet.body.setAllowGravity(false);
     enemy.health -= damage
     this.sfx.enemyHit.play()
 
-    //this.vfx.createEmitter("orange", enemy.x, enemy.y, 1, 0, 500).explode(15)
-    //this.vfx.createEmitter("yellow", bullet.x, bullet.y, 0.5, 0, 300).explode(8)
+    window.IndieAudioSynth?.playBladeClash(1.2)
+    window.IndieJuice?.spawnSparks(this, bullet.x || enemy.x, bullet.y || enemy.y, 6)
+    window.IndieJuice?.spawnBlood(this, enemy.x, enemy.y, 7)
+    window.IndieJuice?.floatingText(this, enemy.x, enemy.y - 20, `-${damage}`, "#ef4444", 16)
 
     if (enemy.health <= 0) {
       this.killEnemy(enemy)
@@ -2549,9 +2659,15 @@ bullet.body.setAllowGravity(false);
   }
 
   collectDiamond(player, diamond) {
+    const gemX = diamond.x
+    const gemY = diamond.y
     diamond.disableBody(true, true)
     this.diamondsCollected++
     this.scoreText.setText(this.diamondsCollected.toString())
+
+    window.IndieAudioSynth?.playGemChime()
+    window.IndieJuice?.spawnSparks(this, gemX, gemY, 8)
+    window.IndieJuice?.floatingText(this, gemX, gemY - 15, "+1 💎", "#38bdf8", 14)
   }
 
   smartEnemyMovement(enemy) {
@@ -2869,9 +2985,42 @@ update(time, delta) {
         this.gameUI.x = this.cameras.main.worldView.x;
         this.gameUI.y = this.cameras.main.worldView.y;
         this.gameUI.setScale(1 / this.cameras.main.zoom);
+
+        // Update Altitude Progress Meter
+        if (this.altitudeMarker && this.player && this.rows && this.tileSize) {
+            const worldTop = this.mazeOffsetY;
+            const worldBottom = this.rows * this.tileSize + this.mazeOffsetY;
+            const totalH = Math.max(worldBottom - worldTop, 1);
+            const currentAscent = Phaser.Math.Clamp(worldBottom - this.player.y, 0, totalH);
+            const progress = currentAscent / totalH;
+            const trackHeight = 150;
+            const markerY = trackHeight * (1 - progress);
+            this.altitudeMarker.y = markerY;
+            if (this.altitudeFill) {
+                this.altitudeFill.clear();
+                this.altitudeFill.fillStyle(0x0284c7, 0.85);
+                this.altitudeFill.fillRoundedRect(-3, markerY, 6, trackHeight - markerY, 3);
+            }
+            if (this.altitudePctText) {
+                this.altitudePctText.setText(`${Math.round(progress * 100)}%`);
+                this.altitudePctText.y = markerY;
+            }
+        }
     }
 
     if (this.levelTransitioning || !this.player || !this.player.active) return;
+
+    // Magma Abyss Warning if close to floor
+    if (this.rows && this.tileSize) {
+        const floorDangerY = (this.rows - 3) * this.tileSize + this.mazeOffsetY;
+        if (this.player.y > floorDangerY) {
+            if (!this.lastMagmaWarn || time - this.lastMagmaWarn > 1800) {
+                this.lastMagmaWarn = time;
+                window.IndieJuice?.screenShake(this, 120, 0.008);
+                window.IndieJuice?.floatingText(this, this.player.x, this.player.y - 25, "🔥 MAGMA ABYSS! 🔥", "#ef4444", 13);
+            }
+        }
+    }
     
     this.player.onLadder = false;
 
@@ -2992,17 +3141,76 @@ update(time, delta) {
             // Check for a jump command.
             const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.keys.jump);
             const wJustPressed = Phaser.Input.Keyboard.JustDown(this.keys.up);
+            const isOnGround = !!(this.player.body && this.player.body.blocked.down);
 
-            if ((spaceJustPressed || wJustPressed) && this.player.body.blocked.down) {
-                // Only jump if on the ground.
-                this.player.body.setVelocityY(-this.playerJumpPower);
+            // Landing impact squash
+            if (!this.playerWasOnGround && isOnGround) {
+                if (this.player.sprite) {
+                    this.tweens.killTweensOf(this.player.sprite);
+                    this.player.sprite.setScale(1.22, 0.78);
+                    this.tweens.add({
+                        targets: this.player.sprite,
+                        scaleX: 1.0,
+                        scaleY: 1.0,
+                        duration: 160,
+                        ease: "Back.easeOut",
+                    });
+                }
+                window.IndieJuice?.spawnDust(this, this.player.x, this.player.y + 14, 5);
+                window.IndieAudioSynth?.playFootstep();
             }
+
+            if ((spaceJustPressed || wJustPressed) && isOnGround) {
+                // Takeoff stretch and jump velocity
+                this.player.body.setVelocityY(-this.playerJumpPower);
+                if (this.player.sprite) {
+                    this.tweens.killTweensOf(this.player.sprite);
+                    this.player.sprite.setScale(0.82, 1.25);
+                    this.tweens.add({
+                        targets: this.player.sprite,
+                        scaleX: 1.0,
+                        scaleY: 1.0,
+                        duration: 200,
+                        ease: "Quad.easeOut",
+                    });
+                }
+                window.IndieAudioSynth?.playJump();
+                window.IndieJuice?.spawnDust(this, this.player.x, this.player.y + 14, 4);
+            }
+
+            this.playerWasOnGround = isOnGround;
         }
         
         // -----------------------------------------------------------------
 
+        // Player Procedural Run / Ladder / Idle Animation
+        if (this.player.sprite) {
+            const isMovingHoriz = Math.abs(this.player.body.velocity.x) > 10;
+            const isMovingVertLadder = onLadder && Math.abs(this.player.body.velocity.y) > 10;
+            const isOnGround = !!(this.player.body && this.player.body.blocked.down);
+
+            if (onLadder && isMovingVertLadder) {
+                this.player.sprite.rotation = Math.sin(time * 0.02) * 0.12;
+                this.player.sprite.scaleY = 1.0 + Math.sin(time * 0.025) * 0.08;
+            } else if (isOnGround && isMovingHoriz) {
+                const leanDir = this.player.body.velocity.x > 0 ? 0.12 : -0.12;
+                this.player.sprite.rotation = Phaser.Math.Linear(this.player.sprite.rotation, leanDir, 0.2);
+                this.player.sprite.y = Math.sin(time * 0.018) * 2.8;
+
+                if (!this.lastStepDust || time - this.lastStepDust > 220) {
+                    this.lastStepDust = time;
+                    window.IndieJuice?.spawnDust(this, this.player.x, this.player.y + 14, 2);
+                    window.IndieAudioSynth?.playFootstep();
+                }
+            } else if (isOnGround && !isMovingHoriz) {
+                this.player.sprite.rotation = Phaser.Math.Linear(this.player.sprite.rotation, 0, 0.2);
+                this.player.sprite.y = Phaser.Math.Linear(this.player.sprite.y, 0, 0.2);
+                this.player.sprite.scaleY = 1.0 + Math.sin(time * 0.004) * 0.03;
+                this.player.sprite.scaleX = 1.0;
+            }
+        }
+
         // At the end of every frame, reset the ladder flag.
-        // The physics overlap will set it to true again on the next frame if needed.
         this.player.onLadder = false;
         
         // -----------------------------------------------------------------
@@ -3037,6 +3245,22 @@ update(time, delta) {
 this.enemies.children.iterate((enemy) => {
     if (!enemy.active || enemy.isFrozen || !enemy.visionCone) return;
     enemy.isVisible = this.isEnemyVisible(enemy);
+
+    // Procedural Enemy Animation Rig
+    if (enemy.sprite) {
+        if (enemy.type === "dragon" || enemy.type === "enemy_2") {
+            enemy.sprite.scaleY = 1.0 + Math.sin(time * 0.014 + (enemy.x || 0) * 0.1) * 0.15;
+            enemy.sprite.y = Math.sin(time * 0.008 + (enemy.x || 0) * 0.05) * 4;
+        } else {
+            const isMoving = enemy.isMoving || (enemy.body && (Math.abs(enemy.body.velocity.x) > 5 || Math.abs(enemy.body.velocity.y) > 5));
+            if (isMoving) {
+                enemy.sprite.rotation = Math.sin(time * 0.016 + (enemy.x || 0) * 0.1) * 0.14;
+            } else {
+                enemy.sprite.rotation = 0;
+            }
+        }
+    }
+
     const distToPlayer = Phaser.Math.Distance.Between(enemy.x, enemy.y, this.player.x, this.player.y);
     const hasLOS = this.hasLineOfSight(enemy.x, enemy.y, this.player.x, this.player.y);
 

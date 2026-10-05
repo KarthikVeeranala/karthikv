@@ -2583,7 +2583,7 @@ const aicadeGames: AicadeGame[] = [
     badge: "IGDC 2024 Top 45 Finalist",
     tagline: "Fast-Paced Melee Combat with Attack Chains & Dodge Rolls",
     description: "Award-nominated top-down action game featuring 5-hit attack combo buffering, 180ms i-frame dodge rolls, posture-breaking parries, and multi-phase arena encounters.",
-    controls: "WASD: Move | J: Attack / Combo | K: Dodge Roll | Space: Interact",
+    controls: "WASD: Move / Sprint (Shift) | Mouse Click / F: 5-Hit Combo | V: Heavy Strike | X / R-Click: Special Slash | C: Dash | Ctrl: Dodge Roll | E: Block / Interact | Space: Jump",
     tech: ["Phaser 3", "Combo Buffer", "i-Frames", "Finite State Machine"],
   },
   {
@@ -2622,7 +2622,7 @@ const aicadeGames: AicadeGame[] = [
     badge: "Ragdoll Simulation",
     tagline: "Multi-Joint Skeletal Physics & Impact Impulse",
     description: "Interactive ragdoll playground with multi-joint Verlet constraints, collision sound feedback, dynamic spring stiffness, and velocity-scaled particle impacts.",
-    controls: "Mouse Click & Drag: Grab & Toss Ragdoll | Weapon Bar: Select Toy",
+    controls: "Mouse Click & Drag: Grab, Pull & Toss Ragdoll | 1-5: Weapon Hotkeys | Left Click: Punch / Fire",
     tech: ["Verlet Integration", "Multi-Joint Skeletal", "Impulse Dynamics"],
   },
   {
@@ -2674,7 +2674,7 @@ const aicadeGames: AicadeGame[] = [
     badge: "Vertical Platformer",
     tagline: "Vertical Traversal, Ladder State Machines & Hazard Timing",
     description: "Vertical ascent platformer featuring ladder climbing states, moving spike hazards, falling platforms, gravity manipulation, and precision jump buffering.",
-    controls: "A/D or Left/Right: Run | W/Up: Climb Ladders | Space: Jump",
+    controls: "A/D: Run | W/S: Climb Ladders | Space: Jump | Mouse: Aim Gun | Left Click: Shoot | R: Reload",
     tech: ["Platform Physics", "Climbing State Machine", "Hazard Triggers"],
   },
 ];

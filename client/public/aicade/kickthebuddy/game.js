@@ -257,6 +257,13 @@ if (this.chainConstraints && this.chainConstraints.length > 0) {
                     this.updateKoBar();
                     this.createBloodEffect(constraint.bodyB);
                 }
+
+                // Snap chains when pulled with tension so the buddy can be freely thrown
+                if (currentLength > stretchThreshold * 1.35) {
+                    this.breakChain();
+                    if (window.IndieAudioSynth) window.IndieAudioSynth.playBladeClash(1.0);
+                    break;
+                }
             }
             
             const length = Phaser.Math.Distance.BetweenPoints(startPoint, endPoint);
@@ -636,9 +643,32 @@ this.subtitleText = this.add.text(this.game.config.width / 2, this.game.config.h
 
 
 // Add it to the UI elements so it gets cleaned up automatically
-this.uiElements.push(this.subtitleText);
     this.createBuddy();
-    this.matter.add.mouseSpring();
+    this.mouseSpringConstraint = this.matter.add.mouseSpring({
+        length: 1,
+        stiffness: 0.7,
+        damping: 0.1
+    });
+
+    // Ensure dragging works: wake all buddy parts immediately on any pointer interaction
+    this.input.on('pointerdown', () => {
+        if (this.buddyParts) {
+            this.buddyParts.forEach(p => {
+                if (p.body) Phaser.Physics.Matter.Matter.Sleeping.set(p.body, false);
+            });
+        }
+    });
+
+    if (window.ComboTracker) {
+        this.comboTracker = new window.ComboTracker(this);
+    }
+
+    // Keyboard quick-swap hotkeys [1] - [5]
+    this.input.keyboard.on('keydown-ONE', () => this.equipWeaponByKey('pistol'));
+    this.input.keyboard.on('keydown-TWO', () => this.equipWeaponByKey('shotgun'));
+    this.input.keyboard.on('keydown-THREE', () => this.equipWeaponByKey('crossbow'));
+    this.input.keyboard.on('keydown-FOUR', () => this.equipWeaponByKey('rifle'));
+    this.input.keyboard.on('keydown-FIVE', () => this.equipWeaponByKey('grenade_launcher'));
 
     this.matter.world.on('collisionstart', (event) => {
         event.pairs.forEach(pair => {
@@ -698,24 +728,135 @@ this.matter.world.add(this.chainConstraints);
 handleWallCollision(buddyPartBody) {
     if (this.isGameOver) return;
 
-    // âœ… CHANGE: Reduced damage from 1 to 0.5 to slow the KO bar fill rate.
-    const wallHitDamage = 0.5;
+    const speed = Math.hypot(buddyPartBody.velocity.x, buddyPartBody.velocity.y);
+    const wallHitDamage = Math.max(0.5, speed * 0.35);
     this.koMeter = Math.min(this.koMeter + wallHitDamage, this.koMeterMax);
     this.updateKoBar();
 
-    // âœ… NEW: Add 1 point to the score on every wall hit.
-    this.updateScore(1);
+    this.updateScore(Math.max(1, Math.round(speed * 0.5)));
 
-    if (this.sounds.damage) {
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playFleshHit(Math.max(0.6, 1.2 - speed * 0.04));
+    } else if (this.sounds.damage) {
         this.sounds.damage.play({ volume: 0.05, detune: 200 });
     }
+
+    if (window.IndieJuice) {
+        if (speed > 2) {
+            window.IndieJuice.spawnShockwave(this, buddyPartBody.position.x, buddyPartBody.position.y, Math.min(2.5, 0.6 + speed * 0.09));
+            window.IndieJuice.spawnDust(this, buddyPartBody.position.x, buddyPartBody.position.y, Math.min(16, 4 + Math.floor(speed * 0.6)));
+            window.IndieJuice.screenShake(this, Math.min(0.02, 0.004 + speed * 0.001), 100);
+            window.IndieJuice.floatingText(this, buddyPartBody.position.x, buddyPartBody.position.y - 25, Math.round(speed * 3), speed > 8);
+        }
+    }
+
+    if (this.comboTracker) {
+        this.comboTracker.hit(buddyPartBody.position.x, buddyPartBody.position.y);
+    }
+
     this.createBloodEffect(buddyPartBody);
+
+    if (speed > 7) {
+        this.triggerComedicTaunt();
+        this.triggerDazedStars();
+    }
 
     if (this.koMeter >= this.koMeterMax) {
         this.handleKO();
     }
 }
 
+
+triggerComedicTaunt() {
+    const quotes = [
+        "Is that all you've got?!",
+        "My spleen!",
+        "Who gave you that weapon?!",
+        "Time out! Time out!",
+        "That barely tickled!",
+        "Ouch! Watch the stitches!",
+        "I need an ice pack!",
+        "You click like a snail!",
+        "Nice shot, rookie!"
+    ];
+    const quote = Phaser.Utils.Array.GetRandom(quotes);
+    const head = this.buddyParts && this.buddyParts[0] && this.buddyParts[0].sprite;
+    const x = head ? head.x : this.game.config.width / 2;
+    const y = head ? head.y - 70 : 300;
+
+    if (window.IndieJuice) {
+        window.IndieJuice.floatingText(this, x, y, quote, false, {
+            fontFamily: 'Arial Black, sans-serif',
+            fontSize: '18px',
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 4,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            padding: { x: 10, y: 5 }
+        });
+    }
+}
+
+triggerDazedStars() {
+    const head = this.buddyParts && this.buddyParts[0] && this.buddyParts[0].body;
+    if (!head || !head.position) return;
+    const x = head.position.x;
+    const y = head.position.y - 50;
+
+    for (let i = 0; i < 4; i++) {
+        const star = this.add.text(x, y, '⭐', { fontSize: '18px' }).setOrigin(0.5).setDepth(210);
+        const startAngle = (i / 4) * Math.PI * 2;
+        const radius = 35;
+        let elapsed = 0;
+
+        const timer = this.time.addEvent({
+            delay: 16,
+            repeat: 60,
+            callback: () => {
+                elapsed += 0.08;
+                if (!head || !head.position) {
+                    star.destroy();
+                    timer.remove();
+                    return;
+                }
+                const curAngle = startAngle + elapsed;
+                star.setPosition(
+                    head.position.x + Math.cos(curAngle) * radius,
+                    head.position.y - 50 + Math.sin(curAngle) * (radius * 0.4)
+                );
+            }
+        });
+
+        this.time.delayedCall(1000, () => {
+            this.tweens.add({
+                targets: star,
+                alpha: 0,
+                duration: 200,
+                onComplete: () => star.destroy()
+            });
+        });
+    }
+}
+
+equipWeaponByKey(keyName) {
+    if (!this.weapons) return;
+    const weapon = this.weapons.find(w => w.key === keyName);
+    if (!weapon) return;
+    
+    weapon.unlocked = true;
+    if (weapon.equipped) {
+        this.showGamePopup(`${weapon.name} active!`);
+        return;
+    }
+    
+    weapon.equipped = true;
+    this.setupEquippedWeapon(weapon);
+    this.showGamePopup(`[EQUIPPED] ${weapon.name}!`);
+
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playBladeClash(1.4);
+    }
+}
 
 createButton(x, y, text, callback) {
     const buttonContainer = this.add.container(x, y);
@@ -791,7 +932,21 @@ scoreContainer.add([scoreBg, this.scoreText]);
         this.buildInGameWeaponsMenu();
     });
 
-    this.uiElements.push(scoreContainer, koBarContainer, coinContainer, weaponsBtn);
+    // --- Neon Hotkey Dock Bar ---
+    const dockContainer = this.add.container(this.game.config.width / 2, this.game.config.height - 40).setDepth(80);
+    const dockBg = this.add.graphics()
+        .fillStyle(0x000000, 0.8)
+        .fillRoundedRect(-320, -18, 640, 36, 18)
+        .lineStyle(2, 0x00d2ff, 0.9)
+        .strokeRoundedRect(-320, -18, 640, 36, 18);
+    const dockText = this.add.text(0, 0, 'HOTKEYS: [1] Pistol   [2] Shotgun   [3] Crossbow   [4] Rifle   [5] Launcher', {
+        fontFamily: 'Arial Black, sans-serif',
+        fontSize: '15px',
+        color: '#00d2ff'
+    }).setOrigin(0.5);
+    dockContainer.add([dockBg, dockText]);
+
+    this.uiElements.push(scoreContainer, koBarContainer, coinContainer, weaponsBtn, dockContainer);
 }
 
 /**
@@ -1014,6 +1169,14 @@ this.matter.constraint.create({ bodyA: head, bodyB: torso, pointA: { x: 20, y: 4
 handleHit(body) {
     if (this.isGameOver) return;
     
+    // Break initial chain anchors so player can pull and throw the buddy around freely
+    this.breakChain();
+
+    // Ensure all bodies are awake
+    this.buddyParts.forEach(p => {
+        if (p.body) Phaser.Physics.Matter.Matter.Sleeping.set(p.body, false);
+    });
+    
     this.comboCount++;
     //if (this.comboCount > 10) { this.comboCount = 1; }
 
@@ -1042,7 +1205,8 @@ for (let i = 0; i < 5; i++) {
     this.createBloodEffect(body);
 }
 
-    const force = new Phaser.Math.Vector2(Phaser.Math.FloatBetween(-2.0, 2.0), Phaser.Math.FloatBetween(-3.0, -1.5));
+    // Gentle tactile nudge that does not break mouse dragging constraint
+    const force = new Phaser.Math.Vector2(Phaser.Math.FloatBetween(-0.04, 0.04), -0.05);
     this.matter.body.applyForce(body, body.position, force);
 
     const hitPart = this.buddyParts.find(p => p.body.id === body.id);
@@ -1069,11 +1233,23 @@ const emitter = this.add.particles(body.position.x, body.position.y, 'coin', {
         }
     }
 
-    if (this.sounds.damage) {
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playFleshHit(1.2);
+    } else if (this.sounds.damage) {
         this.sounds.damage.play({ volume: 0.05 });
     }
     
-    this.vfx.shakeGameObject(this.cameras.main, 100, 0.005);
+    if (window.IndieJuice) {
+        window.IndieJuice.spawnSparks(this, body.position.x, body.position.y, 8, 0xffcc00);
+        window.IndieJuice.spawnShockwave(this, body.position.x, body.position.y, 0.9);
+        window.IndieJuice.screenShake(this, 0.006, 80);
+    } else {
+        this.vfx.shakeGameObject(this.cameras.main, 100, 0.005);
+    }
+
+    if (this.comboTracker) {
+        this.comboTracker.hit(body.position.x, body.position.y);
+    }
     
     if (this.koMeter >= this.koMeterMax) {
         this.handleKO();
@@ -1277,19 +1453,31 @@ handleKO() {
     
     this.phase = 'ko_transition';
 
-   if (this.sounds.ko_sound) { this.sounds.ko_sound.play({ volume: 0.8 }); }
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playExplosion();
+    } else if (this.sounds.ko_sound) {
+        this.sounds.ko_sound.play({ volume: 0.8 });
+    }
 
-    // Visual Effects
-    const flash = this.add.rectangle(this.game.config.width / 2, this.game.config.height / 2, this.game.config.width, this.game.config.height, 0xffffff, 0.8).setDepth(100);
-    this.tweens.add({ targets: flash, alpha: 0, duration: 400, onComplete: () => flash.destroy() });
-    this.vfx.shakeGameObject(this.cameras.main, 400, 0.01);
+    if (window.IndieJuice) {
+        window.IndieJuice.screenShake(this, 0.03, 500);
+        window.IndieJuice.flash(this, 0xffffff, 250);
+        window.IndieJuice.spawnShockwave(this, this.game.config.width / 2, this.game.config.height / 2, 4.0);
+        window.IndieJuice.spawnSparks(this, this.game.config.width / 2, this.game.config.height / 2, 30, 0xff2200);
+        window.IndieJuice.spawnDust(this, this.game.config.width / 2, this.game.config.height / 2, 20);
+    } else {
+        // Visual Effects
+        const flash = this.add.rectangle(this.game.config.width / 2, this.game.config.height / 2, this.game.config.width, this.game.config.height, 0xffffff, 0.8).setDepth(100);
+        this.tweens.add({ targets: flash, alpha: 0, duration: 400, onComplete: () => flash.destroy() });
+        this.vfx.shakeGameObject(this.cameras.main, 400, 0.01);
+    }
 
     // This splits the body parts
     this.matter.world.remove(this.constraints);
     
     // --- EXPLOSION LOGIC ---
     const explosionCenter = this.buddyParts[1].body.position; // Explode from the torso
-    const explosionStrength = 0.1;
+    const explosionStrength = 0.12;
 
     this.buddyParts.forEach(part => {
         const direction = Phaser.Physics.Matter.Matter.Vector.sub(part.body.position, explosionCenter);
@@ -1475,23 +1663,31 @@ updateCoinText() {
 
 
 firePistol(weaponData, weaponSprite) {
-if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 }); }
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playGunshot(false);
+    } else if (this.sounds.weapon_shoot) {
+        this.sounds.weapon_shoot.play({ volume: 0.03 });
+    }
     const target = this.buddyParts[1];
     if (!target || !target.body) return;
-    const startPos = { x: weaponSprite.x, y: weaponSprite.y }; // Use sprite center
+    const startPos = { x: weaponSprite.x, y: weaponSprite.y };
     const endPos = { x: target.body.position.x, y: target.body.position.y };
-    const angle = weaponSprite.rotation; // Get angle from the already-rotated sprite
+    const angle = weaponSprite.rotation;
     
-    // Create bullet slightly in front of the gun
+    if (window.IndieJuice) {
+        window.IndieJuice.spawnCasing(this, startPos.x, startPos.y, weaponSprite.flipX ? -1 : 1);
+        window.IndieJuice.spawnSparks(this, startPos.x, startPos.y, 4, 0xffd700);
+    }
+
     const muzzleOffset = 50;
     const bulletStartPos = {
         x: startPos.x + muzzleOffset * Math.cos(angle),
         y: startPos.y + muzzleOffset * Math.sin(angle)
     };
 
-    const bullet = this.add.rectangle(bulletStartPos.x, bulletStartPos.y, 12, 4, 0xffeb3b).setRotation(angle);
+    const bullet = this.add.rectangle(bulletStartPos.x, bulletStartPos.y, 14, 4, 0xffeb3b).setRotation(angle);
     this.tweens.add({
-        targets: bullet, x: endPos.x, y: endPos.y, duration: 300, ease: 'Linear',
+        targets: bullet, x: endPos.x, y: endPos.y, duration: 250, ease: 'Linear',
         onComplete: () => {
             bullet.destroy();
             this.handleWeaponHit(target.body, weaponData.damage, angle);
@@ -1500,14 +1696,24 @@ if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 });
 }
 
 fireShotgun(weaponData, weaponSprite) {
-if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 }); }
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playGunshot(true);
+    } else if (this.sounds.weapon_shoot) {
+        this.sounds.weapon_shoot.play({ volume: 0.04 });
+    }
     const target = this.buddyParts[1];
     if (!target || !target.body) return;
     const startPos = { x: weaponSprite.x, y: weaponSprite.y };
-    const baseAngle = weaponSprite.rotation; // Get angle from the already-rotated sprite
+    const baseAngle = weaponSprite.rotation;
+
+    if (window.IndieJuice) {
+        window.IndieJuice.screenShake(this, 0.01, 100);
+        window.IndieJuice.spawnDust(this, startPos.x, startPos.y, 8);
+        window.IndieJuice.spawnCasing(this, startPos.x, startPos.y, weaponSprite.flipX ? -1 : 1);
+    }
 
     for (let i = 0; i < 5; i++) {
-        const spread = Phaser.Math.DegToRad(Phaser.Math.Between(-15, 15)); // Spread in radians
+        const spread = Phaser.Math.DegToRad(Phaser.Math.Between(-16, 16));
         const pelletAngle = baseAngle + spread;
         const endPos = { x: target.body.position.x + Phaser.Math.Between(-60, 60), y: target.body.position.y + Phaser.Math.Between(-60, 60) };
         
@@ -1523,12 +1729,16 @@ if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 });
 }
 
 fireCrossbow(weaponData, weaponSprite) {
-if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 }); }
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playSwordSwing(1.6);
+    } else if (this.sounds.weapon_shoot) {
+        this.sounds.weapon_shoot.play({ volume: 0.03 });
+    }
     const target = this.buddyParts[1];
     if (!target || !target.body) return;
     const startPos = { x: weaponSprite.x, y: weaponSprite.y };
     const endPos = { x: target.body.position.x, y: target.body.position.y };
-    const angle = weaponSprite.rotation; // Get angle from the already-rotated sprite
+    const angle = weaponSprite.rotation;
     const bolt = this.add.rectangle(startPos.x, startPos.y, 30, 5, 0x8B4513).setRotation(angle);
     this.tweens.add({
         targets: bolt, x: endPos.x, y: endPos.y, duration: 80, ease: 'Linear',
@@ -1540,14 +1750,24 @@ if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 });
 }
 
 fireRifle(weaponData, weaponSprite) {
-if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 }); }
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playGunshot(false);
+    } else if (this.sounds.weapon_shoot) {
+        this.sounds.weapon_shoot.play({ volume: 0.03 });
+    }
     this.breakChain();
     const target = this.buddyParts[1];
     if (!target || !target.body) return;
     const startPos = { x: weaponSprite.x, y: weaponSprite.y };
     const endPos = { x: target.body.position.x, y: target.body.position.y };
-    const angle = weaponSprite.rotation; // Get angle from the already-rotated sprite
-    const bullet = this.add.rectangle(startPos.x, startPos.y, 15, 3, 0xffffff).setRotation(angle);
+    const angle = weaponSprite.rotation;
+    
+    if (window.IndieJuice) {
+        window.IndieJuice.spawnCasing(this, startPos.x, startPos.y, weaponSprite.flipX ? -1 : 1);
+        window.IndieJuice.spawnSparks(this, startPos.x, startPos.y, 4, 0xffcc00);
+    }
+
+    const bullet = this.add.rectangle(startPos.x, startPos.y, 16, 3, 0xffffff).setRotation(angle);
     this.tweens.add({
         targets: bullet, x: endPos.x, y: endPos.y, duration: 70, ease: 'Linear',
         onComplete: () => {
@@ -1558,7 +1778,11 @@ if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 });
 }
 
 fireGrenadeLauncher(weaponData, weaponSprite) {
-if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 }); }
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playGunshot(true);
+    } else if (this.sounds.weapon_shoot) {
+        this.sounds.weapon_shoot.play({ volume: 0.03 });
+    }
     this.breakChain();
     const target = this.buddyParts[1];
     if (!target || !target.body) return;
@@ -1569,23 +1793,16 @@ if (this.sounds.weapon_shoot) { this.sounds.weapon_shoot.play({ volume: 0.03 });
         targets: grenade, x: endPos.x, y: endPos.y, duration: 400, ease: 'Cubic.easeIn',
         onComplete: () => {
             grenade.destroy();
-            this.handleExplosionHit(endPos, 100, weaponData.damage);
+            this.handleExplosionHit(endPos, 120, weaponData.damage);
         }
     });
 }
 
-
-/**
- * Handles the logic for a weapon hit, applying force, damage, and rewards.
- * @param {Matter.Body} body - The buddy part that was hit.
- * @param {number} damage - The damage to apply.
- * @param {number} [angle] - Optional: The angle of impact for applying force.
- */
 handleWeaponHit(body, damage, angle) {
     if (this.isGameOver || !body) return;
     this.koMeter = Math.min(this.koMeter + (damage * 0.25), this.koMeterMax); 
     this.updateKoBar();
-    this.updateScore(1);
+    this.updateScore(Math.max(1, Math.round(damage * 0.2)));
 
     if (angle !== undefined) {
         const forceMagnitude = 0.08;
@@ -1593,32 +1810,50 @@ handleWeaponHit(body, damage, angle) {
         this.matter.body.applyForce(body, body.position, force);
     }
     
-if (this.sounds.damage) { this.sounds.damage.play({ volume: 0.05 }); }
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playFleshHit(1.0);
+    } else if (this.sounds.damage) {
+        this.sounds.damage.play({ volume: 0.05 });
+    }
+
+    if (window.IndieJuice) {
+        window.IndieJuice.spawnSparks(this, body.position.x, body.position.y, 7, 0xffea00);
+        window.IndieJuice.floatingText(this, body.position.x, body.position.y - 20, Math.round(damage), damage > 30);
+    }
+
+    if (this.comboTracker) {
+        this.comboTracker.hit(body.position.x, body.position.y);
+    }
     
     this.weaponHitCounter++;
     
-    // âœ… NEW: Trigger blood effect every two weapon hits
-for (let i = 0; i < 4; i++) {
-    this.createBloodEffect(body);
-}
+    for (let i = 0; i < 4; i++) {
+        this.createBloodEffect(body);
+    }
     
     if (this.weaponHitCounter > 0 && this.weaponHitCounter % 3 === 0) {
         this.spawnCoin(body.position.x, body.position.y);
     }
     
-const emitter = this.add.particles(body.position.x, body.position.y, 'coin', {
-    speed: 50, scale: { start: 0.1, end: 0 }, lifespan: 200, blendMode: 'NORMAL', tint: 0xbb0a1e
-});
-emitter.explode(15);
+    const emitter = this.add.particles(body.position.x, body.position.y, 'coin', {
+        speed: 50, scale: { start: 0.1, end: 0 }, lifespan: 200, blendMode: 'NORMAL', tint: 0xbb0a1e
+    });
+    emitter.explode(15);
     
-    // âœ… CHANGE 2: Check for a KO after a weapon hit.
-    // This ensures the KO sequence runs even if the player isn't clicking.
     if (this.koMeter >= this.koMeterMax) {
         this.handleKO();
     }
-}
-
 handleExplosionHit(position, radius, damage) {
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playExplosion();
+    }
+    if (window.IndieJuice) {
+        window.IndieJuice.spawnShockwave(this, position.x, position.y, 3.2);
+        window.IndieJuice.screenShake(this, 0.022, 350);
+        window.IndieJuice.flash(this, 0xff7700, 150);
+        window.IndieJuice.spawnSparks(this, position.x, position.y, 20, 0xffaa00);
+        window.IndieJuice.spawnDust(this, position.x, position.y, 12);
+    }
     const explosionFX = this.add.circle(position.x, position.y, radius, 0xffa500, 0.5);
     this.tweens.add({ targets: explosionFX, scale: 0, duration: 300, onComplete: () => explosionFX.destroy() });
 
@@ -1626,13 +1861,10 @@ handleExplosionHit(position, radius, damage) {
         if (!part.body) return;
         const distance = Phaser.Math.Distance.Between(position.x, position.y, part.body.position.x, part.body.position.y);
         if (distance <= radius) {
-            // âœ… FIX: Apply a strong, radial force from the explosion's center.
             const direction = new Phaser.Math.Vector2(part.body.position.x - position.x, part.body.position.y - position.y).normalize();
-            const forceMagnitude = 0.15;
+            const forceMagnitude = 0.18;
             const force = direction.scale(forceMagnitude);
             this.matter.body.applyForce(part.body, part.body.position, force);
-            
-            // Call handleWeaponHit for damage/score, but without an angle.
             this.handleWeaponHit(part.body, damage);
         }
     });

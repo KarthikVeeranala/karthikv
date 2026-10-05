@@ -169,7 +169,10 @@
     <div class="key-hints">
       <span><span class="keycap">W A S D</span> Move</span>
       <span><span class="keycap">SPACE</span> Jump</span>
-      <span><span class="keycap">L-CLICK</span> Attack Combo</span>
+      <span><span class="keycap">L-CLICK / F</span> Attack Combo</span>
+      <span><span class="keycap">V</span> Heavy Attack</span>
+      <span><span class="keycap">R-CLICK / X</span> Special Slash</span>
+      <span><span class="keycap">C</span> Dash</span>
       <span><span class="keycap">CTRL</span> Roll</span>
       <span><span class="keycap">E</span> Block</span>
     </div>
@@ -190,10 +193,7 @@
   <script src="../shared/aicade-runtime.js"></script>
 
   <script>
-    let gameLaunched = false;
     function launchGame() {
-      if (gameLaunched) return;
-      gameLaunched = true;
       const splash = document.getElementById("splash");
       if (splash) splash.style.display = "none";
       const container = document.getElementById("game-container");

@@ -5839,7 +5839,8 @@ class BaseScene extends Phaser.Scene {
     }
 init(data) {
         // If spawnPoint data is passed, store it. Otherwise, it remains null.
-        this.spawnPoint = data.spawnPoint || null;
+        this.spawnPoint = (data && data.spawnPoint) || null;
+        this.isReturnVisit = !!(data && (data.spawnPoint || data.dungeonCompleted));
     }
 
     create() {
@@ -5941,9 +5942,25 @@ init(data) {
     if (this.controlsEnabled && !this.inConversation && distance < 80 && !this.conversationWithNpcHad) {
         this.startNpcConversation();
     }
-    else if(distance < 80 && this.conversationWithNpcHad){
-        this.sound.stopAll();
-        this.scene.start('RewardScene');
+    else if (distance < 80 && this.conversationWithNpcHad) {
+        if (this.isReturnVisit) {
+            this.sound.stopAll();
+            this.scene.start("RewardScene");
+        } else {
+            this.showDialogue("npc", "The Rune Gate to the east is open! Head through it to enter the dungeon, or press [ENTER] to warp there now.");
+        }
+    });
+    this.input.keyboard.on("keydown-ENTER", () => {
+        const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.npc.x, this.npc.y);
+        if (this.controlsEnabled && !this.inConversation && dist < 120 && this.conversationWithNpcHad && !this.isReturnVisit) {
+            if (this.sceneTransitioning) return;
+            this.sceneTransitioning = true;
+            this.cameras.main.fadeOut(800, 0, 0, 0);
+            this.cameras.main.once("camerafadeoutcomplete", () => {
+                this.bgMusic.stop();
+                this.scene.start("TeleportScene", { fromPortal: { x: 2000, y: 1050 } });
+            });
+        }
     }
 });
 
@@ -8369,10 +8386,13 @@ class DungeonScene extends Phaser.Scene {
         
 
         // --- Keyboard Setup ---
+        this.canDash = true;
+        this.isDashing = false;
+        if (!this.comboTracker && window.ComboTracker) { this.comboTracker = new window.ComboTracker(this); }
         this.keyState = {
             A: false, D: false, SHIFT: false,
             SPACE: false, CTRL: false,
-            Z: false, E: false
+            Z: false, E: false, C: false, V: false, X: false, W: false, S: false
         };
 
         this.input.keyboard.on('keydown-A', () => { this.keyState.A = true; });
@@ -8390,6 +8410,26 @@ class DungeonScene extends Phaser.Scene {
         this.input.keyboard.on('keyup-CTRL', () => { this.keyState.CTRL = false; });
         this.input.keyboard.on('keyup-Z', () => { this.keyState.Z = false; });
         this.input.keyboard.on('keyup-E', () => { this.keyState.E = false; });
+
+        this.input.keyboard.on('keydown-C', () => { this.keyState.C = true; });
+        this.input.keyboard.on('keyup-C', () => { this.keyState.C = false; });
+        this.input.keyboard.on('keydown-V', () => { this.keyState.V = true; });
+        this.input.keyboard.on('keyup-V', () => { this.keyState.V = false; });
+        this.input.keyboard.on('keydown-X', () => { this.keyState.X = true; });
+        this.input.keyboard.on('keyup-X', () => { this.keyState.X = false; });
+        this.input.keyboard.on('keydown-W', () => { this.keyState.W = true; });
+        this.input.keyboard.on('keyup-W', () => { this.keyState.W = false; });
+        this.input.keyboard.on('keydown-LEFT', () => { this.keyState.A = true; });
+        this.input.keyboard.on('keyup-LEFT', () => { this.keyState.A = false; });
+        this.input.keyboard.on('keydown-RIGHT', () => { this.keyState.D = true; });
+        this.input.keyboard.on('keyup-RIGHT', () => { this.keyState.D = false; });
+        this.input.keyboard.on('keydown-UP', () => { this.keyState.W = true; });
+        this.input.keyboard.on('keyup-UP', () => { this.keyState.W = false; });
+        this.input.keyboard.on('keydown-S', () => { this.keyState.S = true; });
+        this.input.keyboard.on('keyup-S', () => { this.keyState.S = false; });
+        this.input.keyboard.on('keydown-DOWN', () => { this.keyState.S = true; });
+        this.input.keyboard.on('keyup-DOWN', () => { this.keyState.S = false; });
+        this.input.keyboard.on('keydown-F', () => { this.handleAttack(); });
 
         this.input.on('pointerdown', this.handleAttack, this);
 
@@ -8860,6 +8900,10 @@ this.scoreText = this.add.text(1160, 80, 'Score: ' + this.score, {
 
         this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
+        if (typeof ComboTracker !== 'undefined') {
+            this.comboTracker = new ComboTracker(this);
+        }
+
         // --- DEATH SCREEN UI (Initially hidden) ---
         const screenCenterX = this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.height / 2;
@@ -9073,11 +9117,14 @@ this.scoreText = this.add.text(1160, 80, 'Score: ' + this.score, {
     }
 
     // --- MODIFIED: To check for boss ---
-    checkPlayerAttackHit(isSpecial = false) {
-        // Define a simple hitbox in front of the player
-        const attackHitbox = new Phaser.Geom.Rectangle(this.player.x, this.player.y - 20, 70, 40);
+    checkPlayerAttackHit(isSpecial = false, isHeavy = false) {
+        // Hitbox defined in front of player
+        if (window.IndieAudioSynth) {
+            window.IndieAudioSynth.playSwordSwing(isSpecial ? 0.75 : (isHeavy ? 0.9 : 1.15));
+        }
+        const attackHitbox = new Phaser.Geom.Rectangle(this.player.x, this.player.y - 20, isHeavy ? 90 : 70, 40);
         if (this.player.flipX) {
-            attackHitbox.x -= 60; // Adjust hitbox based on direction
+            attackHitbox.x -= (isHeavy ? 80 : 60); // Adjust hitbox based on direction
         }
 
         // --- Check Enemy 1 ---
@@ -9085,9 +9132,11 @@ this.scoreText = this.add.text(1160, 80, 'Score: ' + this.score, {
             const enemyHitbox = this.enemy1.body;
             if (Phaser.Geom.Intersects.RectangleToRectangle(attackHitbox, enemyHitbox)) {
                 if (isSpecial) {
-                    this.enemyTakeDamage(this.enemy1.maxHealth * 0.5);
+                    this.enemyTakeDamage(this.enemy1.maxHealth * 0.5, true);
+                } else if (isHeavy) {
+                    this.enemyTakeDamage(this.enemy1.maxHealth * 0.35, false, true);
                 } else {
-                    this.enemyTakeDamage(this.enemy1.maxHealth * 0.1);
+                    this.enemyTakeDamage(this.enemy1.maxHealth * 0.15, false);
                 }
                 this.enemy1.isHittable = false;
                 this.time.delayedCall(500, () => {
@@ -9109,7 +9158,10 @@ this.scoreText = this.add.text(1160, 80, 'Score: ' + this.score, {
             if (Phaser.Geom.Intersects.RectangleToRectangle(attackHitbox, bossHitbox)) {
                 if (isSpecial) {
                     // Special attack hits boss hard
-                    this.bossTakeDamage(this.boss.maxHealth * 0.25); 
+                    this.bossTakeDamage(this.boss.maxHealth * 0.25, true);
+                } else if (isHeavy) {
+                    // Heavy attack
+                    this.bossTakeDamage(this.boss.maxHealth * 0.12, false, true);
                 } else {
                     // Normal attack
                     this.bossTakeDamage(this.boss.maxHealth * 0.05);
@@ -9122,12 +9174,27 @@ this.scoreText = this.add.text(1160, 80, 'Score: ' + this.score, {
         }
     }
 
-    enemyTakeDamage(amount) {
+    enemyTakeDamage(amount, isSpecial = false, isHeavy = false) {
         if (!this.enemy1 || this.enemy1.state === 'DEAD' || this.enemy1.isActionLocked) {
             return;
         }
 
         this.enemy1.health -= amount;
+
+        // Juice feedback: Sparks, Blood, Hit-Stop, Damage text & SFX
+        if (window.IndieAudioSynth) {
+            window.IndieAudioSynth.playBladeClash(isSpecial ? 0.8 : (isHeavy ? 1.0 : 1.2));
+        }
+        if (window.IndieJuice) {
+            window.IndieJuice.hitStop(this, isSpecial ? 80 : (isHeavy ? 65 : 45));
+            window.IndieJuice.screenShake(this, isSpecial ? 0.012 : (isHeavy ? 0.008 : 0.005), isSpecial ? 150 : (isHeavy ? 110 : 80));
+            window.IndieJuice.spawnSparks(this, this.enemy1.x, this.enemy1.y - 15, isSpecial ? 0xffea00 : (isHeavy ? 0xffaa00 : 0xffffff), isSpecial ? 18 : (isHeavy ? 14 : 10));
+            window.IndieJuice.spawnBlood(this, this.enemy1.x, this.enemy1.y - 10, this.player.flipX ? -1 : 1, 0xbf112d, isSpecial ? 20 : (isHeavy ? 16 : 12));
+            window.IndieJuice.floatingText(this, this.enemy1.x, this.enemy1.y - 30, Math.round(amount), isSpecial || isHeavy);
+        }
+        if (this.comboTracker) {
+            this.comboTracker.hit();
+        }
 
 if (this.enemy1.health <= 0) {
     this.updateScore(10); // +10 for enemy kill
@@ -9142,12 +9209,12 @@ if (this.enemy1.health <= 0) {
             this.enemy1.setVelocityX(0);
             this.enemy1.anims.play('enemy1_hit', true);
             const knockbackDirection = this.player.x < this.enemy1.x ? 1 : -1;
-            this.enemy1.setVelocityX(knockbackDirection * 50);
+            this.enemy1.setVelocityX(knockbackDirection * (isHeavy ? 120 : (isSpecial ? 90 : 50)));
         }
     }
 
     // --- NEW: Function for boss taking damage ---
-    bossTakeDamage(amount) {
+    bossTakeDamage(amount, isSpecial = false, isHeavy = false) {
         if (!this.boss || this.boss.state === 'DEAD') {
             return;
         }
@@ -9157,8 +9224,44 @@ if (this.enemy1.health <= 0) {
         // Flash red to show hit
         this.boss.setTint(0xff0000);
         this.time.delayedCall(100, () => {
-            if (this.boss) this.boss.clearTint();
+            if (this.boss) {
+                if (this.boss.isEnraged) {
+                    this.boss.setTint(0xff3333);
+                } else {
+                    this.boss.clearTint();
+                }
+            }
         }, [], this);
+
+        // Juice feedback: Hit stop, Screen shake, Sparks, Blood, Damage text & SFX
+        if (window.IndieAudioSynth) {
+            window.IndieAudioSynth.playBladeClash(isSpecial ? 0.7 : (isHeavy ? 0.85 : 0.95));
+        }
+        if (window.IndieJuice) {
+            window.IndieJuice.hitStop(this, isSpecial ? 90 : (isHeavy ? 75 : 50));
+            window.IndieJuice.screenShake(this, isSpecial ? 0.015 : (isHeavy ? 0.010 : 0.007), isSpecial ? 160 : (isHeavy ? 120 : 90));
+            window.IndieJuice.spawnSparks(this, this.boss.x, this.boss.y - 30, isSpecial ? 0xffea00 : (isHeavy ? 0xff9900 : 0xffbb00), isSpecial ? 22 : (isHeavy ? 17 : 12));
+            window.IndieJuice.spawnBlood(this, this.boss.x, this.boss.y - 20, this.player.flipX ? -1 : 1, 0x880015, isSpecial ? 24 : (isHeavy ? 20 : 16));
+            window.IndieJuice.floatingText(this, this.boss.x, this.boss.y - 70, Math.round(amount), isSpecial || isHeavy);
+        }
+        if (this.comboTracker) {
+            this.comboTracker.hit();
+        }
+
+        // Boss Enrage Mechanic (Phase 2 at <= 50% maxHealth)
+        if (!this.boss.isEnraged && this.boss.health <= this.boss.maxHealth * 0.5 && this.boss.health > 0) {
+            this.boss.isEnraged = true;
+            this.boss.speed = (this.boss.speed || 60) * 1.45;
+            this.boss.setTint(0xff3333);
+            if (window.IndieAudioSynth) {
+                window.IndieAudioSynth.playBossRumble(700);
+            }
+            if (window.IndieJuice) {
+                window.IndieJuice.flash(this, 0xff0044, 250);
+                window.IndieJuice.screenShake(this, 0.02, 350);
+                window.IndieJuice.floatingText(this, this.boss.x, this.boss.y - 90, "⚠️ ENRAGED! ⚠️", true);
+            }
+        }
 
 if (this.boss.health <= 0) {
     // --- DIE ---
@@ -9168,6 +9271,23 @@ if (this.boss.health <= 0) {
     this.boss.setVelocity(0);
     this.boss.anims.play('boss_death', true);
     this.boss.body.enable = false; // Disable physics
+
+    // Boss Death Climax VFX / SFX
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playExplosion(1.2);
+    }
+    if (window.IndieJuice) {
+        window.IndieJuice.screenShake(this, 0.025, 600);
+        window.IndieJuice.flash(this, 0xffffff, 200);
+        window.IndieJuice.spawnSparks(this, this.boss.x, this.boss.y, 0xffcc00, 35);
+    }
+    // Dramatic camera zoom
+    this.cameras.main.zoomTo(1.25, 400, 'Power2', false);
+    this.time.delayedCall(1200, () => {
+        if (this.cameras && this.cameras.main) {
+            this.cameras.main.zoomTo(1.0, 600, 'Sine.easeInOut');
+        }
+    });
 } else {
     // --- GET HIT ---
     this.updateScore(20); // +20 for boss damage
@@ -9175,7 +9295,7 @@ if (this.boss.health <= 0) {
     // just apply knockback
     const knockbackDirection = this.player.x < this.boss.x ?
         1 : -1;
-    this.boss.setVelocityX(knockbackDirection * 50);
+    this.boss.setVelocityX(knockbackDirection * (isHeavy ? 100 : (isSpecial ? 75 : 40)));
 }
     }
 
@@ -9313,11 +9433,67 @@ enemyAttack() {
             return; // Stop all updates if player is dead
         }
 
-        const { A, D, SHIFT, SPACE, CTRL, Z, E } = this.keyState;
+        const { A, D, SHIFT, SPACE, CTRL, Z, E, C, V, X, W } = this.keyState;
         const onGround = this.player.body.blocked.down;
 
         // --- PRIORITY ACTIONS (JUMP, ROLL, KICK) ---
-        if (SPACE && onGround && !this.player.isActionLocked) {
+        // --- DASH ABILITY (C key) ---
+        if (C && !this.player.isActionLocked && this.canDash && this.player.stamina >= 25) {
+            this.canDash = false;
+            this.isDashing = true;
+            this.player.isActionLocked = true;
+            this.player.stamina = Math.max(0, this.player.stamina - 25);
+            const dashDir = this.player.flipX ? -1 : 1;
+            this.player.setVelocityX(dashDir * (this.player.rollSpeed || 350) * 1.5);
+            this.player.anims.play('roll', true);
+            if (window.IndieAudioSynth) window.IndieAudioSynth.playSwordSwing(1.8);
+            if (window.IndieJuice) {
+                window.IndieJuice.spawnDust(this, this.player.x, this.player.y + 20, 8);
+                window.IndieJuice.spawnSparks(this, this.player.x, this.player.y, 6, 0x00d2ff);
+            }
+            const ghost = this.add.sprite(this.player.x, this.player.y, this.player.texture.key, this.player.frame.name)
+                .setDepth(9).setAlpha(0.6).setFlipX(this.player.flipX);
+            this.tweens.add({
+                targets: ghost,
+                alpha: 0,
+                duration: 250,
+                onComplete: () => ghost.destroy()
+            });
+            this.time.delayedCall(220, () => {
+                this.isDashing = false;
+                this.player.isActionLocked = false;
+            });
+            this.time.delayedCall(600, () => { this.canDash = true; });
+            return;
+        }
+
+        // --- HEAVY ATTACK (V key) ---
+        if (V && onGround && !this.player.isActionLocked) {
+            this.player.isActionLocked = true;
+            this.player.setVelocityX(0);
+            this.player.anims.play('kick', true);
+            if (window.IndieAudioSynth) window.IndieAudioSynth.playSwordSwing(0.85);
+            this.checkPlayerAttackHit(false, true);
+            if (window.IndieJuice) window.IndieJuice.screenShake(this, 0.008, 100);
+            return;
+        }
+
+        // --- SPECIAL SLASH (X key) ---
+        if (X && !this.player.isActionLocked && this.player.stamina >= 40) {
+            this.player.isActionLocked = true;
+            this.player.setVelocityX(0);
+            this.player.stamina = Math.max(0, this.player.stamina - 40);
+            this.player.anims.play('special_attack', true);
+            if (window.IndieAudioSynth) window.IndieAudioSynth.playSwordSwing(0.7);
+            this.checkPlayerAttackHit(true, false);
+            if (window.IndieJuice) {
+                window.IndieJuice.screenShake(this, 0.015, 150);
+                window.IndieJuice.spawnSparks(this, this.player.x + (this.player.flipX ? -40 : 40), this.player.y - 20, 16, 0x00f0ff);
+            }
+            return;
+        }
+
+        if ((SPACE || W) && onGround && !this.player.isActionLocked) {
             this.player.isActionLocked = true;
             this.player.setVelocityY(-this.player.jumpHeight);
             this.player.anims.play('jump');
@@ -9401,6 +9577,9 @@ enemyAttack() {
         // --- Health Bar Updates ---
         this.updateEnemyHealthBar();
         this.updateBossHealthBar(); // NEW
+        if (this.comboTracker && typeof this.comboTracker.update === 'function') {
+            this.comboTracker.update();
+        }
     }
 
     updatePlayerBars() {
