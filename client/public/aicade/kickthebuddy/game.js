@@ -92,7 +92,7 @@ this.lastShownScore = 0;
     this.weaponHitCounter = 0;
 
     // Reset other variables...
-    this.koMeterMax = 1000;
+    this.koMeterMax = 5000;
     this.isGameOver = false;
     this.hitCounter = 0;
     this.lastBloodEffectTime = 0;
@@ -646,21 +646,10 @@ buildInstructionsScreen() {
   }
 
   spawnWallCrack(x, y, intensity = 1) {
-    if (!this.wallCracksGraphics) return;
-    this.wallCracksGraphics.lineStyle(2 * intensity, 0x111111, 0.75);
-    const numSpokes = Phaser.Math.Between(4, 7);
-    for (let i = 0; i < numSpokes; i++) {
-        const angle = (i / numSpokes) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-        const len = Phaser.Math.Between(20, 55) * intensity;
-        const midX = x + Math.cos(angle) * (len * 0.5) + Phaser.Math.Between(-5, 5);
-        const midY = y + Math.sin(angle) * (len * 0.5) + Phaser.Math.Between(-5, 5);
-        const endX = x + Math.cos(angle) * len;
-        const endY = y + Math.sin(angle) * len;
-        this.wallCracksGraphics.beginPath();
-        this.wallCracksGraphics.moveTo(x, y);
-        this.wallCracksGraphics.lineTo(midX, midY);
-        this.wallCracksGraphics.lineTo(endX, endY);
-        this.wallCracksGraphics.stroke();
+    // Subtle temporary impact ring instead of messy black scribbles
+    if (window.IndieJuice) {
+        window.IndieJuice.spawnShockwave(this, x, y, Math.min(1.8, 0.8 + intensity * 0.2));
+        window.IndieJuice.spawnDust(this, x, y, 6);
     }
   }
 
@@ -670,7 +659,7 @@ buildInstructionsScreen() {
 
     if (!this.faceDecal) {
         this.faceDecal = this.add.image(headPart.sprite.x, headPart.sprite.y, 'buddy_face_panicked')
-            .setDisplaySize(140, 140)
+            .setDisplaySize(110, 110)
             .setDepth(15)
             .setAlpha(0);
     }
@@ -1297,7 +1286,7 @@ handleHit(body) {
 this.hitCounter++;
 
 // First, check if the KO bar is at least 25% full
-if (this.koMeter >= this.koMeterMax * 0.25) {
+if (this.hitCounter % 3 === 0) {
     // If it is, then check if it's the right hit count to play a taunt
     if (this.hitCounter > 0 && this.hitCounter % 4 === 0) {
         this.playRandomTaunt();
@@ -2091,7 +2080,7 @@ createBloodEffect(body) {
  * Plays a unique taunt until all have been heard, then plays randomly.
  */
 playRandomTaunt() {
-    const cooldown = 9000;
+    const cooldown = 2500;
     const now = this.time.now;
 
     if (now - this.lastTauntTime < cooldown) {

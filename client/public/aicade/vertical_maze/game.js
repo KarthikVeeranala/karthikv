@@ -882,6 +882,161 @@ this.ladders = null // <-- Add this
   }
 
   
+  
+  generatePlayerSpritesheet() {
+    if (this.textures.exists("player_runner_sheet")) return;
+
+    const fW = 64, fH = 64;
+    const totalFrames = 8;
+    const cvs = this.textures.createCanvas("player_runner_sheet", fW * totalFrames, fH);
+    const ctx = cvs.context;
+
+    const drawRunnerFrame = (frameIdx, pose) => {
+      const ox = frameIdx * fW + fW / 2;
+      const oy = fH / 2;
+      ctx.save();
+      ctx.translate(ox, oy);
+
+      const suitColor = "#1e293b";
+      const armorColor = "#0284c7";
+      const skinColor = "#fed7aa";
+      const visorColor = "#00f0ff";
+      const bootColor = "#0f172a";
+
+      if (pose === "idle0" || pose === "idle1") {
+        const bob = pose === "idle1" ? 1.5 : 0;
+        ctx.fillStyle = "rgba(0,0,0,0.25)";
+        ctx.beginPath(); ctx.ellipse(0, 26, 12, 4, 0, 0, Math.PI * 2); ctx.fill();
+
+        ctx.fillStyle = suitColor;
+        ctx.fillRect(-6, 8 + bob, 4, 16 - bob);
+        ctx.fillRect(2, 8 + bob, 4, 16 - bob);
+        ctx.fillStyle = bootColor;
+        ctx.fillRect(-7, 20, 6, 6);
+        ctx.fillRect(1, 20, 6, 6);
+
+        ctx.fillStyle = suitColor;
+        ctx.fillRect(-8, -10 + bob, 16, 20);
+        ctx.fillStyle = armorColor;
+        ctx.fillRect(-6, -8 + bob, 12, 10);
+
+        ctx.fillStyle = skinColor;
+        ctx.beginPath(); ctx.arc(0, -18 + bob, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = visorColor;
+        ctx.fillRect(-1, -21 + bob, 8, 5);
+
+        ctx.fillStyle = suitColor;
+        ctx.fillRect(-10, -6 + bob, 4, 14);
+        ctx.fillRect(6, -6 + bob, 4, 14);
+      } else if (pose === "run0") {
+        ctx.fillStyle = suitColor;
+        ctx.fillRect(-8, 6, 5, 12);
+        ctx.fillRect(3, 4, 5, 10);
+        ctx.fillStyle = bootColor;
+        ctx.fillRect(-10, 16, 7, 6);
+        ctx.fillRect(6, 12, 7, 6);
+        ctx.fillStyle = suitColor; ctx.fillRect(-7, -10, 14, 18);
+        ctx.fillStyle = armorColor; ctx.fillRect(-5, -8, 10, 10);
+        ctx.fillStyle = skinColor; ctx.beginPath(); ctx.arc(1, -17, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = visorColor; ctx.fillRect(1, -20, 8, 5);
+        ctx.fillStyle = suitColor; ctx.fillRect(5, -6, 4, 12); ctx.fillRect(-10, -3, 4, 12);
+      } else if (pose === "run1") {
+        ctx.fillStyle = suitColor;
+        ctx.fillRect(-5, 8, 4, 14); ctx.fillRect(1, 6, 4, 13);
+        ctx.fillStyle = bootColor; ctx.fillRect(-6, 20, 6, 5); ctx.fillRect(1, 17, 6, 5);
+        ctx.fillStyle = suitColor; ctx.fillRect(-7, -8, 14, 18);
+        ctx.fillStyle = armorColor; ctx.fillRect(-5, -6, 10, 10);
+        ctx.fillStyle = skinColor; ctx.beginPath(); ctx.arc(1, -15, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = visorColor; ctx.fillRect(1, -18, 8, 5);
+        ctx.fillStyle = suitColor; ctx.fillRect(-4, -4, 4, 12); ctx.fillRect(2, -4, 4, 12);
+      } else if (pose === "run2") {
+        ctx.fillStyle = suitColor;
+        ctx.fillRect(3, 6, 5, 12); ctx.fillRect(-8, 4, 5, 10);
+        ctx.fillStyle = bootColor; ctx.fillRect(4, 16, 7, 6); ctx.fillRect(-10, 12, 7, 6);
+        ctx.fillStyle = suitColor; ctx.fillRect(-7, -10, 14, 18);
+        ctx.fillStyle = armorColor; ctx.fillRect(-5, -8, 10, 10);
+        ctx.fillStyle = skinColor; ctx.beginPath(); ctx.arc(1, -17, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = visorColor; ctx.fillRect(1, -20, 8, 5);
+        ctx.fillStyle = suitColor; ctx.fillRect(-9, -6, 4, 12); ctx.fillRect(6, -3, 4, 12);
+      } else if (pose === "run3") {
+        ctx.fillStyle = suitColor;
+        ctx.fillRect(-4, 7, 4, 13); ctx.fillRect(2, 7, 4, 13);
+        ctx.fillStyle = bootColor; ctx.fillRect(-5, 19, 6, 5); ctx.fillRect(1, 19, 6, 5);
+        ctx.fillStyle = suitColor; ctx.fillRect(-7, -9, 14, 18);
+        ctx.fillStyle = armorColor; ctx.fillRect(-5, -7, 10, 10);
+        ctx.fillStyle = skinColor; ctx.beginPath(); ctx.arc(1, -16, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = visorColor; ctx.fillRect(1, -19, 8, 5);
+        ctx.fillStyle = suitColor; ctx.fillRect(-6, -4, 4, 12); ctx.fillRect(4, -4, 4, 12);
+      } else if (pose === "jump") {
+        ctx.fillStyle = suitColor;
+        ctx.fillRect(-7, 3, 5, 10); ctx.fillRect(2, 6, 5, 8);
+        ctx.fillStyle = bootColor; ctx.fillRect(-9, 11, 7, 5); ctx.fillRect(3, 12, 6, 5);
+        ctx.fillStyle = suitColor; ctx.fillRect(-7, -12, 14, 18);
+        ctx.fillStyle = armorColor; ctx.fillRect(-5, -10, 10, 10);
+        ctx.fillStyle = skinColor; ctx.beginPath(); ctx.arc(0, -19, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = visorColor; ctx.fillRect(0, -22, 8, 5);
+        ctx.fillStyle = suitColor; ctx.fillRect(-9, -14, 4, 12); ctx.fillRect(6, -10, 4, 10);
+      } else if (pose === "climb") {
+        ctx.fillStyle = suitColor;
+        ctx.fillRect(-7, 4, 5, 14); ctx.fillRect(2, 2, 5, 14);
+        ctx.fillStyle = bootColor; ctx.fillRect(-7, 18, 5, 6); ctx.fillRect(2, 16, 5, 6);
+        ctx.fillStyle = suitColor; ctx.fillRect(-8, -10, 16, 18);
+        ctx.fillStyle = armorColor; ctx.fillRect(-6, -8, 12, 10);
+        ctx.fillStyle = suitColor; ctx.beginPath(); ctx.arc(0, -18, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillRect(-10, -16, 4, 14); ctx.fillRect(6, -12, 4, 14);
+      }
+
+      ctx.restore();
+    };
+
+    drawRunnerFrame(0, "idle0");
+    drawRunnerFrame(1, "idle1");
+    drawRunnerFrame(2, "run0");
+    drawRunnerFrame(3, "run1");
+    drawRunnerFrame(4, "run2");
+    drawRunnerFrame(5, "run3");
+    drawRunnerFrame(6, "jump");
+    drawRunnerFrame(7, "climb");
+
+    cvs.refresh();
+
+    this.textures.addSpriteSheet("player_runner_sheet", cvs.canvas, {
+      frameWidth: fW,
+      frameHeight: fH
+    });
+
+    if (!this.anims.exists("player_idle")) {
+      this.anims.create({
+        key: "player_idle",
+        frames: this.anims.generateFrameNumbers("player_runner_sheet", { start: 0, end: 1 }),
+        frameRate: 3,
+        repeat: -1
+      });
+    }
+    if (!this.anims.exists("player_run")) {
+      this.anims.create({
+        key: "player_run",
+        frames: this.anims.generateFrameNumbers("player_runner_sheet", { start: 2, end: 5 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+    if (!this.anims.exists("player_jump")) {
+      this.anims.create({
+        key: "player_jump",
+        frames: [{ key: "player_runner_sheet", frame: 6 }],
+        frameRate: 1
+      });
+    }
+    if (!this.anims.exists("player_climb")) {
+      this.anims.create({
+        key: "player_climb",
+        frames: [{ key: "player_runner_sheet", frame: 7 }],
+        frameRate: 1
+      });
+    }
+  }
+
   createProceduralHazardsAndBanners() {
     // 1. Boiling Magma Texture
     if (!this.textures.exists("magma_bubble_fx")) {
