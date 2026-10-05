@@ -220,6 +220,7 @@ if (this.activeWeapons && this.activeWeapons.length > 0) {
     }
 }
 
+    this.updateBuddyFacialExpression();
     // Sync ragdoll sprite positions with their physics bodies.
 if (this.buddyParts && this.buddyParts.length) {
   this.buddyParts.forEach(part => {
@@ -589,6 +590,108 @@ buildInstructionsScreen() {
     this.uiElements.push(continueBtn);
 }
 
+
+  createProceduralExpressionsAndCracks() {
+    // 1. Expression Decals on Head
+    if (!this.textures.exists('buddy_face_panicked')) {
+        const cvs = this.textures.createCanvas('buddy_face_panicked', 120, 120);
+        const ctx = cvs.context;
+        // Big wide shocked eyes
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(42, 50, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(78, 50, 16, 0, Math.PI * 2); ctx.fill();
+        // Dilated pupils
+        ctx.fillStyle = '#000000';
+        ctx.beginPath(); ctx.arc(42, 50, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(78, 50, 7, 0, Math.PI * 2); ctx.fill();
+        // O-shaped mouth
+        ctx.fillStyle = '#111111';
+        ctx.beginPath(); ctx.arc(60, 85, 14, 0, Math.PI * 2); ctx.fill();
+        cvs.refresh();
+    }
+
+    if (!this.textures.exists('buddy_face_bruised')) {
+        const cvs = this.textures.createCanvas('buddy_face_bruised', 120, 120);
+        const ctx = cvs.context;
+        // Swollen purple eye
+        ctx.fillStyle = '#7e22ce';
+        ctx.beginPath(); ctx.arc(42, 50, 20, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#000000';
+        ctx.beginPath(); ctx.arc(42, 50, 5, 0, Math.PI * 2); ctx.fill();
+        // Normal eye squinted
+        ctx.lineWidth = 4; ctx.strokeStyle = '#000000';
+        ctx.beginPath(); ctx.moveTo(68, 50); ctx.lineTo(88, 50); ctx.stroke();
+        // Cross Band-aid on forehead
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(50, 15, 24, 8); ctx.fillRect(58, 7, 8, 24);
+        cvs.refresh();
+    }
+
+    if (!this.textures.exists('buddy_face_ko')) {
+        const cvs = this.textures.createCanvas('buddy_face_ko', 120, 120);
+        const ctx = cvs.context;
+        // X X cartoon eyes
+        ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 5;
+        // Left X
+        ctx.beginPath(); ctx.moveTo(32, 40); ctx.lineTo(52, 60); ctx.moveTo(52, 40); ctx.lineTo(32, 60); ctx.stroke();
+        // Right X
+        ctx.beginPath(); ctx.moveTo(68, 40); ctx.lineTo(88, 60); ctx.moveTo(88, 40); ctx.lineTo(68, 60); ctx.stroke();
+        // Squiggly mouth
+        ctx.beginPath(); ctx.moveTo(40, 90); ctx.lineTo(50, 85); ctx.lineTo(65, 95); ctx.lineTo(80, 88); ctx.stroke();
+        cvs.refresh();
+    }
+
+    // Wall cracks graphic layer
+    this.wallCracksGraphics = this.add.graphics().setDepth(2);
+  }
+
+  spawnWallCrack(x, y, intensity = 1) {
+    if (!this.wallCracksGraphics) return;
+    this.wallCracksGraphics.lineStyle(2 * intensity, 0x111111, 0.75);
+    const numSpokes = Phaser.Math.Between(4, 7);
+    for (let i = 0; i < numSpokes; i++) {
+        const angle = (i / numSpokes) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+        const len = Phaser.Math.Between(20, 55) * intensity;
+        const midX = x + Math.cos(angle) * (len * 0.5) + Phaser.Math.Between(-5, 5);
+        const midY = y + Math.sin(angle) * (len * 0.5) + Phaser.Math.Between(-5, 5);
+        const endX = x + Math.cos(angle) * len;
+        const endY = y + Math.sin(angle) * len;
+        this.wallCracksGraphics.beginPath();
+        this.wallCracksGraphics.moveTo(x, y);
+        this.wallCracksGraphics.lineTo(midX, midY);
+        this.wallCracksGraphics.lineTo(endX, endY);
+        this.wallCracksGraphics.stroke();
+    }
+  }
+
+  updateBuddyFacialExpression() {
+    const headPart = this.buddyParts && this.buddyParts[0];
+    if (!headPart || !headPart.body || !headPart.sprite) return;
+
+    if (!this.faceDecal) {
+        this.faceDecal = this.add.image(headPart.sprite.x, headPart.sprite.y, 'buddy_face_panicked')
+            .setDisplaySize(140, 140)
+            .setDepth(15)
+            .setAlpha(0);
+    }
+
+    this.faceDecal.setPosition(headPart.sprite.x, headPart.sprite.y);
+    this.faceDecal.setRotation(headPart.sprite.rotation);
+
+    if (this.isGameOver || this.phase === 'ko') {
+        this.faceDecal.setTexture('buddy_face_ko').setAlpha(1);
+    } else {
+        const vel = Math.hypot(headPart.body.velocity.x, headPart.body.velocity.y);
+        if (vel > 8) {
+            this.faceDecal.setTexture('buddy_face_panicked').setAlpha(0.95);
+        } else if (this.koMeter > this.koMeterMax * 0.4) {
+            this.faceDecal.setTexture('buddy_face_bruised').setAlpha(0.9);
+        } else {
+            this.faceDecal.setAlpha(0);
+        }
+    }
+  }
+
 buildGameplayScreen() {
     this.init(); 
     this.phase = 'gameplay';
@@ -644,6 +747,7 @@ this.subtitleText = this.add.text(this.game.config.width / 2, this.game.config.h
 
 // Add it to the UI elements so it gets cleaned up automatically
     this.createBuddy();
+    this.createProceduralExpressionsAndCracks();
     this.mouseSpringConstraint = this.matter.add.mouseSpring({
         length: 1,
         stiffness: 0.7,
@@ -746,6 +850,9 @@ handleWallCollision(buddyPartBody) {
             window.IndieJuice.spawnShockwave(this, buddyPartBody.position.x, buddyPartBody.position.y, Math.min(2.5, 0.6 + speed * 0.09));
             window.IndieJuice.spawnDust(this, buddyPartBody.position.x, buddyPartBody.position.y, Math.min(16, 4 + Math.floor(speed * 0.6)));
             window.IndieJuice.screenShake(this, Math.min(0.02, 0.004 + speed * 0.001), 100);
+            if (speed > 6) {
+                this.spawnWallCrack(buddyPartBody.position.x, buddyPartBody.position.y, Math.min(2.0, 0.8 + speed * 0.1));
+            }
             window.IndieJuice.floatingText(this, buddyPartBody.position.x, buddyPartBody.position.y - 25, Math.round(speed * 3), speed > 8);
         }
     }

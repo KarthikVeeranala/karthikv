@@ -5709,56 +5709,55 @@ class RewardScene extends Phaser.Scene {
 showEndText() {
     const { width, height } = this.game.config;
 
-    const text1 = this.add.text(width / 2, height / 2 - 40, "The city is yet to be saved", {
+    // Golden Sunlight Bloom overlay
+    const bloom = this.add.graphics().setDepth(58);
+    bloom.fillStyle(0xfde047, 0.25);
+    bloom.fillRect(0, 0, width, height);
+
+    const card = this.add.container(width / 2, height / 2).setDepth(60).setAlpha(0);
+    const cardBg = this.add.graphics();
+    cardBg.fillStyle(0x0f172a, 0.92);
+    cardBg.fillRoundedRect(-320, -180, 640, 360, 24);
+    cardBg.lineStyle(3, 0xd4af37, 1);
+    cardBg.strokeRoundedRect(-320, -180, 640, 360, 24);
+
+    const title = this.add.text(0, -130, 'DAWN OF AETHEL: RESTORED', {
         fontFamily: 'Georgia, serif',
-        fontSize: '48px',
-        color: '#f4e4c1',
+        fontSize: '36px',
+        color: '#fde047',
         stroke: '#8b6914',
-        strokeThickness: 4,
-        shadow: {
-            offsetX: 0,
-            offsetY: 0,
-            color: '#d4af37',
-            blur: 25,
-            fill: true
-        }
-    }).setOrigin(0.5).setAlpha(0).setDepth(60);
+        strokeThickness: 5
+    }).setOrigin(0.5);
 
-    const text2 = this.add.text(width / 2, height / 2 + 40, "More adventures soon", {
-        fontFamily: 'Georgia, serif',
-        fontSize: '28px',
-        color: '#b8a88a',
+    const subtitle = this.add.text(0, -85, 'The Shadow King falls. Sunstones reignite the ancient citadel.', {
+        fontFamily: 'serif',
+        fontSize: '18px',
+        color: '#94a3b8',
         fontStyle: 'italic'
-    }).setOrigin(0.5).setAlpha(0).setDepth(60);
+    }).setOrigin(0.5);
 
-    // Fade in main title
+    const scoreLine = this.add.text(0, -20, 'HERO COMBAT RATING: S-RANK LEGEND', {
+        fontFamily: 'Arial Black, sans-serif',
+        fontSize: '22px',
+        color: '#38bdf8'
+    }).setOrigin(0.5);
+
+    const stat1 = this.add.text(-180, 40, '✔ Sunstone Shards: 3 / 3', { fontSize: '18px', color: '#e2e8f0', fontFamily: 'serif' });
+    const stat2 = this.add.text(-180, 75, '✔ Crypt Wight: Vanquished', { fontSize: '18px', color: '#e2e8f0', fontFamily: 'serif' });
+    const stat3 = this.add.text(-180, 110, '✔ Shadow King: Banished', { fontSize: '18px', color: '#e2e8f0', fontFamily: 'serif' });
+
+    card.add([cardBg, title, subtitle, scoreLine, stat1, stat2, stat3]);
+
     this.tweens.add({
-        targets: text1,
+        targets: card,
         alpha: 1,
-        duration: 2000,
-        ease: 'Sine.easeInOut'
+        duration: 1500,
+        ease: 'Cubic.easeOut'
     });
 
-    // Delay and fade in subtitle
-    this.tweens.add({
-        targets: text2,
-        alpha: 1,
-        duration: 2000,
-        delay: 1000,
-        ease: 'Sine.easeInOut',
-        onComplete: () => {
-            // Optional fade-out after some time
-            this.time.delayedCall(4000, () => {
-                this.tweens.add({
-                    targets: [text1, text2],
-                    alpha: 0,
-                    duration: 2000,
-                    ease: 'Sine.easeInOut',
-                    onComplete: () => this.cleanupAndGameOver()
-                });
-            });
-        }
-    });
+    if (window.IndieAudioSynth) {
+        window.IndieAudioSynth.playVictoryFanfare();
+    }
 }
 
 
@@ -6002,6 +6001,19 @@ this.keyState = { W: false, A: false, S: false, D: false, SHIFT: false };
             // No spawn point data means this is a new game.
             // Run the original cinematic intro sequence.
             this.startIntroSequence();
+
+        // --- PHASE 6: QUEST LOG & SUNSTONE SHRINES ---
+        this.sunstoneQuest = {
+            totalShrines: 3,
+            activatedShrines: 0,
+            shrinePositions: [
+                { x: 500, y: 1350, id: 1, activated: false },
+                { x: 1200, y: 1200, id: 2, activated: false },
+                { x: 1750, y: 1100, id: 3, activated: false }
+            ]
+        };
+        this.createSunstoneShrines();
+    
         }
     }
 showControlsDisplay(onComplete) {
@@ -6300,6 +6312,68 @@ this.input.off('pointerdown', this.skipTyping, this);
     }
 
 
+    
+    createSunstoneShrines() {
+        this.shrinesGroup = this.add.group();
+        this.sunstoneQuest.shrinePositions.forEach(pos => {
+            const shrineContainer = this.add.container(pos.x, pos.y);
+            const baseGlow = this.add.circle(0, 0, 22, 0xd4af37, 0.4);
+            const stone = this.add.rectangle(0, 0, 26, 36, 0x475569);
+            const crystal = this.add.triangle(0, -10, 0, -16, -8, 0, 8, 0, 0x06b6d4).setAlpha(0.7);
+            const label = this.add.text(0, -32, '[E] Awaken Shrine', {
+                fontSize: '13px',
+                color: '#fde047',
+                fontFamily: 'serif',
+                stroke: '#000',
+                strokeThickness: 3
+            }).setOrigin(0.5).setVisible(false);
+
+            shrineContainer.add([baseGlow, stone, crystal, label]);
+            shrineContainer.shrineData = pos;
+            shrineContainer.label = label;
+            shrineContainer.crystal = crystal;
+            shrineContainer.baseGlow = baseGlow;
+
+            this.shrinesGroup.add(shrineContainer);
+        });
+    }
+
+    updateShrinesInteraction() {
+        if (!this.shrinesGroup || !this.player || !this.controlsEnabled || this.inConversation) return;
+
+        this.shrinesGroup.children.each(container => {
+            if (!container || !container.shrineData) return;
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, container.x, container.y);
+            const isNear = dist < 70;
+            
+            if (container.shrineData.activated) {
+                container.label.setVisible(false);
+                return;
+            }
+
+            container.label.setVisible(isNear);
+
+            if (isNear && Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E))) {
+                container.shrineData.activated = true;
+                this.sunstoneQuest.activatedShrines++;
+                container.label.setVisible(false);
+                container.crystal.setFillStyle(0xfde047);
+                container.crystal.setAlpha(1);
+                container.baseGlow.setFillStyle(0xfde047, 0.9);
+
+                window.IndieAudioSynth?.playGemChime(1.6);
+                window.IndieJuice?.spawnSparks(this, container.x, container.y - 10, 25, 0xfde047);
+                window.IndieJuice?.spawnShockwave(this, container.x, container.y, 2.5);
+                window.IndieJuice?.floatingText(this, container.x, container.y - 50, '✨ SUNSTONE AWAKENED! ✨', '#fde047', 16);
+
+                if (this.sunstoneQuest.activatedShrines >= this.sunstoneQuest.totalShrines) {
+                    window.IndieJuice?.floatingText(this, this.player.x, this.player.y - 80, '🌟 RUNE GATE FULLY CHARGED! 🌟', '#38bdf8', 18);
+                    window.IndieAudioSynth?.playVictoryFanfare();
+                }
+            }
+        });
+    }
+
     startReturnSequence() {
         this.controlsEnabled = false; // Ensure controls are off
         this.inConversation = true;   // Set conversation flag
@@ -6540,7 +6614,8 @@ this.tweens.add({
         const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.npc.x, this.npc.y);
         
         // This part just shows or hides the text. The input is handled by the event listener.
-        if (distance < 80) {
+        this.updateShrinesInteraction();
+        if (distance < 80) {
             this.interactText.setVisible(true);
         } else {
             this.interactText.setVisible(false);
@@ -9412,7 +9487,12 @@ enemyAttack() {
 
     returnToBaseScene() {
         const returnSpawnPoint = { x: 2000, y: 950 };
-        this.scene.start('BaseScene', { spawnPoint: returnSpawnPoint });
+        this.scene.start('BaseScene', { 
+            spawnPoint: returnSpawnPoint,
+            dungeonCompleted: true,
+            score: this.score,
+            bossDefeated: !this.boss
+        });
     }
 
     update() {

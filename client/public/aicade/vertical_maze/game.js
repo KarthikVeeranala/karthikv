@@ -748,6 +748,7 @@ this.ladders = null // <-- Add this
     this.createPowerupUI()
     this.createAltitudeMeterUI()
     this.generatePlayerSpritesheet()
+    this.createProceduralHazardsAndBanners()
     this.createCrosshair()
     this.reloadText = this.add
       .bitmapText(this.width / 2, this.height - 150, "pixel_font", "Press R to Reload", 22)
@@ -878,6 +879,99 @@ this.ladders = null // <-- Add this
     }
 
     weaponContainer.add([this.weaponIcon, this.reloadBarContainer, ...this.ammoBarSegments.getChildren()])
+  }
+
+  
+  createProceduralHazardsAndBanners() {
+    // 1. Boiling Magma Texture
+    if (!this.textures.exists("magma_bubble_fx")) {
+      const cvs = this.textures.createCanvas("magma_bubble_fx", 24, 24);
+      const ctx = cvs.context;
+      const grad = ctx.createRadialGradient(12, 12, 2, 12, 12, 11);
+      grad.addColorStop(0, "#fff59d");
+      grad.addColorStop(0.4, "#ff7043");
+      grad.addColorStop(1, "rgba(216, 27, 96, 0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(12, 12, 11, 0, Math.PI * 2);
+      ctx.fill();
+      cvs.refresh();
+    }
+
+    // 2. Magma Floor Graphics Object
+    const worldW = this.cols * this.tileSize;
+    const worldBottom = this.rows * this.tileSize + this.mazeOffsetY;
+    this.magmaSurfaceY = worldBottom - 18;
+    this.magmaFloorGraphics = this.add.graphics().setDepth(200);
+
+    // 3. Emitter for rising magma bubbles and embers
+    if (this.add.particles) {
+      try {
+        this.magmaEmitter = this.add.particles(0, 0, "magma_bubble_fx", {
+          x: { min: this.mazeOffsetX, max: this.mazeOffsetX + worldW },
+          y: { min: this.magmaSurfaceY, max: this.magmaSurfaceY + 40 },
+          lifespan: { min: 800, max: 1800 },
+          speedY: { min: -40, max: -90 },
+          speedX: { min: -15, max: 15 },
+          scale: { start: 0.6, end: 0 },
+          alpha: { start: 0.9, end: 0 },
+          blendMode: "ADD",
+          frequency: 120
+        }).setDepth(201);
+      } catch (e) {}
+    }
+
+    // 4. Milestone Tracker
+    this.passedMilestones = new Set();
+  }
+
+  showMilestoneBanner(text, subtext) {
+    if (!this.gameUI) return;
+    window.IndieAudioSynth?.playGemChime(1.5);
+    window.IndieAudioSynth?.playVictoryFanfare();
+
+    const banner = this.add.container(this.width / 2, -100).setDepth(4000);
+    const bg = this.add.graphics();
+    bg.fillStyle(0x000000, 0.85);
+    bg.fillRoundedRect(-280, -35, 560, 70, 16);
+    bg.lineStyle(2, 0x00d2ff, 1);
+    bg.strokeRoundedRect(-280, -35, 560, 70, 16);
+
+    const titleText = this.add.text(0, -10, text, {
+      fontFamily: "Arial Black, sans-serif",
+      fontSize: "22px",
+      color: "#00f0ff",
+      stroke: "#000000",
+      strokeThickness: 3
+    }).setOrigin(0.5);
+
+    const subTextObj = this.add.text(0, 16, subtext, {
+      fontFamily: "sans-serif",
+      fontSize: "14px",
+      color: "#e2e8f0"
+    }).setOrigin(0.5);
+
+    banner.add([bg, titleText, subTextObj]);
+    this.gameUI.add(banner);
+
+    this.tweens.add({
+      targets: banner,
+      y: 110,
+      duration: 600,
+      ease: "Back.easeOut",
+      onComplete: () => {
+        this.time.delayedCall(2200, () => {
+          this.tweens.add({
+            targets: banner,
+            y: -120,
+            alpha: 0,
+            duration: 500,
+            ease: "Power2",
+            onComplete: () => banner.destroy()
+          });
+        });
+      }
+    });
   }
 
   createCrosshair() {
@@ -2954,6 +3048,69 @@ bullet.body.setAllowGravity(false);
 update(time, delta) {
     if (this.isPlayerDead) {
         return;
+    }
+
+    
+    // Update Boiling Magma & Milestone Progression
+    if (this.magmaFloorGraphics && this.magmaSurfaceY) {
+        const worldW = this.cols * this.tileSize;
+        const wave = Math.sin(time * 0.004) * 5;
+        this.magmaFloorGraphics.clear();
+        this.magmaFloorGraphics.fillStyle(0xd81b60, 0.9);
+        this.magmaFloorGraphics.fillRect(this.mazeOffsetX, this.magmaSurfaceY + wave, worldW, 80);
+        this.magmaFloorGraphics.fillStyle(0xff7043, 0.85);
+        this.magmaFloorGraphics.fillRect(this.mazeOffsetX, this.magmaSurfaceY + 8 + wave, worldW, 70);
+        this.magmaFloorGraphics.fillStyle(0xfff59d, 0.95);
+        this.magmaFloorGraphics.fillRect(this.mazeOffsetX, this.magmaSurfaceY + wave, worldW, 4);
+
+        // Check if player touched the magma
+        if (this.player && this.player.y >= this.magmaSurfaceY - 10 && !this.player.isInvincible && !this.isPlayerDead) {
+            this.handlePlayerHit(this.player, { x: this.player.x, y: this.magmaSurfaceY });
+            window.IndieAudioSynth?.playExplosion();
+        }
+    }
+
+    // Check Altitude Milestones
+    if (this.player && this.rows && this.tileSize && this.passedMilestones) {
+        const totalRows = this.rows;
+        const playerRow = Math.floor((this.player.y - this.mazeOffsetY) / this.tileSize);
+        const floorPct = 1 - (playerRow / totalRows);
+
+        if (floorPct >= 0.33 && !this.passedMilestones.has('F3')) {
+            this.passedMilestones.add('F3');
+            this.showMilestoneBanner('FLOOR 3: THE FORGOTTEN CRYPTS', 'Ascending past subterranean ruins...');
+        }
+        if (floorPct >= 0.66 && !this.passedMilestones.has('F7')) {
+            this.passedMilestones.add('F7');
+            this.showMilestoneBanner('FLOOR 7: THE MOLTEN CORE REACHED!', 'Hazard heat rising! Keep climbing!');
+        }
+        if (floorPct >= 0.95 && !this.passedMilestones.has('SUMMIT')) {
+            this.passedMilestones.add('SUMMIT');
+            this.showMilestoneBanner('SUMMIT ESCAPED: RUNE GATE REACHED!', 'Enter the portal to claim your escape!');
+        }
+    }
+
+    // Procedural Enemy Animation Loops (Dragon wing-beats & Goblin trots)
+    if (this.enemies && this.enemies.children) {
+        this.enemies.children.each(enemy => {
+            if (enemy && enemy.sprite && enemy.active) {
+                if (enemy.type === 'dragon' || (enemy.spriteKey && enemy.spriteKey.includes('dragon'))) {
+                    // Wing-beat flutter
+                    enemy.sprite.scaleY = 1.0 + Math.sin(time * 0.009) * 0.12;
+                    enemy.sprite.scaleX = 1.0 + Math.cos(time * 0.009) * 0.06;
+                } else {
+                    // Goblin trot
+                    const isMoving = Math.abs(enemy.body?.velocity?.x || 0) > 5;
+                    if (isMoving) {
+                        enemy.sprite.rotation = Math.sin(time * 0.015) * 0.15;
+                        enemy.sprite.y = Math.sin(time * 0.02) * 2.5;
+                    } else {
+                        enemy.sprite.rotation = 0;
+                        enemy.sprite.y = 0;
+                    }
+                }
+            }
+        });
     }
 
     if (this.crosshair) {
