@@ -5186,6 +5186,14 @@ window.AethelAudio = {
     }
 };
 
+if (typeof window !== 'undefined') {
+    const unlockAudio = () => {
+        if (window.AethelAudio) window.AethelAudio.getCtx();
+    };
+    window.addEventListener('pointerdown', unlockAudio, { once: true });
+    window.addEventListener('keydown', unlockAudio, { once: true });
+}
+
 window.AethelJuice = {
     floatingText(scene, x, y, msg, color = '#fde047', size = '16px') {
         try {
@@ -5696,6 +5704,29 @@ class BaseScene extends Phaser.Scene {
         this.load.image('treasure_chests', 'assets/images/treasure_chests.png');
         this.load.image('boss_malakar', 'assets/images/boss_malakar.png');
         this.load.image('boss_malakar_enrage', 'assets/images/boss_malakar_enrage.png');
+        this.load.image('core_dawn', 'assets/images/core_dawn.png');
+        this.load.image('core_earth', 'assets/images/core_earth.png');
+        this.load.image('core_flame', 'assets/images/core_flame.png');
+
+        // NPC Dialogue Face Shot Portraits
+        this.load.image('npc_princess_lera', 'assets/images/npc_princess_lera.png');
+        this.load.image('npc_blacksmith', 'assets/images/npc_blacksmith.png');
+        this.load.image('npc_priestess', 'assets/images/npc_priestess.png');
+        this.load.image('npc_ignatius', 'assets/images/npc_ignatius.png');
+        this.load.image('npc_finn', 'assets/images/npc_finn.png');
+        this.load.image('npc_corin', 'assets/images/npc_corin.png');
+        this.load.image('npc_barnaby', 'assets/images/npc_barnaby.png');
+        this.load.image('npc_sylvan', 'assets/images/npc_sylvan.png');
+
+        // NPC World Spritesheets (LPC 64x64 format)
+        this.load.spritesheet('npc_princess_sprite', 'assets/images/npc_princess_sprite.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('npc_blacksmith_sprite', 'assets/images/npc_blacksmith_sprite.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('npc_priestess_sprite', 'assets/images/npc_priestess_sprite.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('npc_ignatius_sprite', 'assets/images/npc_ignatius_sprite.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('npc_finn_sprite', 'assets/images/npc_finn_sprite.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('npc_corin_sprite', 'assets/images/npc_corin_sprite.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('npc_barnaby_sprite', 'assets/images/npc_barnaby_sprite.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('npc_sylvan_sprite', 'assets/images/npc_sylvan_sprite.png', { frameWidth: 64, frameHeight: 64 });
 
         // Tiled Map Assets
         if (typeof mapData !== 'undefined' && mapData.tilesets) {
@@ -5780,7 +5811,7 @@ class BaseScene extends Phaser.Scene {
         this.createAnimations();
 
         if (this.isReturnVisit) {
-            this.player = this.physics.add.sprite(playerSpawnX, playerSpawnY, "south_idle_sprite", "south_idle000.png").setDepth(10).setDisplaySize(60, 60);
+            this.player = this.physics.add.sprite(playerSpawnX, playerSpawnY, "south_idle_sprite", "idle-south000.png").setDepth(10).setDisplaySize(60, 60);
             this.player.body.setSize(14, 18).setOffset(24, 34);
             this.player.setCollideWorldBounds(true);
             this.controlsEnabled = true;
@@ -5869,14 +5900,14 @@ class BaseScene extends Phaser.Scene {
         this.npcGroup = this.physics.add.staticGroup();
         this.npcs = [
             { id: 'elder', name: 'Elder Oakhaven', title: 'High Sage of Aethel', x: 570, y: 870, sprite: 'npc_idle_sprite', isAnimated: true },
-            { id: 'princess', name: 'Princess Lera', title: 'Crown Heir of the Citadel', x: 1150, y: 720, sprite: 'npc_priestess' },
-            { id: 'blacksmith', name: 'Blacksmith Drake', title: 'Forge Master', x: 1420, y: 1180, sprite: 'npc_blacksmith' },
-            { id: 'priestess', name: 'Sean the Priestess', title: 'Sun Devotee', x: 1750, y: 680, sprite: 'npc_priestess' },
-            { id: 'alchemist', name: 'Ignatius', title: 'Master Alchemist', x: 820, y: 1280, sprite: 'npc_ignatius' },
-            { id: 'angler', name: 'Finn the Angler', title: 'River Fisherman', x: 650, y: 1550, sprite: 'npc_finn' },
-            { id: 'bard', name: 'Corin', title: 'Minstrel of the Fall', x: 1050, y: 1020, sprite: 'npc_corin' },
-            { id: 'trader', name: 'Barnaby', title: 'Wandering Merchant', x: 1350, y: 950, sprite: 'npc_barnaby' },
-            { id: 'tailor', name: 'Sylvan', title: 'Citadel Weaver', x: 1600, y: 1300, sprite: 'npc_sylvan' }
+            { id: 'princess', name: 'Princess Lera', title: 'Crown Heir of the Citadel', x: 1150, y: 720, sprite: 'npc_princess_sprite', frame: 18, isLpc: true },
+            { id: 'blacksmith', name: 'Blacksmith Drake', title: 'Forge Master', x: 1420, y: 1180, sprite: 'npc_blacksmith_sprite', frame: 18, isLpc: true },
+            { id: 'priestess', name: 'Sean the Priestess', title: 'Sun Devotee', x: 1750, y: 680, sprite: 'npc_priestess_sprite', frame: 14, isLpc: true },
+            { id: 'alchemist', name: 'Ignatius', title: 'Master Alchemist', x: 820, y: 1280, sprite: 'npc_ignatius_sprite', frame: 14, isLpc: true },
+            { id: 'angler', name: 'Finn the Angler', title: 'River Fisherman', x: 650, y: 1550, sprite: 'npc_finn_sprite', frame: 18, isLpc: true },
+            { id: 'bard', name: 'Corin', title: 'Minstrel of the Fall', x: 1050, y: 1020, sprite: 'npc_corin_sprite', frame: 18, isLpc: true },
+            { id: 'trader', name: 'Barnaby', title: 'Wandering Merchant', x: 1350, y: 950, sprite: 'npc_barnaby_sprite', frame: 18, isLpc: true },
+            { id: 'tailor', name: 'Sylvan', title: 'Citadel Weaver', x: 1600, y: 1300, sprite: 'npc_sylvan_sprite', frame: 18, isLpc: true }
         ];
 
         this.npcSprites = {};
@@ -5886,6 +5917,16 @@ class BaseScene extends Phaser.Scene {
             if (n.isAnimated) {
                 spr = this.physics.add.sprite(n.x, n.y, n.sprite).setDepth(6).setImmovable(true);
                 if (this.anims.exists('npc-idle-south')) spr.anims.play('npc-idle-south', true);
+            } else if (n.isLpc && this.textures.exists(n.sprite)) {
+                spr = this.physics.add.sprite(n.x, n.y, n.sprite, n.frame).setDepth(6).setDisplaySize(52, 60).setImmovable(true);
+                this.tweens.add({
+                    targets: spr,
+                    scaleY: spr.scaleY * 0.96,
+                    duration: 1200 + Math.random() * 400,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
+                });
             } else {
                 const tex = (this.textures.exists(n.sprite)) ? n.sprite : 'npc_idle_sprite';
                 spr = this.physics.add.sprite(n.x, n.y, tex).setDepth(6).setDisplaySize(48, 56).setImmovable(true);
@@ -5931,31 +5972,36 @@ class BaseScene extends Phaser.Scene {
     }
 
     createScreenLockedHUD() {
-        this.hudContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(100);
+        const zoom = (this.cameras && this.cameras.main && this.cameras.main.zoom) ? this.cameras.main.zoom : 1.8;
+        const invZoom = 1 / zoom;
+
+        // Container covers 0..1280, 0..720 in unscaled screen coordinates
+        this.hudContainer = this.add.container(640 - 640 * invZoom, 360 - 360 * invZoom).setScrollFactor(0).setDepth(100);
+        this.hudContainer.setScale(invZoom);
 
         // 1. Top-Left: Player Stats Card
-        const cardBg = this.add.rectangle(130, 48, 240, 76, 0x0f172a, 0.9).setStrokeStyle(2, 0xd4af37).setScrollFactor(0).setDepth(100);
-        this.hudLevelText = this.add.text(25, 20, "LVL 1", { fontSize: '13px', fontFamily: 'Georgia, serif', color: '#fde047', fontStyle: 'bold' }).setScrollFactor(0).setDepth(101);
-        this.hudHpText = this.add.text(80, 20, "HP: 100/100", { fontSize: '12px', color: '#ef4444', fontStyle: 'bold' }).setScrollFactor(0).setDepth(101);
-        this.hudStaminaText = this.add.text(175, 20, "STA: 100", { fontSize: '12px', color: '#22c55e', fontStyle: 'bold' }).setScrollFactor(0).setDepth(101);
-        this.hudGoldText = this.add.text(25, 52, `GOLD: ${window.AethelState ? window.AethelState.gold : 150}`, { fontSize: '12px', color: '#fbbf24', fontStyle: 'bold' }).setScrollFactor(0).setDepth(101);
-        this.hudCoresText = this.add.text(130, 52, "CORES: 0/3", { fontSize: '12px', color: '#38bdf8', fontStyle: 'bold' }).setScrollFactor(0).setDepth(101);
+        const cardBg = this.add.rectangle(130, 48, 240, 76, 0x0f172a, 0.92).setStrokeStyle(2, 0xd4af37);
+        this.hudLevelText = this.add.text(25, 20, "LVL 1", { fontSize: '13px', fontFamily: 'Georgia, serif', color: '#fde047', fontStyle: 'bold' });
+        this.hudHpText = this.add.text(80, 20, "HP: 100/100", { fontSize: '12px', color: '#ef4444', fontStyle: 'bold' });
+        this.hudStaminaText = this.add.text(175, 20, "STA: 100", { fontSize: '12px', color: '#22c55e', fontStyle: 'bold' });
+        this.hudGoldText = this.add.text(25, 52, `GOLD: ${window.AethelState ? window.AethelState.gold : 150}`, { fontSize: '12px', color: '#fbbf24', fontStyle: 'bold' });
+        this.hudCoresText = this.add.text(130, 52, "CORES: 0/3", { fontSize: '12px', color: '#38bdf8', fontStyle: 'bold' });
 
         // 2. Top-Center: Objectives Bar
-        const objCard = this.add.rectangle(this.cameras.main.width / 2, 35, 340, 44, 0x0f172a, 0.9).setStrokeStyle(2, 0x38bdf8).setScrollFactor(0).setDepth(100);
-        this.hudMainObjText = this.add.text(this.cameras.main.width / 2, 24, "[MAIN] Delve into Rune Gate Dungeon", {
+        const objCard = this.add.rectangle(640, 35, 360, 44, 0x0f172a, 0.92).setStrokeStyle(2, 0x38bdf8);
+        this.hudMainObjText = this.add.text(640, 24, "[MAIN] Delve into Rune Gate Dungeon", {
             fontSize: '11px', color: '#fde047', fontStyle: 'bold'
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
-        this.hudSideObjText = this.add.text(this.cameras.main.width / 2, 42, "[SIDE] Speak with Elder Oakhaven & Citizens", {
+        }).setOrigin(0.5);
+        this.hudSideObjText = this.add.text(640, 42, "[SIDE] Speak with Elder Oakhaven & Citizens", {
             fontSize: '10px', color: '#93c5fd'
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
+        }).setOrigin(0.5);
 
-        // 3. Top-Right: $120x120 Real-Time Mini-Map Radar
-        const mmX = this.cameras.main.width - 75;
+        // 3. Top-Right: 120x120 Real-Time Mini-Map Radar
+        const mmX = 1205;
         const mmY = 75;
-        const mmBorder = this.add.rectangle(mmX, mmY, 126, 126, 0x0f172a, 0.9).setStrokeStyle(2, 0xd4af37).setScrollFactor(0).setDepth(100);
-        this.miniMapBg = this.add.graphics().setScrollFactor(0).setDepth(101);
-        this.miniMapEntities = this.add.graphics().setScrollFactor(0).setDepth(102);
+        const mmBorder = this.add.rectangle(mmX, mmY, 126, 126, 0x0f172a, 0.92).setStrokeStyle(2, 0xd4af37);
+        this.miniMapBg = this.add.graphics();
+        this.miniMapEntities = this.add.graphics();
 
         // Draw radar static frame
         this.miniMapBg.fillStyle(0x1e293b, 0.85);
@@ -5968,10 +6014,10 @@ class BaseScene extends Phaser.Scene {
         this.miniMapSize = 120;
 
         // 4. Bottom-Center: Ability Dock
-        const dockBg = this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height - 40, 320, 36, 0x0f172a, 0.9).setStrokeStyle(2, 0xd4af37).setScrollFactor(0).setDepth(100);
-        this.hudAbilityText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height - 40, "[Q] Ability: None | [R] Cast", {
+        const dockBg = this.add.rectangle(640, 680, 360, 38, 0x0f172a, 0.92).setStrokeStyle(2, 0xd4af37);
+        this.hudAbilityText = this.add.text(640, 680, "[Q] Ability: None | [R] Cast", {
             fontSize: '12px', fontFamily: 'Georgia, serif', color: '#fde047', fontStyle: 'bold'
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
+        }).setOrigin(0.5);
 
         this.hudContainer.add([cardBg, this.hudLevelText, this.hudHpText, this.hudStaminaText, this.hudGoldText, this.hudCoresText, objCard, this.hudMainObjText, this.hudSideObjText, mmBorder, this.miniMapBg, this.miniMapEntities, dockBg, this.hudAbilityText]);
 
@@ -5980,26 +6026,36 @@ class BaseScene extends Phaser.Scene {
     }
 
     createCinematicDialogueUI() {
-        this.dialogueContainer = this.add.container(this.cameras.main.width / 2, this.cameras.main.height - 110).setScrollFactor(0).setDepth(150).setVisible(false);
+        const zoom = (this.cameras && this.cameras.main && this.cameras.main.zoom) ? this.cameras.main.zoom : 1.8;
+        const invZoom = 1 / zoom;
 
-        const bg = this.add.rectangle(0, 0, 680, 160, 0x0f172a, 0.95).setStrokeStyle(2, 0xd4af37);
-        this.dialogueNpcBust = this.add.image(270, 0, 'old_man_frontface').setDisplaySize(90, 110);
-        this.dialogueHeroBust = this.add.image(-270, 0, 'player-portrait').setDisplaySize(90, 110);
+        this.dialogueContainer = this.add.container(640 - 640 * invZoom, 360 - 360 * invZoom).setScrollFactor(0).setDepth(150).setVisible(false);
+        this.dialogueContainer.setScale(invZoom);
 
-        this.dialogueSpeakerName = this.add.text(-200, -60, "SPEAKER", {
-            fontSize: '14px', fontFamily: 'Georgia, serif', color: '#fde047', stroke: '#000', strokeThickness: 3, fontStyle: 'bold'
+        // Dialogue panel fits safely from Y=500 to Y=660 (canvas height 720, 60px safe margin)
+        const bg = this.add.rectangle(640, 580, 720, 160, 0x0f172a, 0.96).setStrokeStyle(2, 0xd4af37);
+        this.dialogueHeroBust = this.add.image(350, 580, 'player-portrait').setDisplaySize(96, 116);
+        this.dialogueNpcBust = this.add.image(930, 580, 'old_man_frontface').setDisplaySize(96, 116);
+
+        this.dialogueSpeakerName = this.add.text(420, 520, "SPEAKER", {
+            fontSize: '15px', fontFamily: 'Georgia, serif', color: '#fde047', stroke: '#000', strokeThickness: 3, fontStyle: 'bold'
         });
-        this.dialogueTextBody = this.add.text(-200, -32, "", {
-            fontSize: '12px', fontFamily: 'Georgia, serif', color: '#ffffff', wordWrap: { width: 440 }, lineHeight: 20
+        this.dialogueTextBody = this.add.text(420, 545, "", {
+            fontSize: '13px', fontFamily: 'Georgia, serif', color: '#ffffff', wordWrap: { width: 460 }, lineHeight: 22
         });
-        const promptDismiss = this.add.text(0, 62, "Press [SPACE] or Click to continue...", {
-            fontSize: '10px', color: '#94a3b8'
+        const promptDismiss = this.add.text(640, 642, "Press [SPACE] or Click anywhere to continue...", {
+            fontSize: '11px', color: '#94a3b8'
         }).setOrigin(0.5);
 
         this.dialogueContainer.add([bg, this.dialogueHeroBust, this.dialogueNpcBust, this.dialogueSpeakerName, this.dialogueTextBody, promptDismiss]);
 
         this.input.keyboard.on('keydown-SPACE', () => {
-            if (this.dialogueContainer.visible) this.hideDialogue();
+            if (this.dialogueContainer && this.dialogueContainer.visible) this.hideDialogue();
+        });
+        this.input.on('pointerdown', () => {
+            if (this.dialogueContainer && this.dialogueContainer.visible) {
+                this.hideDialogue();
+            }
         });
     }
 
@@ -6008,6 +6064,32 @@ class BaseScene extends Phaser.Scene {
         this.inConversation = true;
         this.dialogueSpeakerName.setText(name);
         this.dialogueTextBody.setText(text);
+
+        const portraitMap = {
+            'elder': 'old_man_frontface',
+            'princess': 'npc_princess_lera',
+            'blacksmith': 'npc_blacksmith',
+            'priestess': 'npc_priestess',
+            'alchemist': 'npc_ignatius',
+            'angler': 'npc_finn',
+            'bard': 'npc_corin',
+            'trader': 'npc_barnaby',
+            'tailor': 'npc_sylvan',
+            'conduit': 'sunstone_conduit'
+        };
+
+        const texKey = portraitMap[speakerKey] || 'old_man_frontface';
+        if (this.textures.exists(texKey)) {
+            this.dialogueNpcBust.setTexture(texKey).setVisible(true);
+            if (texKey === 'sunstone_conduit') {
+                this.dialogueNpcBust.setDisplaySize(96, 96);
+            } else {
+                this.dialogueNpcBust.setDisplaySize(96, 116);
+            }
+        } else {
+            this.dialogueNpcBust.setVisible(false);
+        }
+
         this.dialogueContainer.setVisible(true);
         if (window.AethelAudio) window.AethelAudio.playChime();
     }
@@ -6135,7 +6217,7 @@ class BaseScene extends Phaser.Scene {
                 onComplete: () => {
                     this.player.anims.play('getting-up', true);
                     this.player.once('animationcomplete', () => {
-                        this.player.setTexture('south_idle_sprite', 'south_idle000.png');
+                        this.player.setTexture('south_idle_sprite', 'idle-south000.png');
                         this.controlsEnabled = true;
                         this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
                         if (window.AethelJuice) window.AethelJuice.floatingText(this, this.player.x, this.player.y - 60, "AWAKEN, STAR CHILD", "#fde047", "18px");
@@ -6338,10 +6420,10 @@ class BaseScene extends Phaser.Scene {
         this.anims.create({ key: 'walk-northeast', frames: this.anims.generateFrameNames('northeast_sprite', { prefix: 'northeast00', start: 0, end: 5, suffix: '.png' }), frameRate: 10, repeat: -1 });
         this.anims.create({ key: 'walk-northwest', frames: this.anims.generateFrameNames('northwest_sprite', { prefix: 'northwest00', start: 0, end: 5, suffix: '.png' }), frameRate: 10, repeat: -1 });
 
-        this.anims.create({ key: 'idle-south', frames: this.anims.generateFrameNames('south_idle_sprite', { prefix: 'south_idle00', start: 0, end: 5, suffix: '.png' }), frameRate: 6, repeat: -1 });
-        this.anims.create({ key: 'idle-north', frames: this.anims.generateFrameNames('north_idle_sprite', { prefix: 'north_idle00', start: 0, end: 5, suffix: '.png' }), frameRate: 6, repeat: -1 });
-        this.anims.create({ key: 'idle-east', frames: this.anims.generateFrameNames('east_idle_sprite', { prefix: 'east_idle00', start: 0, end: 5, suffix: '.png' }), frameRate: 6, repeat: -1 });
-        this.anims.create({ key: 'idle-west', frames: this.anims.generateFrameNames('west_idle_sprite', { prefix: 'west_idle00', start: 0, end: 5, suffix: '.png' }), frameRate: 6, repeat: -1 });
+        this.anims.create({ key: 'idle-south', frames: this.anims.generateFrameNames('south_idle_sprite', { prefix: 'idle-south00', start: 0, end: 5, suffix: '.png' }), frameRate: 6, repeat: -1 });
+        this.anims.create({ key: 'idle-north', frames: this.anims.generateFrameNames('north_idle_sprite', { prefix: 'idle-north00', start: 0, end: 5, suffix: '.png' }), frameRate: 6, repeat: -1 });
+        this.anims.create({ key: 'idle-east', frames: this.anims.generateFrameNames('east_idle_sprite', { prefix: 'idle-east00', start: 0, end: 5, suffix: '.png' }), frameRate: 6, repeat: -1 });
+        this.anims.create({ key: 'idle-west', frames: this.anims.generateFrameNames('west_idle_sprite', { prefix: 'idle-west00', start: 0, end: 5, suffix: '.png' }), frameRate: 6, repeat: -1 });
 
         this.anims.create({
             key: 'portal-spin',
@@ -6360,7 +6442,7 @@ class BaseScene extends Phaser.Scene {
         if (this.textures.exists('npc_idle_sprite')) {
             this.anims.create({
                 key: 'npc-idle-south',
-                frames: this.anims.generateFrameNames('npc_idle_sprite', { prefix: 'oldman_idle00', start: 0, end: 5, suffix: '.png' }),
+                frames: this.anims.generateFrameNames('npc_idle_sprite', { prefix: 'oldman00', start: 0, end: 3, suffix: '.png' }),
                 frameRate: 6,
                 repeat: -1
             });
